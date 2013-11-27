@@ -8,18 +8,19 @@ cross origin resource sharing (CORS) using a simple decorator.
 
 Install the extension with one of the following commands:
 
-    $ easy_install flask-cors
-
+```bash
+$ easy_install flask-cors
+```
 or alternatively if you have pip installed (which you should):
-
-    $ pip install flask-cors
-
+```bash
+$ pip install flask-cors
+```
 
 ## Usage
 
 ### Simple Usage
 
-```
+```python
 from flask import Flask
 from flask.ext.cors import origin
 
@@ -42,4 +43,4 @@ if __name__ == "__main__":
 *  `origin` a list of origins to support
 *  `methods` a list or string of methods to support
 *  `max_age` a timedelta or string to set Access-Control-Max-Age headers
-*  `headers` Headers to set Access-Control-Allow-Headers
+*  `headers` Headers to set as Access-Control-Allow-Headers
