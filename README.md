@@ -22,7 +22,7 @@ $ pip install flask-cors
 
 ```python
 from flask import Flask
-from flask.ext.cors import origin
+from flask.ext.cors import cross_origin
 
 app = Flask(__name__)
 SECRET_KEY = "not actually a secret"
@@ -30,7 +30,7 @@ app.config.from_object(__name__)
 
 
 @app.route("/")
-@origin('*') # allow all origins all methods.
+@cross_origin() # allow all origins all methods.
 def helloWorld():
   return "hello world"
 
