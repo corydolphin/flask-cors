@@ -7,22 +7,23 @@ to add cross origin support to your flask app!
 :copyright: (C) 2013 by Cory Dolphin.
 :license:   MIT/X11, see LICENSE for more details.
 """
-from flask import Flask
+from flask import Flask, request
 
 try:
-  import flask_cors.origin # support local usage without installed package
+  from flask_cors import cross_origin # support local usage without installed package
 except:
-  from flask.ext.cors import origin # this is how you would normally import
+  from flask.ext.cors import cross_origin # this is how you would normally import
 
 app = Flask(__name__)
-SECRET_KEY = "yeah, not actually a secret"
-app.config.from_object(__name__)
 
 
-@app.route("/")
-@origin('*')
+
+@app.route("/", methods=['GET', 'OPTIONS'])
+@cross_origin()
 def helloWorld():
-  return "hello world"
+    return '''<h1>Hello CORS!</h1> Read about my spec at the
+<a href="http://www.w3.org/TR/cors/">W3</a> Or, checkout my documentation
+on <a href="https://github.com/wcdolphin/flask-cors">Github</a>'''
 
 if __name__ == "__main__":
     app.run(debug=True)
