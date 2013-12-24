@@ -7,41 +7,24 @@ cross origin resource sharing (CORS) using a simple decorator.
 
 ## Installation
 
-Install the extension with one of the following commands:
-
-```bash
-$ easy_install flask-cors
-```
-or alternatively if you have pip installed (which you should):
+Install the extension with using pip, or easy_install.
 ```bash
 $ pip install flask-cors
 ```
 
 ## Usage
+This extension exposes a simple decorator to decorate flask routes with. Simply
+add `@cross_origin()` below a call to Flask's `@app.route(..)` incanation to
+accept the default options and allow CORS on a given route.
+
 
 ### Simple Usage
 
 ```python
-from flask import Flask
-from flask.ext.cors import cross_origin
-
-app = Flask(__name__)
-SECRET_KEY = "not actually a secret"
-app.config.from_object(__name__)
-
-
 @app.route("/")
 @cross_origin() # allow all origins all methods.
 def helloWorld():
-  return "hello world"
-
-if __name__ == "__main__":
-    app.run(debug=True)
+  return "Hello, cross-origin-world!"
 ```
 
-### Options
-
-*  `origin` a list of origins to support
-*  `methods` a list or string of methods to support
-*  `max_age` a timedelta or string to set Access-Control-Max-Age headers
-*  `headers` Headers to set as Access-Control-Allow-Headers
+For a full list of options, please see the documentation.

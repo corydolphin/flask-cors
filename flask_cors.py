@@ -5,16 +5,41 @@ from functools import update_wrapper
 AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
 def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
-           headers=None, supports_credentials=True, max_age=None, 
+           headers=None, supports_credentials=False, max_age=None, 
            send_wildcard=True, always_send=True, automatic_options=False):
     '''
-    This function is the decorator which is used to wrap a Flask route with.
+    This function is the decorator which is used to wrap a Flask route with. In
+    the simplest case, simply use the default parameters to allow all origins
+    in what is the most permissive configuration. If this method modifies state
+    or performs authentication which may be brute-forced, you should add some
+    degree of perfection, for example Cross Site Forgery Request protection.
+     
+
     :param origins: The origin, or list of origins which are to be allowed,
         and injected into the returned `Access-Control-Allow-Origin` header
-    :type origins: :class:`list` or `string`
+    :type origins: list or string
 
     :param methods: The methods to be allowed and injected `Access-Control-Allow-Methods`.
-    :type add_context_processor: bool
+    :type methods: list
+
+    :param headers: The list of allowed headers to be injected in  `Access-Control-Allow-Headers`.
+    :type headers: list or string
+
+    :param supports_credentials: TODO. Currently unusued, May be implemented in the future
+    :type supports_credentials: bool
+
+    :param max_age: The maximum time for which this CORS request may be cached. This value is set as the `Access-Control-Max-Age` header.
+    :type max_age: timedelta, integer, string or None
+
+    :param send_wildcard: If True, and the origins parameter is `*`, a wildcard `Access-Control-Allow-Origin` header is sent, rather than echoing the request's `Origin` header.
+    :type send_wildcard: bool
+
+    :param always_send: If True, CORS headers are sent even if there is no `Origin` in the request's headers. 
+    :type always_send: bool
+
+    :param automatic_options: If True, Flask's automatic_options is enabled, otherwise default Flask-Cors behavior is used.
+    :type automatic_options: bool
+
     '''
 
     methods = methods or ['GET','HEAD','POST','OPTIONS','PUT']
