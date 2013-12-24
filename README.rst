@@ -33,7 +33,21 @@ Simple Usage
     def helloWorld():
       return "Hello, cross-origin-world!"
 
-For a full list of options, please see the documentation.
+For a full list of options, please see the full
+`documentation <http://flask-cors.readthedocs.org/en/latest/>`__
+
+Tests
+-----
+
+A simple set of tests is included in ``test.py``. To run, install nose,
+and simply invoke ``nosetests`` or run ``python test.py`` to exercise
+the tests.
+
+Contributing
+------------
+
+Questions, comments or improvements? Please create an issue on Github,
+tweet at me or send me an email.
 
 .. |Build Status| image:: https://travis-ci.org/wcdolphin/flask-cors.png?branch=master
    :target: https://travis-ci.org/wcdolphin/flask-cors

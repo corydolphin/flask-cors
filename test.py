@@ -36,8 +36,7 @@ class DefaultsTestCase(FlaskCorsTestCase):
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/')
-                print("Testing %s, %s" % (verb, result.headers))
-                assert result.headers.get(AccessControlAllowOrigin) == '*'
+                self.assertEqual(result.headers.get(AccessControlAllowOrigin), '*')
 
     def test_wildcard_defaults_origin(self):
         ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
@@ -48,8 +47,7 @@ class DefaultsTestCase(FlaskCorsTestCase):
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/',headers = {'Origin': example_origin})
-                print("Testing %s, %s" % (verb, result.headers))
-                assert result.headers.get(AccessControlAllowOrigin) == '*'
+                self.assertEqual(result.headers.get(AccessControlAllowOrigin),'*')
 
 
 class W3TestCase(FlaskCorsTestCase):
@@ -75,7 +73,7 @@ class W3TestCase(FlaskCorsTestCase):
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/', headers = {'Origin': example_origin})
-                assert result.headers.get(AccessControlAllowOrigin) == example_origin
+                self.assertEqual(result.headers.get(AccessControlAllowOrigin),example_origin)
 
     def test_wildcard_no_origin_header(self):
         ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
@@ -84,4 +82,7 @@ class W3TestCase(FlaskCorsTestCase):
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/')
-                assert AccessControlAllowOrigin not in result.headers
+                self.assertTrue(AccessControlAllowOrigin not in result.headers)
+
+if __name__ == "__main__":
+     unittest.main()
