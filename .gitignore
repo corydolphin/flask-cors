@@ -19,6 +19,9 @@ var
 develop-eggs
 .installed.cfg
 
+docs/.build
+docs/_build
+
 # Pip Installer Log
 pip-log.txt
 
