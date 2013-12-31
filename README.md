@@ -35,3 +35,7 @@ A simple set of tests is included in `test.py`. To run, install nose, and simply
 
 ## Contributing
 Questions, comments or improvements? Please create an issue on Github, tweet at me or send me an email.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/wcdolphin/flask-cors/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
