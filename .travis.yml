@@ -9,3 +9,4 @@ install:
 script:
     - pip install flask nose
     - nosetests
+    - python setup.py install
