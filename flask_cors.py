@@ -1,6 +1,7 @@
 from datetime import timedelta
 from flask import make_response, request, current_app
 from functools import update_wrapper
+from six import string_types
 
 AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
@@ -45,9 +46,9 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
     methods = methods or ['GET','HEAD','POST','OPTIONS','PUT']
     methods = ', '.join(sorted(x.upper() for x in methods))
 
-    if headers is not None and isinstance(headers, basestring):
+    if headers is not None and isinstance(headers, string_types):
         headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origins, basestring):
+    if not isinstance(origins, string_types):
         origins = ', '.join(origins)
     wildcard = origins == '*'
 
