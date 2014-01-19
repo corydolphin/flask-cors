@@ -46,7 +46,7 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
     methods = methods or ['GET','HEAD','POST','OPTIONS','PUT']
     methods = ', '.join(sorted(x.upper() for x in methods))
 
-    if headers is not None and isinstance(headers, string_types):
+    if headers is not None and isinstance(headers, list):
         headers = ', '.join(x.upper() for x in headers)
     if not isinstance(origins, string_types):
         origins = ', '.join(origins)
