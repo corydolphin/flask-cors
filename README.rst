@@ -49,5 +49,9 @@ Contributing
 Questions, comments or improvements? Please create an issue on Github,
 tweet at me or send me an email.
 
+|Bitdeli Badge|
+
 .. |Build Status| image:: https://travis-ci.org/wcdolphin/flask-cors.png?branch=master
    :target: https://travis-ci.org/wcdolphin/flask-cors
+.. |Bitdeli Badge| image:: https://d2weczhvl823v0.cloudfront.net/wcdolphin/flask-cors/trend.png
+   :target: https://bitdeli.com/free
