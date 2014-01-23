@@ -2,6 +2,7 @@ from datetime import timedelta
 from flask import make_response, request, current_app
 from functools import update_wrapper
 from six import string_types
+import collections
 
 AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
@@ -26,7 +27,7 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
     :param headers: The list of allowed headers to be injected in  `Access-Control-Allow-Headers`.
     :type headers: list or string
 
-    :param supports_credentials: TODO. Currently unusued, May be implemented in the future
+    :param supports_credentials: TODO. Currently unusued, May be implemented in the future.
     :type supports_credentials: bool
 
     :param max_age: The maximum time for which this CORS request may be cached. This value is set as the `Access-Control-Max-Age` header.
@@ -44,12 +45,15 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
     '''
 
     methods = methods or ['GET','HEAD','POST','OPTIONS','PUT']
-    methods = ', '.join(sorted(x.upper() for x in methods))
+    methods = ', '.join(sorted(x for x in methods)).upper()
 
-    if headers is not None and isinstance(headers, string_types):
-        headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origins, string_types):
+
+    if not isinstance(headers, string_types) and isinstance(headers, collections.Iterable):
+        headers = ', '.join(x for x in headers)
+
+    if not isinstance(headers, string_types) and isinstance(headers, collections.Iterable):
         origins = ', '.join(origins)
+
     wildcard = origins == '*'
 
     if isinstance(max_age, timedelta):
@@ -73,25 +77,24 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
             else:
                 resp = make_response(f(*args, **kwargs))
 
-            h = resp.headers
 
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             if wildcard:
                 # If the `origins` param is '*', either send the request's origin, or `*`
                 if send_wildcard:
-                    h[AccessControlAllowOrigin] = origins
+                    resp.headers[AccessControlAllowOrigin] = origins
                 else:
-                    h[AccessControlAllowOrigin] = request.headers.get('Origin', '*')
+                    resp.headers[AccessControlAllowOrigin] = request.headers.get('Origin', '*')
             else:
-                h[AccessControlAllowOrigin] = request.headers.get('Origin')
+                resp.headers[AccessControlAllowOrigin] = request.headers.get('Origin')
 
 
-            h['Access-Control-Allow-Methods'] = methods
+            resp.headers['Access-Control-Allow-Methods'] = methods
             if max_age:
-                h['Access-Control-Max-Age'] = str(max_age)
+                resp.headers['Access-Control-Max-Age'] = str(max_age)
             if headers is not None:
-                h['Access-Control-Allow-Headers'] = headers
+                resp.headers['Access-Control-Allow-Headers'] = headers
             return resp
 
         f.required_methods = ['OPTIONS']
