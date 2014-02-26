@@ -29,6 +29,22 @@ class OriginsTestCase(FlaskCorsTestCase):
         def wildcard():
             return 'Welcome!'
 
+        @self.app.route('/test_list')
+        @cross_origin(origins=["Foo","Bar"])
+        def test_list():
+            return 'Welcome!'
+
+        @self.app.route('/test_string')
+        @cross_origin(origins="Foo")
+        def test_string():
+            return 'Welcome!'
+
+        @self.app.route('/test_set')
+        @cross_origin(origins=set(["Foo","Bar"]))
+        def test_set():
+            return 'Welcome!'
+
+
     def test_wildcard_defaults_no_origin(self):
         ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
             header should not be included, according to the w3 spec.
@@ -49,6 +65,33 @@ class OriginsTestCase(FlaskCorsTestCase):
                 result = verb('/',headers = {'Origin': example_origin})
                 self.assertEqual(result.headers.get(AccessControlAllowOrigin),'*')
 
+    def test_list_serialized(self):
+        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
+            header should be echoed back.
+        '''
+        with self.app.test_client() as c:
+            result = c.get('/test_list')
+            self.assertEqual(result.headers.get(AccessControlAllowOrigin),'Foo, Bar')
+
+    def test_string_serialized(self):
+        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
+            header should be echoed back.
+        '''
+        with self.app.test_client() as c:
+            result = c.get('/test_string')
+            self.assertEqual(result.headers.get(AccessControlAllowOrigin),'Foo')
+
+
+    def test_set_serialized(self):
+        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
+            header should be echoed back.
+        '''
+        with self.app.test_client() as c:
+            result = c.get('/test_set')
+
+            allowed = result.headers.get(AccessControlAllowOrigin)
+            self.assertTrue(allowed =='Foo, Bar' or allowed =='Bar, Foo') # Order is not garaunteed
+
 
 class OriginsW3TestCase(FlaskCorsTestCase):
     def setUp(self):
@@ -64,6 +107,7 @@ class OriginsW3TestCase(FlaskCorsTestCase):
                 approach. 
             '''
             return 'Welcome!'
+
 
     def test_wildcard_origin_header(self):
         ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
@@ -84,6 +128,14 @@ class OriginsW3TestCase(FlaskCorsTestCase):
                 result = verb('/')
                 self.assertTrue(AccessControlAllowOrigin not in result.headers)
 
+    def test_wildcard_no_origin_header(self):
+        ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
+            header should not be included.
+        '''
+        with self.app.test_client() as c:
+            for verb in self.iter_verbs(c):
+                result = verb('/')
+                self.assertTrue(AccessControlAllowOrigin not in result.headers)
 
 class HeadersTestCase(FlaskCorsTestCase):
     def setUp(self):
