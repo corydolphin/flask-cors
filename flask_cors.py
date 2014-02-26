@@ -51,8 +51,10 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
     if not isinstance(headers, string_types) and isinstance(headers, collections.Iterable):
         headers = ', '.join(x for x in headers)
 
+    origins_str = str(origins)
     if not isinstance(origins, string_types) and isinstance(origins, collections.Iterable):
-        origins = ', '.join(origins)
+        origins_str = ', '.join(origins)
+
 
     wildcard = origins == '*'
 
@@ -86,8 +88,10 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
                     resp.headers[AccessControlAllowOrigin] = origins
                 else:
                     resp.headers[AccessControlAllowOrigin] = request.headers.get('Origin', '*')
+
+            # If not 'wildcard', send the string-joined-form of the origins header
             else:
-                resp.headers[AccessControlAllowOrigin] = request.headers.get('Origin')
+                resp.headers[AccessControlAllowOrigin] = origins_str
 
 
             resp.headers['Access-Control-Allow-Methods'] = methods
