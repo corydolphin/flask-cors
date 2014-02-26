@@ -51,7 +51,7 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
     if not isinstance(headers, string_types) and isinstance(headers, collections.Iterable):
         headers = ', '.join(x for x in headers)
 
-    if not isinstance(headers, string_types) and isinstance(headers, collections.Iterable):
+    if not isinstance(origins, string_types) and isinstance(origins, collections.Iterable):
         origins = ', '.join(origins)
 
     wildcard = origins == '*'
