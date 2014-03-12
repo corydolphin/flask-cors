@@ -75,13 +75,14 @@ def cross_origin(origins=None, methods=None, headers=None, supports_credentials=
             # Determine origins when in the context of a request
             origins = _origins or current_app.config.get('CORS_ORIGINS', '*')
             origins_str = str(origins)
-            request_origin = request.headers.get('Origin', '')
 
             if not isinstance(origins, string_types) and isinstance(origins, collections.Iterable):
                 origins_str = ', '.join(origins)
 
             # If the Origin header is not present terminate this set of steps.
             # The request is outside the scope of this specification.
+            request_origin = request.headers.get('Origin', '')
+
             if not 'Origin' in request.headers and not always_send:
                 return make_response(f(*args, **kwargs))
 
