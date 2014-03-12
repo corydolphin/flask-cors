@@ -199,7 +199,7 @@ class HeadersTestCase(FlaskCorsTestCase):
 
             allowed = result.headers.get('Access-Control-Allow-Headers')
             # Order is not garaunteed
-            self.assertTrue(allowed == ' Foo, Bar' or allowed == 'Bar, Foo')
+            self.assertTrue(allowed == 'Foo, Bar' or allowed == 'Bar, Foo')
 
 
 if __name__ == "__main__":
