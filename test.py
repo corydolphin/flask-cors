@@ -154,15 +154,6 @@ class OriginsW3TestCase(FlaskCorsTestCase):
                 result = verb('/')
                 self.assertTrue(AccessControlAllowOrigin not in result.headers)
 
-    def test_wildcard_no_origin_header(self):
-        ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
-            header should not be included.
-        '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                result = verb('/')
-                self.assertTrue(AccessControlAllowOrigin not in result.headers)
-
 
 class HeadersTestCase(FlaskCorsTestCase):
     def setUp(self):
