@@ -13,7 +13,7 @@ AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
 class FlaskCorsTestCase(unittest.TestCase):
     def iter_verbs(self,c):
-        ''' A simple helper method to iterate through a range of 
+        ''' A simple helper method to iterate through a range of
             HTTP Verbs and return the test_client bound instance,
             keeping writing our tests as DRY as possible.
         '''
@@ -53,6 +53,23 @@ class OriginsTestCase(FlaskCorsTestCase):
             for verb in self.iter_verbs(c):
                 result = verb('/')
                 self.assertEqual(result.headers.get(AccessControlAllowOrigin), '*')
+
+    def test_app_configured_origins(self):
+        ''' If the application contains a list of origins in the `CORS_ORIGINS` config
+        value, then origins should default to them instead of '*'
+        '''
+        app = Flask(__name__)
+        app.config['CORS_ORIGINS'] = ['Foo', 'Bar']
+
+        @app.route('/')
+        @cross_origin()
+        def wildcard():
+            return 'Welcome!'
+
+        with app.test_client() as c:
+            for verb in self.iter_verbs(c):
+                result = verb('/')
+                self.assertEqual(result.headers.get(AccessControlAllowOrigin), 'Foo, Bar')
 
     def test_wildcard_defaults_origin(self):
         ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
@@ -104,7 +121,7 @@ class OriginsW3TestCase(FlaskCorsTestCase):
                 only if it is actually set. This behavior is most similar to the
                 actual W3 specification, http://www.w3.org/TR/cors/ but
                 is not the default because it is more common to use the wildcard
-                approach. 
+                approach.
             '''
             return 'Welcome!'
 
