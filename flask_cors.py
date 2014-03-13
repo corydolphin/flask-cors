@@ -1,21 +1,31 @@
-from datetime import timedelta
-from flask import make_response, request, current_app
-from functools import update_wrapper
-from six import string_types
+# -*- coding: utf-8 -*-
+"""
+    flask_cors
+    ~~~~~~~~~~
+
+    Flask-CORS extension module
+"""
+
 import collections
+
+from datetime import timedelta
+from functools import update_wrapper
+
+from flask import make_response, request, current_app
+from six import string_types
 
 AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
-def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
-           headers=None, supports_credentials=False, max_age=None, 
-           send_wildcard=True, always_send=True, automatic_options=False):
+
+def cross_origin(origins=None, methods=None, headers=None, supports_credentials=False,
+                 max_age=None, send_wildcard=True, always_send=True, automatic_options=False):
     '''
     This function is the decorator which is used to wrap a Flask route with. In
     the simplest case, simply use the default parameters to allow all origins
     in what is the most permissive configuration. If this method modifies state
     or performs authentication which may be brute-forced, you should add some
     degree of perfection, for example Cross Site Forgery Request protection.
-     
+
 
     :param origins: The origin, or list of origins which are to be allowed,
         and injected into the returned `Access-Control-Allow-Origin` header
@@ -30,31 +40,30 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
     :param supports_credentials: TODO. Currently unusued, May be implemented in the future.
     :type supports_credentials: bool
 
-    :param max_age: The maximum time for which this CORS request may be cached. This value is set as the `Access-Control-Max-Age` header.
+    :param max_age: The maximum time for which this CORS request may be cached. This value is set
+                    as the `Access-Control-Max-Age` header.
     :type max_age: timedelta, integer, string or None
 
-    :param send_wildcard: If True, and the origins parameter is `*`, a wildcard `Access-Control-Allow-Origin` header is sent, rather than echoing the request's `Origin` header.
+    :param send_wildcard: If True, and the origins parameter is `*`, a wildcard
+                          `Access-Control-Allow-Origin` header is sent, rather than echoing the
+                          request's `Origin` header.
     :type send_wildcard: bool
 
-    :param always_send: If True, CORS headers are sent even if there is no `Origin` in the request's headers. 
+    :param always_send: If True, CORS headers are sent even if there is no `Origin` in the
+                        request's headers.
     :type always_send: bool
 
-    :param automatic_options: If True, Flask's automatic_options is enabled, otherwise default Flask-Cors behavior is used.
+    :param automatic_options: If True, Flask's automatic_options is enabled, otherwise default
+                              Flask-Cors behavior is used.
     :type automatic_options: bool
 
     '''
-
-    methods = methods or ['GET','HEAD','POST','OPTIONS','PUT']
+    _origins = origins
+    methods = methods or ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT']
     methods = ', '.join(sorted(x for x in methods)).upper()
-
 
     if not isinstance(headers, string_types) and isinstance(headers, collections.Iterable):
         headers = ', '.join(x for x in headers)
-
-    origins_str = str(origins)
-    if not isinstance(origins, string_types) and isinstance(origins, collections.Iterable):
-        origins_str = ', '.join(origins)
-
 
     wildcard = origins == '*'
 
@@ -63,22 +72,30 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
 
     def decorator(f):
         def wrapped_function(*args, **kwargs):
-            # If the Origin header is not present terminate this set of steps. 
+            # Determine origins when in the context of a request
+            origins = _origins or current_app.config.get('CORS_ORIGINS', '*')
+            origins_str = str(origins)
+
+            if not isinstance(origins, string_types) and isinstance(origins, collections.Iterable):
+                origins_str = ', '.join(origins)
+
+            # If the Origin header is not present terminate this set of steps.
             # The request is outside the scope of this specification.
+            request_origin = request.headers.get('Origin', '')
+
             if not 'Origin' in request.headers and not always_send:
                 return make_response(f(*args, **kwargs))
 
             # If the value of the Origin header is not a case-sensitive match
             # for any of the values in list of origins, do not set any additional
             # headers and terminate this set of steps.
-            elif not wildcard and not always_send and not request.headers.get('Origin', '') in origins:
+            elif not wildcard and not always_send and not request_origin in origins:
                 return make_response(f(*args, **kwargs))
 
             if automatic_options and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
             else:
                 resp = make_response(f(*args, **kwargs))
-
 
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
@@ -93,7 +110,6 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
             else:
                 resp.headers[AccessControlAllowOrigin] = origins_str
 
-
             resp.headers['Access-Control-Allow-Methods'] = methods
             if max_age:
                 resp.headers['Access-Control-Max-Age'] = str(max_age)
@@ -101,8 +117,9 @@ def cross_origin(origins='*', methods=['GET','HEAD','POST','OPTIONS','PUT'],
                 resp.headers['Access-Control-Allow-Headers'] = headers
             return resp
 
+        # Override Flask's default OPTIONS handling
         f.required_methods = ['OPTIONS']
-        f.provide_automatic_options = automatic_options # Override Flask's default OPTIONS handling
+        f.provide_automatic_options = automatic_options
 
         return update_wrapper(wrapped_function, f)
     return decorator
