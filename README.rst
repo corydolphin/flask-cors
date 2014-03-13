@@ -33,6 +33,20 @@ Simple Usage
     def helloWorld():
       return "Hello, cross-origin-world!"
 
+Using defaults
+~~~~~~~~~~~~~~
+
+Alternatively, setting your application's ``CORS_ORIGINS`` configuration
+property will
+
+.. code:: python
+
+    app.config['CORS_ORIGINS'] = ['Foo', 'Bar']
+    @app.route("/")
+    @cross_origin() # will return CORS headers for origins 'Foo' and 'Bar'
+    def helloWorld():
+      return "Hello, cross-origin-world!"
+
 For a full list of options, please see the full
 `documentation <http://flask-cors.readthedocs.org/en/latest/>`__
 
@@ -46,8 +60,9 @@ the tests.
 Contributing
 ------------
 
-Questions, comments or improvements? Please create an issue on Github,
-tweet at me or send me an email.
+Questions, comments or improvements? Please create an issue on
+`Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
+[@wcdolphin](https://twitter.com/wcdolphin) or send me an email.
 
 |Bitdeli Badge|
 

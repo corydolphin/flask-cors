@@ -12,13 +12,13 @@ from setuptools import setup
 
 setup(
     name='Flask-Cors',
-    version='1.1.3',
+    version='1.2.0',
     url='https://github.com/wcdolphin/flask-cors',
     license='MIT',
     author='Cory Dolphin',
     author_email='wcdolphin@gmail.com',
     description="A Flask extension adding a decorator for CORS support",
-    long_description=__doc__,
+    long_description=open('README.rst').read(),
     py_modules=['flask_cors'],
     # if you would be using a package instead use packages instead
     # of py_modules:
