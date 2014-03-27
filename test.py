@@ -202,5 +202,37 @@ class HeadersTestCase(FlaskCorsTestCase):
             self.assertTrue(allowed == 'Foo, Bar' or allowed == 'Bar, Foo')
 
 
+class SupportsCredentialsCase(FlaskCorsTestCase):
+    def setUp(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/test_credentials')
+        @cross_origin(supports_credentials=True)
+        def test_credentials():
+            return 'Credentials!'
+
+        @self.app.route('/test_open')
+        @cross_origin()
+        def test_open():
+            return 'Open!'
+
+    def test_credentialed_request(self):
+        ''' The specified route should return the
+            Access-Control-Allow-Credentials header.
+        '''
+        with self.app.test_client() as c:
+            result = c.get('/test_credentials')
+            header = result.headers.get('Access-Control-Allow-Credentials')
+            self.assertEquals(header, 'true')
+
+    def test_open_request(self):
+        ''' The default behavior should be to disallow credentials.
+        '''
+        with self.app.test_client() as c:
+            result = c.get('/test_open')
+            self.assertTrue('Access-Control-Allow-Credentials' not in
+                result.headers)
+
+
 if __name__ == "__main__":
     unittest.main()

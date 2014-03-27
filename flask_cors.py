@@ -37,7 +37,8 @@ def cross_origin(origins=None, methods=None, headers=None, supports_credentials=
     :param headers: The list of allowed headers to be injected in  `Access-Control-Allow-Headers`.
     :type headers: list or string
 
-    :param supports_credentials: TODO. Currently unusued, May be implemented in the future.
+    :param supports_credentials: If True, issues the `Access-Control-Allow-Credentials` header.
+                                 This allows users to make authenticated requests.
     :type supports_credentials: bool
 
     :param max_age: The maximum time for which this CORS request may be cached. This value is set
@@ -115,6 +116,8 @@ def cross_origin(origins=None, methods=None, headers=None, supports_credentials=
                 resp.headers['Access-Control-Max-Age'] = str(max_age)
             if headers is not None:
                 resp.headers['Access-Control-Allow-Headers'] = headers
+            if supports_credentials:
+                resp.headers['Access-Control-Allow-Credentials'] = 'true'
             return resp
 
         # Override Flask's default OPTIONS handling
