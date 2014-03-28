@@ -17,45 +17,50 @@ from six import string_types
 AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
 
-def cross_origin(origins=None, methods=None, headers=None, supports_credentials=False,
-                 max_age=None, send_wildcard=True, always_send=True, automatic_options=False):
+def cross_origin(origins=None, methods=None, headers=None,
+                 supports_credentials=False, max_age=None, send_wildcard=True,
+                 always_send=True, automatic_options=False):
     '''
     This function is the decorator which is used to wrap a Flask route with. In
     the simplest case, simply use the default parameters to allow all origins
     in what is the most permissive configuration. If this method modifies state
     or performs authentication which may be brute-forced, you should add some
-    degree of perfection, for example Cross Site Forgery Request protection.
+    degree of protection, for example Cross Site Forgery Request protection.
 
 
     :param origins: The origin, or list of origins which are to be allowed,
         and injected into the returned `Access-Control-Allow-Origin` header
     :type origins: list or string
 
-    :param methods: The methods to be allowed and injected `Access-Control-Allow-Methods`.
+    :param methods: The methods to be allowed and injected as the
+        `Access-Control-Allow-Methods` header returned.
     :type methods: list
 
-    :param headers: The list of allowed headers to be injected in  `Access-Control-Allow-Headers`.
+    :param headers: The list of allowed headers to be injected as the
+        `Access-Control-Allow-Headers` header returned.
     :type headers: list or string
 
-    :param supports_credentials: If True, issues the `Access-Control-Allow-Credentials` header.
-                                 This allows users to make authenticated requests.
+    :param supports_credentials: Allows users to make authenticated requests.
+        If true, injects the `Access-Control-Allow-Credentials` header in
+        responses.
+         Note: this option cannot be used in conjuction with a '*' origin
     :type supports_credentials: bool
 
-    :param max_age: The maximum time for which this CORS request may be cached. This value is set
-                    as the `Access-Control-Max-Age` header.
+    :param max_age: The maximum time for which this CORS request may be cached.
+        This value is set as the `Access-Control-Max-Age` header.
     :type max_age: timedelta, integer, string or None
 
     :param send_wildcard: If True, and the origins parameter is `*`, a wildcard
-                          `Access-Control-Allow-Origin` header is sent, rather than echoing the
-                          request's `Origin` header.
+                          `Access-Control-Allow-Origin` header is sent, rather
+                          than echoing the request's `Origin` header.
     :type send_wildcard: bool
 
-    :param always_send: If True, CORS headers are sent even if there is no `Origin` in the
-                        request's headers.
+    :param always_send: If True, CORS headers are sent even if there is no
+        `Origin` in the request's headers.
     :type always_send: bool
 
-    :param automatic_options: If True, Flask's automatic_options is enabled, otherwise default
-                              Flask-Cors behavior is used.
+    :param automatic_options: If True, Flask's automatic_options is enabled,
+        otherwise the default Flask-Cors behavior is used.
     :type automatic_options: bool
 
     '''
@@ -88,8 +93,8 @@ def cross_origin(origins=None, methods=None, headers=None, supports_credentials=
                 return make_response(f(*args, **kwargs))
 
             # If the value of the Origin header is not a case-sensitive match
-            # for any of the values in list of origins, do not set any additional
-            # headers and terminate this set of steps.
+            # for any of the values in list of origins, do not set any
+            # additional headers and terminate this set of steps.
             elif not wildcard and not always_send and not request_origin in origins:
                 return make_response(f(*args, **kwargs))
 
