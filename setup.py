@@ -12,7 +12,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Cors',
-    version='1.2.0',
+    version='1.2.1',
     url='https://github.com/wcdolphin/flask-cors',
     license='MIT',
     author='Cory Dolphin',
