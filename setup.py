@@ -9,10 +9,11 @@
 
 from setuptools import setup
 
+from flask_cors import __version__
 
 setup(
     name='Flask-Cors',
-    version='1.2.1',
+    version=__version__,
     url='https://github.com/wcdolphin/flask-cors',
     license='MIT',
     author='Cory Dolphin',

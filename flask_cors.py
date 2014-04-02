@@ -5,6 +5,7 @@
 
     Flask-CORS extension module
 """
+__version__ = '1.2.1'
 
 import collections
 
