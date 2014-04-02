@@ -5,8 +5,7 @@
 
     Flask-CORS extension module
 """
-__version__ = '1.2.1'
-
+from _version import __version__
 import collections
 
 from datetime import timedelta
