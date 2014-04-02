@@ -9,7 +9,7 @@
 
 from setuptools import setup
 
-from flask_cors import __version__
+from _version import __version__
 
 setup(
     name='Flask-Cors',

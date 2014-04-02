@@ -1,19 +1,11 @@
 language: python
 python:
-- '2.6'
-- '2.7'
-- '3.3'
-- pypy
-install:
-- python setup.py install
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "pypy"
+
 script:
-- pip install flask nose six
-- python setup.py install
-- nosetests
-deploy:
-  provider: pypi
-  user: wcdolphin
-  password:
-    secure: gqpNz25kMn5FVSM23oGofMfXJZdJcOFO0+QYBrvh/D0GEcjwTrL/1oo9HpeUOwC0wfZhY3aPvNSA5FDfjd8YlIBWRnSrOtlGmt0uya3mp3NQgI7+NDdCLmdLmwdGa40PyAjFon2S6vvytm/8+sChHjoE6OeqsoHcDnniWUsN1/k=
-  on:
-    tags: true
+  - "pip install flask nose six"
+  - "python setup.py install"
+  - "nosetests"
