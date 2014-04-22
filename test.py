@@ -14,9 +14,11 @@ except ImportError:
 from flask import Flask
 
 try:
-    from flask_cors import cross_origin  # support local usage without installed package
+    # support local usage without installed package
+    from flask_cors import cross_origin
 except:
-    from flask.ext.cors import cross_origin  # this is how you would normally import
+    # this is how you would normally import
+    from flask.ext.cors import cross_origin
 
 AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
@@ -56,62 +58,77 @@ class OriginsTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
     def test_wildcard_defaults_no_origin(self):
-        ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
-            header should not be included, according to the w3 spec.
+        ''' If there is no Origin header in the request, the
+            Access-Control-Allow-Origin header should not be included,
+            according to the w3 spec.
         '''
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/')
-                self.assertEqual(result.headers.get(AccessControlAllowOrigin), '*')
+                self.assertEqual(result.headers.get(AccessControlAllowOrigin),
+                                 '*')
 
     def test_app_configured_origins(self):
-        ''' If the application contains a list of origins in the `CORS_ORIGINS` config
-        value, then origins should default to them instead of '*'
+        ''' If the application contains a list of origins in the
+            `CORS_ORIGINS` config value, then origins should default to them
+            instead of '*'
         '''
         app = Flask(__name__)
         app.config['CORS_ORIGINS'] = ['Foo', 'Bar']
 
         @app.route('/')
-        @cross_origin(methods=['GET','OPTIONS','HEAD','PUT','POST'])
+        @cross_origin(methods=['GET', 'OPTIONS', 'HEAD', 'PUT', 'POST'])
         def wildcard():
             return 'Welcome!'
 
         with app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/')
-                self.assertEqual(result.headers.get(AccessControlAllowOrigin), 'Foo, Bar')
+                self.assertEqual(
+                    result.headers.get(AccessControlAllowOrigin),
+                    'Foo, Bar'
+                )
 
     def test_wildcard_defaults_origin(self):
-        ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
-            header should be included, if and only if the always_send parameter is
-            `True`, which is the default value.
+        ''' If there is no Origin header in the request, the
+            Access-Control-Allow-Origin header should be included, if and only
+            if the always_send parameter is `True`, which is the default value.
         '''
         example_origin = 'http://example.com'
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/', headers={'Origin': example_origin})
                 self.assertEqual(result.status_code, 200)
-                self.assertEqual(result.headers.get(AccessControlAllowOrigin), '*')
+                self.assertEqual(
+                    result.headers.get(AccessControlAllowOrigin),
+                    '*'
+                )
 
     def test_list_serialized(self):
-        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
-            header should be echoed back.
+        ''' If there is an Origin header in the request, the
+            Access-Control-Allow-Origin header should be echoed.
         '''
         with self.app.test_client() as c:
             result = c.get('/test_list')
-            self.assertEqual(result.headers.get(AccessControlAllowOrigin), 'Foo, Bar')
+            self.assertEqual(
+                result.headers.get(AccessControlAllowOrigin),
+                'Foo, Bar'
+            )
 
     def test_string_serialized(self):
-        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
-            header should be echoed back.
+        ''' If there is an Origin header in the request,
+            the Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
             result = c.get('/test_string')
-            self.assertEqual(result.headers.get(AccessControlAllowOrigin), 'Foo')
+            self.assertEqual(
+                result.headers.get(AccessControlAllowOrigin),
+                'Foo'
+            )
 
     def test_set_serialized(self):
-        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
-            header should be echoed back.
+        ''' If there is an Origin header in the request,
+            the Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
             result = c.get('/test_set')
@@ -129,26 +146,29 @@ class OriginsW3TestCase(FlaskCorsTestCase):
         @cross_origin(origins='*', send_wildcard=False, always_send=False)
         def allowOrigins():
             ''' This sets up flask-cors to echo the request's `Origin` header,
-                only if it is actually set. This behavior is most similar to the
-                actual W3 specification, http://www.w3.org/TR/cors/ but
-                is not the default because it is more common to use the wildcard
-                approach.
+                only if it is actually set. This behavior is most similar to
+                the actual W3 specification, http://www.w3.org/TR/cors/ but
+                is not the default because it is more common to use the
+                wildcard configuration in order to support CDN caching.
             '''
             return 'Welcome!'
 
     def test_wildcard_origin_header(self):
-        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
-            header should be echoed back.
+        ''' If there is an Origin header in the request, the
+            Access-Control-Allow-Origin header should be echoed back.
         '''
         example_origin = 'http://example.com'
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/', headers={'Origin': example_origin})
-                self.assertEqual(result.headers.get(AccessControlAllowOrigin), example_origin)
+                self.assertEqual(
+                    result.headers.get(AccessControlAllowOrigin),
+                    example_origin
+                )
 
     def test_wildcard_no_origin_header(self):
-        ''' If there is no Origin header in the request, the Access-Control-Allow-Origin
-            header should not be included.
+        ''' If there is no Origin header in the request, the
+            Access-Control-Allow-Origin header should not be included.
         '''
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
@@ -176,31 +196,37 @@ class HeadersTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
     def test_list_serialized(self):
-        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
-            header should be echoed back.
+        ''' If there is an Origin header in the request,
+            the Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
             result = c.get('/test_list')
-            self.assertEqual(result.headers.get('Access-Control-Allow-Headers'), 'Foo, Bar')
+            self.assertEqual(
+                result.headers.get('Access-Control-Allow-Headers'),
+                'Foo, Bar'
+            )
 
     def test_string_serialized(self):
-        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
-            header should be echoed back.
+        ''' If there is an Origin header in the request, the
+            Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
             result = c.get('/test_string')
-            self.assertEqual(result.headers.get('Access-Control-Allow-Headers'), 'Foo')
+            self.assertEqual(
+                result.headers.get('Access-Control-Allow-Headers'),
+                'Foo'
+            )
 
     def test_set_serialized(self):
-        ''' If there is an Origin header in the request, the Access-Control-Allow-Origin
-            header should be echoed back.
+        ''' If there is an Origin header in the request, the
+            Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
             result = c.get('/test_set')
 
             allowed = result.headers.get('Access-Control-Allow-Headers')
-            # Order is not garaunteed
-            self.assertTrue(allowed == 'Foo, Bar' or allowed == 'Bar, Foo')
+            # Order is not garaunteed for sets
+            self.assertTrue(allowed in ['Foo, Bar', 'Bar, Foo'])
 
 
 class SupportsCredentialsCase(FlaskCorsTestCase):
@@ -231,8 +257,10 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             result = c.get('/test_open')
-            self.assertTrue('Access-Control-Allow-Credentials' not in
-                result.headers)
+            self.assertTrue(
+                'Access-Control-Allow-Credentials' not in result.headers
+            )
+
 
 class OptionsTestCase(FlaskCorsTestCase):
     def setUp(self):
@@ -248,7 +276,7 @@ class OptionsTestCase(FlaskCorsTestCase):
         def test_no_options_and_not_auto():
             return 'Welcome!'
 
-        @self.app.route('/test_options_and_not_auto',methods=['OPTIONS'])
+        @self.app.route('/test_options_and_not_auto', methods=['OPTIONS'])
         @cross_origin(automatic_options=False)
         def test_options_and_not_auto():
             return 'Welcome!'
@@ -260,12 +288,13 @@ class OptionsTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             result = c.options('/test_default')
-            self.assertEqual(result.status_code,200)
+            self.assertEqual(result.status_code, 200)
             self.assertTrue(AccessControlAllowOrigin in result.headers)
 
-            result = c.options('/test_default', headers={
-                    'Origin': 'http://foo.bar.com/'})
-            self.assertEqual(result.status_code,200)
+            headers = {'Origin': 'http://foo.bar.com/'}
+            result = c.options('/test_default', headers=headers)
+
+            self.assertEqual(result.status_code, 200)
             self.assertTrue(AccessControlAllowOrigin in result.headers)
             self.assertEqual(result.headers[AccessControlAllowOrigin], '*')
 
@@ -277,14 +306,14 @@ class OptionsTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             result = c.options('/test_no_options_and_not_auto')
-            self.assertEqual(result.status_code,200)
+            self.assertEqual(result.status_code, 200)
             self.assertFalse(AccessControlAllowOrigin in result.headers)
 
-            result = c.options('/test_no_options_and_not_auto', headers={
-                    'Origin': 'http://foo.bar.com/'})
-            self.assertEqual(result.status_code,200)
+            headers = {'Origin': 'http://foo.bar.com/'}
+            result = c.options('/test_no_options_and_not_auto',
+                               headers=headers)
+            self.assertEqual(result.status_code, 200)
             self.assertFalse(AccessControlAllowOrigin in result.headers)
-
 
     def test_options_and_not_auto(self):
         '''
@@ -293,16 +322,15 @@ class OptionsTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             result = c.options('/test_options_and_not_auto')
-            self.assertEqual(result.status_code,200)
+            self.assertEqual(result.status_code, 200)
             self.assertTrue(AccessControlAllowOrigin in result.headers)
-            self.assertEqual(result.data, "Welcome!")
+            self.assertEqual(result.data, u"Welcome!")
 
-            result = c.options('/test_options_and_not_auto', headers={
-                               'Origin': 'http://foo.bar.com/'
-                               })
-            self.assertEqual(result.status_code,200)
-            self.assertEqual(result.headers[AccessControlAllowOrigin],'*')
-            self.assertEqual(result.data, "Welcome!")
+            headers = {'Origin': 'http://foo.bar.com/'}
+            result = c.options('/test_options_and_not_auto', headers=headers)
+            self.assertEqual(result.status_code, 200)
+            self.assertEqual(result.headers[AccessControlAllowOrigin], '*')
+            self.assertEqual(result.data, u"Welcome!")
 
 if __name__ == "__main__":
     unittest.main()

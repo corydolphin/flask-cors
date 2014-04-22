@@ -5,7 +5,11 @@ python:
   - "3.3"
   - "pypy"
 
-script:
+install:
+  - "pip install pep8"
   - "pip install flask nose six"
+
+script:
   - "python setup.py install"
   - "nosetests"
+  - "pep8 flask_cors.py"
