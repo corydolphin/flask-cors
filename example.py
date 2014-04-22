@@ -10,11 +10,11 @@ to add cross origin support to your flask app!
 from flask import Flask, request
 
 try:
-    # support local usage without installed package
-    from flask_cors import cross_origin
-except:
     # this is how you would normally import
     from flask.ext.cors import cross_origin
+except:
+    # support local usage without installed package
+    from flask_cors import cross_origin
 
 app = Flask(__name__)
 

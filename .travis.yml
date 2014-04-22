@@ -6,10 +6,14 @@ python:
   - "pypy"
 
 install:
-  - "pip install pep8"
-  - "pip install flask nose six"
+  - "pip install flask six" 
+  - "pip install pep8 coveralls nose"
 
 script:
-  - "python setup.py install"
+  - "nosetests --with-coverage --cover-package=flask_cors"
+  - "python setup.py build install"
   - "nosetests"
+
+after_success:
   - "pep8 flask_cors.py"
+  - "coveralls"
