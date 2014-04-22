@@ -14,11 +14,11 @@ except ImportError:
 from flask import Flask
 
 try:
-    # support local usage without installed package
-    from flask_cors import cross_origin
-except:
     # this is how you would normally import
     from flask.ext.cors import cross_origin
+except:
+    # support local usage without installed package
+    from flask_cors import cross_origin
 
 AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
