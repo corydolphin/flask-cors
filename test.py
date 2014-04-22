@@ -324,13 +324,13 @@ class OptionsTestCase(FlaskCorsTestCase):
             result = c.options('/test_options_and_not_auto')
             self.assertEqual(result.status_code, 200)
             self.assertTrue(AccessControlAllowOrigin in result.headers)
-            self.assertEqual(result.data, u"Welcome!")
+            self.assertEqual(result.data.decode("utf-8"), u"Welcome!")
 
             headers = {'Origin': 'http://foo.bar.com/'}
             result = c.options('/test_options_and_not_auto', headers=headers)
             self.assertEqual(result.status_code, 200)
             self.assertEqual(result.headers[AccessControlAllowOrigin], '*')
-            self.assertEqual(result.data, u"Welcome!")
+            self.assertEqual(result.data.decode("utf-8"), u"Welcome!")
 
 if __name__ == "__main__":
     unittest.main()
