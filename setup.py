@@ -20,7 +20,7 @@ setup(
     author_email='wcdolphin@gmail.com',
     description="A Flask extension adding a decorator for CORS support",
     long_description=open('README.rst').read(),
-    py_modules=['flask_cors'],
+    py_modules=['flask_cors','_version'],
     # if you would be using a package instead use packages instead
     # of py_modules:
     # packages=['flask_sqlite3'],
