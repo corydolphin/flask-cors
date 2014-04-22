@@ -72,7 +72,7 @@ class OriginsTestCase(FlaskCorsTestCase):
         app.config['CORS_ORIGINS'] = ['Foo', 'Bar']
 
         @app.route('/')
-        @cross_origin()
+        @cross_origin(methods=['GET','OPTIONS','HEAD','PUT','POST'])
         def wildcard():
             return 'Welcome!'
 
@@ -90,6 +90,7 @@ class OriginsTestCase(FlaskCorsTestCase):
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/', headers={'Origin': example_origin})
+                self.assertEqual(result.status_code, 200)
                 self.assertEqual(result.headers.get(AccessControlAllowOrigin), '*')
 
     def test_list_serialized(self):
@@ -233,6 +234,75 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
             self.assertTrue('Access-Control-Allow-Credentials' not in
                 result.headers)
 
+class OptionsTestCase(FlaskCorsTestCase):
+    def setUp(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/test_default')
+        @cross_origin()
+        def test_default():
+            return 'Welcome!'
+
+        @self.app.route('/test_no_options_and_not_auto')
+        @cross_origin(automatic_options=False)
+        def test_no_options_and_not_auto():
+            return 'Welcome!'
+
+        @self.app.route('/test_options_and_not_auto',methods=['OPTIONS'])
+        @cross_origin(automatic_options=False)
+        def test_options_and_not_auto():
+            return 'Welcome!'
+
+    def test_defaults(self):
+        '''
+            The default behavior should automatically provide OPTIONS
+            and return CORS headers.
+        '''
+        with self.app.test_client() as c:
+            result = c.options('/test_default')
+            self.assertEqual(result.status_code,200)
+            self.assertTrue(AccessControlAllowOrigin in result.headers)
+
+            result = c.options('/test_default', headers={
+                    'Origin': 'http://foo.bar.com/'})
+            self.assertEqual(result.status_code,200)
+            self.assertTrue(AccessControlAllowOrigin in result.headers)
+            self.assertEqual(result.headers[AccessControlAllowOrigin], '*')
+
+    def test_no_options_and_not_auto(self):
+        '''
+            If automatic_options is False, and the view func does not provide
+            OPTIONS, then Flask's default handling will occur, and no CORS
+            headers will be returned.
+        '''
+        with self.app.test_client() as c:
+            result = c.options('/test_no_options_and_not_auto')
+            self.assertEqual(result.status_code,200)
+            self.assertFalse(AccessControlAllowOrigin in result.headers)
+
+            result = c.options('/test_no_options_and_not_auto', headers={
+                    'Origin': 'http://foo.bar.com/'})
+            self.assertEqual(result.status_code,200)
+            self.assertFalse(AccessControlAllowOrigin in result.headers)
+
+
+    def test_options_and_not_auto(self):
+        '''
+            If OPTIONS is in methods, and automatic_options is False,
+            the view function must return a response.
+        '''
+        with self.app.test_client() as c:
+            result = c.options('/test_options_and_not_auto')
+            self.assertEqual(result.status_code,200)
+            self.assertTrue(AccessControlAllowOrigin in result.headers)
+            self.assertEqual(result.data, "Welcome!")
+
+            result = c.options('/test_options_and_not_auto', headers={
+                               'Origin': 'http://foo.bar.com/'
+                               })
+            self.assertEqual(result.status_code,200)
+            self.assertEqual(result.headers[AccessControlAllowOrigin],'*')
+            self.assertEqual(result.data, "Welcome!")
 
 if __name__ == "__main__":
     unittest.main()

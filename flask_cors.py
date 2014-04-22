@@ -19,7 +19,7 @@ AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
 
 def cross_origin(origins=None, methods=None, headers=None,
                  supports_credentials=False, max_age=None, send_wildcard=True,
-                 always_send=True, automatic_options=False):
+                 always_send=True, automatic_options=True):
     '''
     This function is the decorator which is used to wrap a Flask route with. In
     the simplest case, simply use the default parameters to allow all origins
@@ -59,8 +59,10 @@ def cross_origin(origins=None, methods=None, headers=None,
         `Origin` in the request's headers.
     :type always_send: bool
 
-    :param automatic_options: If True, Flask's automatic_options is enabled,
-        otherwise the default Flask-Cors behavior is used.
+    :param automatic_options: If True, CORS headers will be returned for OPTIONS
+        requests. For use with cross domain POST requests which preflight
+        OPTIONS requests, you will need to specifically allow the Content-Type
+        header.
     :type automatic_options: bool
 
     '''
@@ -125,9 +127,17 @@ def cross_origin(origins=None, methods=None, headers=None,
                 resp.headers['Access-Control-Allow-Credentials'] = 'true'
             return resp
 
-        # Override Flask's default OPTIONS handling
-        f.required_methods = ['OPTIONS']
-        f.provide_automatic_options = automatic_options
+        # If True, intercept OPTIONS requests by modifying the view function
+        # mirroring Flask's default behavior, and wrapping the response with
+        # CORS headers.
+        # 
+        # If f.provide_automatic_options is unset or True, Flask's route
+        # decorator (which is actually wraps the function object we return)
+        # intercepts OPTIONS handling, and requests will not have CORS headers
+        if automatic_options:
+            f.required_methods = getattr(f, 'required_methods', set())
+            f.required_methods.add('OPTIONS')
+            f.provide_automatic_options = False
 
         return update_wrapper(wrapped_function, f)
     return decorator
