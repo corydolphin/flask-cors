@@ -31,6 +31,10 @@ setup(
         'Flask',
         'Six'
     ],
+    tests_require=[
+        'nose'
+    ],
+    test_suite = 'nose.collector',
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
