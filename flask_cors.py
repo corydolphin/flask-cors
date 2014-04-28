@@ -14,8 +14,12 @@ from functools import update_wrapper
 from flask import make_response, request, current_app
 from six import string_types
 
-AccessControlAllowOrigin = 'Access-Control-Allow-Origin'
-
+# Common string constants
+ACL_ORIGIN = 'Access-Control-Allow-Origin'
+ACL_METHODS = 'Access-Control-Allow-Methods'
+ACL_HEADERS = 'Access-Control-Allow-Headers'
+ACL_CREDENTIALS = 'Access-Control-Allow-Credentials'
+ACL_MAX_AGE = 'Access-Control-Max-Age'
 
 def cross_origin(origins=None, methods=None, headers=None,
                  supports_credentials=False, max_age=None, send_wildcard=True,
@@ -116,23 +120,23 @@ def cross_origin(origins=None, methods=None, headers=None,
                 # If the `origins` param is '*', either send the request's
                 # origin, or `*`
                 if send_wildcard:
-                    resp.headers[AccessControlAllowOrigin] = origins
+                    resp.headers[ACL_ORIGIN] = origins
                 else:
                     req_origin = request.headers.get('Origin', '*')
-                    resp.headers[AccessControlAllowOrigin] = req_origin
+                    resp.headers[ACL_ORIGIN] = req_origin
 
             # If not 'wildcard', send the string-joined-form of the
             # origins header
             else:
-                resp.headers[AccessControlAllowOrigin] = origins_str
+                resp.headers[ACL_ORIGIN] = origins_str
 
-            resp.headers['Access-Control-Allow-Methods'] = methods
+            resp.headers[ACL_METHODS] = methods
             if max_age:
-                resp.headers['Access-Control-Max-Age'] = str(max_age)
+                resp.headers[ACL_MAX_AGE] = str(max_age)
             if headers is not None:
-                resp.headers['Access-Control-Allow-Headers'] = headers
+                resp.headers[ACL_HEADERS] = headers
             if supports_credentials:
-                resp.headers['Access-Control-Allow-Credentials'] = 'true'
+                resp.headers[ACL_CREDENTIALS] = 'true'
             return resp
 
         # If True, intercept OPTIONS requests by modifying the view function
