@@ -1,8 +1,3 @@
-.. Flask-Cors documentation master file, created by
-   sphinx-quickstart on Thu Dec 19 13:46:50 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Flask-CORS
 ==========
 
@@ -38,12 +33,37 @@ Simple Usage
     def helloWorld():
       return "Hello, cross-origin-world!"
 
-.. |Build Status| image:: https://travis-ci.org/wcdolphin/flask-cors.png?branch=master
-   :target: https://travis-ci.org/wcdolphin/flask-cors
+Using JSON with Cross Origin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+When using JSON cross origin, browsers will issue a pre-flight OPTIONS
+request for POST requests. In order for browsers to allow POST requests
+with a JSON content type, you must allow the Content-Type header.
+
+.. code:: python
+
+    @app.route("/user/create", methods=['GET','POST'])
+    @cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
+    def cross_origin_json_post():
+      return jsonify(success=True)
+
+Application-wide settings
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Alternatively, setting your application's ``CORS_ORIGINS`` configuration
+property will
+
+.. code:: python
+
+    app.config['CORS_ORIGINS'] = ['Foo', 'Bar']
+
+
+    @app.route("/")
+    @cross_origin() # will return CORS headers for origins 'Foo' and 'Bar'
+    def helloWorld():
+      return "Hello, cross-origin-world!"
 
 Options
 ~~~~~~~
 
 .. autofunction:: flask_cors.cross_origin
-

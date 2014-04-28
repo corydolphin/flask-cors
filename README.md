@@ -27,12 +27,27 @@ def helloWorld():
   return "Hello, cross-origin-world!"
 ```
 
-### Using defaults
+### Using JSON with Cross Origin
+When using JSON cross origin, browsers will issue a pre-flight OPTIONS request
+for POST requests. In order for browsers to allow POST requests with a JSON
+content type, you must allow the Content-Type header.
+
+```python
+@app.route("/user/create", methods=['GET','POST'])
+@cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
+def cross_origin_json_post():
+  return jsonify(success=True)
+```
+
+
+### Application-wide settings
 Alternatively, setting your application's `CORS_ORIGINS` configuration property
 will
 
 ```python
 app.config['CORS_ORIGINS'] = ['Foo', 'Bar']
+
+
 @app.route("/")
 @cross_origin() # will return CORS headers for origins 'Foo' and 'Bar'
 def helloWorld():
@@ -44,7 +59,7 @@ For a full list of options, please see the full [documentation](http://flask-cor
 
 
 ## Tests
-A simple set of tests is included in `test.py`. To run, install nose, and simply invoke `nosetests` or run `python test.py` to exercise the tests. 
+A simple set of tests is included in `test.py`. To run, install nose, and simply invoke `nosetests` or run `python test.py` or `python setup.py test` to exercise the tests. 
 
 ## Contributing
 Questions, comments or improvements? Please create an issue on [Github](https://github.com/wcdolphin/flask-cors), tweet at [@wcdolphin](https://twitter.com/wcdolphin) or send me an email.
