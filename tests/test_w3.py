@@ -34,6 +34,14 @@ class OriginsW3TestCase(FlaskCorsTestCase):
             '''
             return 'Welcome!'
 
+        @self.app.route('/default-origins')
+        @cross_origin(send_wildcard=False, always_send=False)
+        def noWildcard():
+            ''' With the default origins configuration, send_wildcard should
+                still be respected.
+            '''
+            return 'Welcome!'
+
     def test_wildcard_origin_header(self):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
@@ -55,6 +63,22 @@ class OriginsW3TestCase(FlaskCorsTestCase):
             for verb in self.iter_verbs(c):
                 result = verb('/')
                 self.assertTrue(ACL_ORIGIN not in result.headers)
+
+    def test_wildcard_default_origins(self):
+        ''' If there is an Origin header in the request, the
+            Access-Control-Allow-Origin header should be echoed back.
+        '''
+        example_origin = 'http://example.com'
+        with self.app.test_client() as c:
+            for verb in self.iter_verbs(c):
+                result = verb(
+                    '/default-origins',
+                    headers={'Origin': example_origin}
+                )
+                self.assertEqual(
+                    result.headers.get(ACL_ORIGIN),
+                    example_origin
+                )
 
 
 if __name__ == "__main__":
