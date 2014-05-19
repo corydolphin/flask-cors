@@ -85,8 +85,6 @@ def cross_origin(origins=None, methods=None, headers=None,
             and isinstance(headers, collections.Iterable)):
         headers = ', '.join(x for x in headers)
 
-    wildcard = origins == '*'
-
     if isinstance(max_age, timedelta):
         max_age = max_age.total_seconds()
 
@@ -95,6 +93,7 @@ def cross_origin(origins=None, methods=None, headers=None,
             # Determine origins when in the context of a request
             origins = _origins or current_app.config.get('CORS_ORIGINS', '*')
             origins_str = str(origins)
+            wildcard = origins_str == '*'
 
             if(not isinstance(origins, string_types)
                     and isinstance(origins, collections.Iterable)):
