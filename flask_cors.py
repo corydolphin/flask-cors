@@ -78,12 +78,9 @@ def cross_origin(origins=None, methods=None, headers=None,
 
     '''
     _origins = origins
+    _headers = headers
     methods = methods or ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT']
     methods = ', '.join(sorted(x for x in methods)).upper()
-
-    if (not isinstance(headers, string_types)
-            and isinstance(headers, collections.Iterable)):
-        headers = ', '.join(x for x in headers)
 
     if isinstance(max_age, timedelta):
         max_age = max_age.total_seconds()
@@ -98,6 +95,13 @@ def cross_origin(origins=None, methods=None, headers=None,
             if(not isinstance(origins, string_types)
                     and isinstance(origins, collections.Iterable)):
                 origins_str = ', '.join(origins)
+
+            # Determine headers when in the context of the request
+            headers = _headers or current_app.config.get('CORS_HEADERS')
+
+            if (not isinstance(headers, string_types)
+                    and isinstance(headers, collections.Iterable)):
+                headers = ', '.join(x for x in headers)
 
             # If the Origin header is not present terminate this set of steps.
             # The request is outside the scope of this specification.
