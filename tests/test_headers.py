@@ -35,6 +35,23 @@ class HeadersTestCase(FlaskCorsTestCase):
         def test_set():
             return 'Welcome!'
 
+    def test_app_configured_headers(self):
+        ''' If the application contains a list of headers in the
+            `CORS_HEADERS` config value, then headers should default to them.
+        '''
+        app = Flask(__name__)
+        app.config['CORS_HEADERS'] = ['Foo', 'Bar']
+
+        @app.route('/')
+        @cross_origin(methods=['GET', 'OPTIONS', 'HEAD', 'PUT', 'POST'])
+        def wildcard():
+            return 'Welcome!'
+
+        with app.test_client() as c:
+            for verb in self.iter_verbs(c):
+                result = verb('/')
+                self.assertEqual(result.headers.get(ACL_HEADERS), 'Foo, Bar')
+
     def test_list_serialized(self):
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
