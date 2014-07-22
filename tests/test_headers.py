@@ -75,6 +75,7 @@ class HeadersTestCase(FlaskCorsTestCase):
             self.assertTrue(allowed in ['Foo, Bar', 'Bar, Foo'])
 
 
+
 class AppConfigHeadersTestCase(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
