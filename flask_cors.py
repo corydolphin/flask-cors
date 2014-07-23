@@ -129,7 +129,7 @@ def cross_origin(origins=None, methods=None, headers=None, expose_headers=None,
 
             max_age = _max_age or _app_max_age
             if isinstance(max_age, timedelta):
-                max_age = max_age.total_seconds()
+                max_age = int(max_age.total_seconds())
 
             send_wildcard = _send_wildcard or _app_send_wildcard
 
