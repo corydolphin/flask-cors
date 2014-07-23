@@ -8,10 +8,6 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
-
-
-from _version import __version__
-
 import collections
 from datetime import timedelta
 from functools import update_wrapper
@@ -25,6 +21,10 @@ ACL_METHODS = 'Access-Control-Allow-Methods'
 ACL_HEADERS = 'Access-Control-Allow-Headers'
 ACL_CREDENTIALS = 'Access-Control-Allow-Credentials'
 ACL_MAX_AGE = 'Access-Control-Max-Age'
+
+ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT']
+ALL_METHODS_STR = ', '.join(sorted(ALL_METHODS)).upper()
+
 
 def cross_origin(origins=None, methods=None, headers=None,
                  supports_credentials=False, max_age=None, send_wildcard=True,
@@ -79,8 +79,8 @@ def cross_origin(origins=None, methods=None, headers=None,
     '''
     _origins = origins
     _headers = headers
-    methods = methods or ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT']
-    methods = ', '.join(sorted(x for x in methods)).upper()
+    if methods:
+        methods = ', '.join(sorted(methods)).upper()
 
     if isinstance(max_age, timedelta):
         max_age = max_age.total_seconds()
@@ -119,6 +119,7 @@ def cross_origin(origins=None, methods=None, headers=None,
 
             if automatic_options and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
+                resp.headers[ACL_METHODS] = methods or ALL_METHODS_STR
             else:
                 resp = make_response(f(*args, **kwargs))
 
@@ -138,11 +139,15 @@ def cross_origin(origins=None, methods=None, headers=None,
             else:
                 resp.headers[ACL_ORIGIN] = origins_str
 
-            resp.headers[ACL_METHODS] = methods
-            if max_age:
+            if methods is not None:
+                resp.headers[ACL_METHODS] = methods
+
+            if max_age is not None:
                 resp.headers[ACL_MAX_AGE] = str(max_age)
+
             if headers is not None:
                 resp.headers[ACL_HEADERS] = headers
+
             if supports_credentials:
                 resp.headers[ACL_CREDENTIALS] = 'true'
             return resp
