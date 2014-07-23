@@ -111,6 +111,24 @@ class OriginsTestCase(FlaskCorsTestCase):
             self.assertTrue(allowed == 'Foo, Bar' or allowed == 'Bar, Foo')
 
 
+class AppConfigOriginsTestCase(FlaskCorsTestCase):
+    def setUp(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_ORIGINS'] = ['Foo', 'Bar']
+
+        @self.app.route('/test_list')
+        @cross_origin(methods=['GET', 'OPTIONS', 'HEAD', 'PUT', 'POST'])
+        def wildcard():
+            return 'Welcome!'
+
+    def test_list_serialized(self):
+        ''' If there is an Origin header in the request, the
+            Access-Control-Allow-Origin header should be echoed.
+        '''
+        with self.app.test_client() as c:
+            result = c.get('/test_list')
+            self.assertEqual(result.headers.get(ACL_ORIGIN), 'Foo, Bar')
+
 
 if __name__ == "__main__":
     unittest.main()
