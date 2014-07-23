@@ -72,7 +72,7 @@ class OriginsTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             result = c.get('/test_list')
-            self.assertEqual(result.headers.get(ACL_ORIGIN), 'Foo, Bar')
+            self.assertEqual(result.headers.get(ACL_ORIGIN), 'Bar, Foo')
 
     def test_string_serialized(self):
         ''' If there is an Origin header in the request,
@@ -91,7 +91,7 @@ class OriginsTestCase(FlaskCorsTestCase):
 
             allowed = result.headers.get(ACL_ORIGIN)
             # Order is not garaunteed
-            self.assertTrue(allowed == 'Foo, Bar' or allowed == 'Bar, Foo')
+            self.assertEqual(allowed, 'Bar, Foo')
 
 
 class AppConfigOriginsTestCase(FlaskCorsTestCase):
@@ -108,7 +108,7 @@ class AppConfigOriginsTestCase(FlaskCorsTestCase):
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
                 result = verb('/test_list')
-                self.assertEqual(result.headers.get(ACL_ORIGIN), 'Foo, Bar')
+                self.assertEqual(result.headers.get(ACL_ORIGIN), 'Bar, Foo')
 
 
 if __name__ == "__main__":

@@ -102,13 +102,13 @@ def cross_origin(origins=None, methods=None, headers=None,
 
             # Determine origins when in the context of a request
             origins = _origins or _app_origins or '*'
-            origins_str = _flexible_str(origins)
+            origins_str = _flexible_str(origins, sort=True)
             wildcard = origins_str == '*'
 
             # Determine headers when in the context of the request
             headers = _headers or _app_headers
             if headers is not None:
-                headers = _flexible_str(headers)
+                headers = _flexible_str(headers, sort=True)
 
             # Determine allowed methods when in the context of the request
             methods = _methods or _app_methods
