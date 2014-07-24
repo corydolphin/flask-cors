@@ -19,15 +19,17 @@ from six import string_types
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
 ACL_METHODS = 'Access-Control-Allow-Methods'
 ACL_HEADERS = 'Access-Control-Allow-Headers'
+ACL_EXPOSE_HEADERS = 'Access-Control-Expose-Headers'
 ACL_CREDENTIALS = 'Access-Control-Allow-Credentials'
 ACL_MAX_AGE = 'Access-Control-Max-Age'
+
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT']
 ALL_METHODS_STR = ', '.join(sorted(ALL_METHODS)).upper()
 
 
-def cross_origin(origins=None, methods=None, headers=None,
-                 supports_credentials=False, max_age=None, send_wildcard=True,
+def cross_origin(origins=None, methods=None, headers=None, expose_headers=None,
+                 supports_credentials=False,  max_age=None, send_wildcard=True,
                  always_send=True, automatic_options=True):
     '''
     This function is the decorator which is used to wrap a Flask route with.
@@ -48,6 +50,10 @@ def cross_origin(origins=None, methods=None, headers=None,
 
     :param headers: The list of allowed headers to be injected as the
         `Access-Control-Allow-Headers` header returned.
+    :type headers: list or string
+
+    :param expose_headers: The list of headers to be exposed to browsers
+        through the  `Access-Control-Expose-Headers` header returned.
     :type headers: list or string
 
     :param supports_credentials: Allows users to make authenticated requests.
@@ -78,31 +84,60 @@ def cross_origin(origins=None, methods=None, headers=None,
 
     '''
     _origins = origins
+    _methods = methods
     _headers = headers
-    if methods:
-        methods = ', '.join(sorted(methods)).upper()
-
-    if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
+    _expose_headers = expose_headers
+    _credentials = supports_credentials
+    _max_age = max_age
+    _send_wildcard = send_wildcard
+    _always_send = always_send
+    _automatic_options = automatic_options
 
     def decorator(f):
         def wrapped_function(*args, **kwargs):
-            # Determine origins when in the context of a request
-            origins = _origins or current_app.config.get('CORS_ORIGINS', '*')
-            origins_str = str(origins)
+            # Handle setting of Flask-Cors parameters
+            _app_origins = current_app.config.get('CORS_ORIGINS')
+            _app_methods = current_app.config.get('CORS_METHODS')
+            _app_headers = current_app.config.get('CORS_HEADERS')
+            _app_expose_headers = current_app.config.get('CORS_EXPOSE_HEADERS')
+            _app_credentials = current_app.config.get(
+                'CORS_SUPPORTS_CREDENTIALS')
+            _app_max_age = current_app.config.get('CORS_MAX_AGE')
+            _app_send_wildcard = current_app.config.get(
+                'CORS_SEND_WILDCARD')
+            _app_always_send = current_app.config.get('CORS_ALWAYS_SEND')
+            _app_automatic_options = current_app.config.get('CORS_ALWAYS_SEND')
+
+            # Default origins is wildcard
+            origins = _origins or _app_origins or '*'
+            origins_str = _flexible_str(origins, sort=True)
             wildcard = origins_str == '*'
 
-            if(not isinstance(origins, string_types)
-                    and isinstance(origins, collections.Iterable)):
-                origins_str = ', '.join(origins)
+            methods = _methods or _app_methods
+            if methods is not None:
+                methods = _flexible_str(methods, sort=True).upper()
 
-            # Determine headers when in the context of the request
-            headers = _headers or current_app.config.get('CORS_HEADERS')
+            headers = _headers or _app_headers
+            if headers is not None:
+                headers = _flexible_str(headers, sort=True)
 
-            if (not isinstance(headers, string_types)
-                    and isinstance(headers, collections.Iterable)):
-                headers = ', '.join(x for x in headers)
+            expose_headers = _expose_headers or _app_expose_headers
+            if expose_headers is not None:
+                expose_headers = _flexible_str(expose_headers, sort=True)
 
+            supports_credentials = _credentials or _app_credentials
+
+            max_age = _max_age or _app_max_age
+            if isinstance(max_age, timedelta):
+                max_age = int(max_age.total_seconds())
+
+            send_wildcard = _send_wildcard or _app_send_wildcard
+
+            always_send = _always_send or _app_always_send
+
+            automatic_options = _automatic_options or _app_automatic_options
+
+            # Begin actual CORS handling
             # If the Origin header is not present terminate this set of steps.
             # The request is outside the scope of this specification.
             request_origin = request.headers.get('Origin', '')
@@ -126,13 +161,10 @@ def cross_origin(origins=None, methods=None, headers=None,
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             if wildcard:
-                # If the `origins` param is '*', either send the request's
-                # origin, or `*`
                 if send_wildcard:
                     resp.headers[ACL_ORIGIN] = origins
                 else:
-                    req_origin = request.headers.get('Origin', '*')
-                    resp.headers[ACL_ORIGIN] = req_origin
+                    resp.headers[ACL_ORIGIN] = request_origin
 
             # If not 'wildcard', send the string-joined-form of the
             # origins header
@@ -142,18 +174,22 @@ def cross_origin(origins=None, methods=None, headers=None,
             if methods is not None:
                 resp.headers[ACL_METHODS] = methods
 
-            if max_age is not None:
-                resp.headers[ACL_MAX_AGE] = str(max_age)
-
             if headers is not None:
                 resp.headers[ACL_HEADERS] = headers
 
+            if expose_headers is not None:
+                resp.headers[ACL_EXPOSE_HEADERS] = expose_headers
+
+            if max_age is not None:
+                resp.headers[ACL_MAX_AGE] = max_age
+
             if supports_credentials:
                 resp.headers[ACL_CREDENTIALS] = 'true'
+
             return resp
 
         # If True, intercept OPTIONS requests by modifying the view function
-        # mirroring Flask's default behavior, and wrapping the response with
+        # replicating Flask's default behavior, and wrapping the response with
         # CORS headers.
         #
         # If f.provide_automatic_options is unset or True, Flask's route
@@ -166,3 +202,14 @@ def cross_origin(origins=None, methods=None, headers=None,
 
         return update_wrapper(wrapped_function, f)
     return decorator
+
+
+def _flexible_str(obj, sort=False):
+    if(not isinstance(obj, string_types)
+            and isinstance(obj, collections.Iterable)):
+        if sort:
+            return ', '.join(str(item) for item in sorted(obj))
+        else:
+            return ', '.join(str(item) for item in obj)
+    else:
+        return str(obj)
