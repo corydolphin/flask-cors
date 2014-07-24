@@ -41,9 +41,22 @@ def cross_origin_json_post():
 
 
 ### Application-wide settings
-Alternatively, setting your application's `CORS_ORIGINS` or `CORS_HEADERS`
-configuration property will effectively change the default value for your
-application, while still allowing you to override it on a per-resource basis:
+Alternatively, you can set any of these options in an app's config
+object. Setting these at the application level effectively changes the
+default value for your application, while still allowing you to override
+it on a per-resource basis.
+
+The application-wide configuration options are creatively prefixed with CORS_
+e.g.
+* CORS_ORIGINS
+* CORS_METHODS
+* CORS_HEADERS
+* CORS_EXPOSE_HEADERS
+* CORS_ALWAYS_SEND
+* CORS_MAX_AGE
+* CORS_SEND_WILDCARD
+* CORS_ALWAYS_SEND
+* CORS_AUTOMATIC_OPTIONS
 
 ```python
 app.config['CORS_ORIGINS'] = ['https://foo.com', 'http://www.bar.com']

@@ -50,10 +50,15 @@ with a JSON content type, you must allow the Content-Type header.
 Application-wide settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Alternatively, setting your application's ``CORS_ORIGINS`` or
-``CORS_HEADERS`` configuration property will effectively change the
+Alternatively, you can set any of these options in an app's config
+object. Setting these at the application level effectively changes the
 default value for your application, while still allowing you to override
-it on a per-resource basis:
+it on a per-resource basis.
+
+The application-wide configuration options are creatively prefixed with
+CORS\_ e.g. \* CORS\_ORIGINS \* CORS\_METHODS \* CORS\_HEADERS \*
+CORS\_EXPOSE\_HEADERS \* CORS\_ALWAYS\_SEND \* CORS\_MAX\_AGE \*
+CORS\_SEND\_WILDCARD \* CORS\_ALWAYS\_SEND \* CORS\_AUTOMATIC\_OPTIONS
 
 .. code:: python
 
