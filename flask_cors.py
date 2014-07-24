@@ -106,7 +106,9 @@ def cross_origin(origins=None, methods=None, headers=None, expose_headers=None,
             _app_send_wildcard = current_app.config.get(
                 'CORS_SEND_WILDCARD')
             _app_always_send = current_app.config.get('CORS_ALWAYS_SEND')
-            _app_automatic_options = current_app.config.get('CORS_ALWAYS_SEND')
+            _app_automatic_options = current_app.config.get(
+                'CORS_AUTOMATIC_OPTIONS'
+            )
 
             # Default origins is wildcard
             origins = _origins or _app_origins or '*'
