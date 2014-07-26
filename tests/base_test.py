@@ -30,5 +30,5 @@ class FlaskCorsTestCase(unittest.TestCase):
             HTTP Verbs and return the test_client bound instance,
             keeping writing our tests as DRY as possible.
         '''
-        for verb in ['get', 'head', 'options']:
+        for verb in ['get']:
             yield getattr(c, verb)
