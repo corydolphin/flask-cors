@@ -28,9 +28,15 @@ on <a href="https://github.com/wcdolphin/flask-cors">Github</a>'''
 
 
 @app.route("/user/create", methods=['GET','POST'])
-@cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
+@cross_origin(headers=['Content-Type'], send_wildcard=False) # Send Access-Control-Allow-Headers
 def cross_origin_json_post():
   return jsonify(success=True)
 
+
+@app.route("/wild")
+def all():
+    return "foo"
+
 if __name__ == "__main__":
+    # FlaskCorsApp(app)
     app.run(debug=True)
