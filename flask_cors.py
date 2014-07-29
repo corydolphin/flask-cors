@@ -30,12 +30,13 @@ ALL_METHODS_STR = ', '.join(sorted(ALL_METHODS)).upper()
 CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_HEADERS',
                   'CORS_EXPOSE_HEADERS', 'CORS_SUPPORTS_CREDENTIALS',
                   'CORS_SEND_WILDCARD', 'CORS_ALWAYS_SEND',
-                  'CORS_AUTOMATIC_OPTIONS']
+                  'CORS_AUTOMATIC_OPTIONS', 'CORS_VARY_HEADER']
 
 _defaults_dict = dict(origins='*',
                       always_send=True,
                       automatic_options=True,
-                      send_wildcard=True)
+                      send_wildcard=True,
+                      vary_header=True)
 
 
 def cross_origin(*args, **kwargs):
@@ -175,6 +176,11 @@ def _set_cors_headers(resp, options):
         if request.method == 'OPTIONS':
             resp.headers[ACL_METHODS] = options.get('methods',
                                                     ALL_METHODS_STR)
+
+        # http://www.w3.org/TR/cors/#resource-implementation
+        if resp.headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
+            vary = ['Origin', resp.headers.get('Vary', None)]
+            resp.headers['Vary'] = ', '. join(v for v in vary if v is not None)
 
 
 def _get_app_kwarg_dict(app=current_app):
