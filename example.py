@@ -7,7 +7,7 @@ to add cross origin support to your flask app!
 :copyright: (C) 2013 by Cory Dolphin.
 :license:   MIT/X11, see LICENSE for more details.
 """
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 
 try:
     # this is how you would normally import
@@ -27,10 +27,10 @@ def helloWorld():
 on <a href="https://github.com/wcdolphin/flask-cors">Github</a>'''
 
 
-@app.route("/user/create", methods=['GET','POST'])
-@cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
+@app.route("/user/create", methods=['GET', 'POST'])
+@cross_origin(headers=['Content-Type'])
 def cross_origin_json_post():
-  return jsonify(success=True)
+    return jsonify(success=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
