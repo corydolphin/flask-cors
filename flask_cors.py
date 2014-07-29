@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    test
+    flask_cors
     ~~~~
     Flask-CORS is a simple extension to Flask allowing you to support cross
     origin resource sharing (CORS) using a simple decorator.
