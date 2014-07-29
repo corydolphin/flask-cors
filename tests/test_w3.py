@@ -19,6 +19,7 @@ except:
     # support local usage without installed package
     from flask_cors import *
 
+
 class OriginsW3TestCase(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
