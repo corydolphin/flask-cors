@@ -20,5 +20,6 @@ deploy:
   password:
     secure: PrKEfSZX/IBwy/1TtocCDVNE9inepYeCoChFQ7MXxC49ytbEjLL8xcv57MSnFgOtMuVxzikjkrplBlDe0+gNtTW8vQQWMg6n2I/rkgI8tIJ+RAwWMBvVDNjtdziBkVlkcfOFHYZ6NHZ1SH/FQ1GCicQF8LSsBnMLJZOJ+RVjs5Q=
   on:
+    all_branches: true
     tags: true
     repo: wcdolphin/flask-cors
