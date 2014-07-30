@@ -25,7 +25,6 @@ ACL_MAX_AGE = 'Access-Control-Max-Age'
 
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT']
-ALL_METHODS_STR = ', '.join(sorted(ALL_METHODS)).upper()
 
 CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_HEADERS',
                   'CORS_EXPOSE_HEADERS', 'CORS_SUPPORTS_CREDENTIALS',
@@ -45,40 +44,40 @@ def cross_origin(*args, **kwargs):
     In the simplest case, simply use the default parameters to allow all
     origins in what is the most permissive configuration. If this method
     modifies state or performs authentication which may be brute-forced, you
-    should add some degree of protection, for example Cross Site Forgery
+    should add some degree of protection, such as Cross Site Forgery
     Request protection.
 
 
-    :param origins: The origin, or list of origins which are to be allowed,
-        and injected into the returned `Access-Control-Allow-Origin` header
+    :param origins: The origin, or list of origins to allow requests from.
     :type origins: list or string
 
-    :param methods: The methods to be allowed and injected as the
-        `Access-Control-Allow-Methods` header returned.
+    :param methods: The method or list of methods which the allowed origins
+        are allowed to access.
     :type methods: list
 
-    :param headers: The list of allowed headers to be injected as the
-        `Access-Control-Allow-Headers` header returned.
+    :param headers: The header or list of header field names which can be used
+        when this resource is accessed by allowed origins.
     :type headers: list or string
 
-    :param expose_headers: The list of headers to be exposed to browsers
-        through the  `Access-Control-Expose-Headers` header returned.
+    :param expose_headers: The header or list of headers which are are safe to
+        expose to browsers.
     :type headers: list or string
 
     :param supports_credentials: Allows users to make authenticated requests.
         If true, injects the `Access-Control-Allow-Credentials` header in
         responses.
-         Note: this option cannot be used in conjuction with a '*' origin
+        Note: According to the W3 spec, this option cannot be used in
+        conjuction with a '*' origin
+
     :type supports_credentials: bool
 
     :param max_age: The maximum time for which this CORS request maybe cached.
-                    This value is set as the `Access-Control-Max-Age` header.
+        This value is set as the `Access-Control-Max-Age` header.
     :type max_age: timedelta, integer, string or None
 
     :param send_wildcard: If True, and the origins parameter is `*`, a
-                          wildcard `Access-Control-Allow-Origin` header is
-                          sent, rather than echoing the request's `Origin`
-                          header.
+        wildcard `Access-Control-Allow-Origin` header is sent, rather than
+        the request's `Origin` header.
     :type send_wildcard: bool
 
     :param always_send: If True, CORS headers are sent even if there is no
@@ -89,6 +88,17 @@ def cross_origin(*args, **kwargs):
         OPTIONS requests. For use with cross domain POST requests which
         preflight OPTIONS requests, you will need to specifically allow
         the Content-Type header.
+    :type automatic_options: bool
+
+    :param vary_header: If True, the header Vary: Origin will be returned
+        as per suggestion by the W3 implementation guidelines. Setting this
+        header when the `Access-Control-Allow-Origin` is dynamically generated
+        e.g. when there is more than one allowed origin, and any Origin other
+        than '*' is returned,
+        informing CDNs and other caches that the CORS headers are dynamic, and
+        cannot be re-used.
+
+        If Fals, the Vary header will never be injected or altered.
     :type automatic_options: bool
 
     '''
@@ -173,8 +183,8 @@ def _set_cors_headers(resp, options):
             resp.headers[ACL_CREDENTIALS] = 'true'
 
         if request.method == 'OPTIONS':
-            resp.headers[ACL_METHODS] = options.get('methods',
-                                                    ALL_METHODS_STR)
+            resp.headers[ACL_METHODS] = options.get('methods', _flexible_str(
+                ALL_METHODS))
 
         # http://www.w3.org/TR/cors/#resource-implementation
         if resp.headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
