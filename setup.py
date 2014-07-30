@@ -22,7 +22,7 @@ setup(
     author_email='wcdolphin@gmail.com',
     description="A Flask extension adding a decorator for CORS support",
     long_description=open('README.rst').read(),
-    py_modules=['flask_cors','_version'],
+    py_modules=['flask_cors', '_version'],
     # if you would be using a package instead use packages instead
     # of py_modules:
     # packages=['flask_sqlite3'],
@@ -36,13 +36,21 @@ setup(
     tests_require=[
         'nose'
     ],
-    test_suite = 'nose.collector',
+    test_suite='nose.collector',
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.1',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ]
