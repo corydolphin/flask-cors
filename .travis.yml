@@ -1,19 +1,24 @@
 language: python
 python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
-  - "pypy"
-
+- '2.6'
+- '2.7'
+- '3.3'
+- pypy
 install:
-  - "pip install pep8 coveralls"
-
+- pip install pep8 coveralls
 script:
-  - "python setup.py test"
-  - "python setup.py build install"
-  - "coverage erase"
-  - "nosetests --with-coverage --cover-package=flask_cors"
-
+- python setup.py test
+- python setup.py build install
+- coverage erase
+- nosetests --with-coverage --cover-package=flask_cors
 after_success:
-  - "pep8 flask_cors.py"
-  - "coveralls"
+- pep8 flask_cors.py
+- coveralls
+deploy:
+  provider: pypi
+  user: wcdolphin
+  password:
+    secure: PrKEfSZX/IBwy/1TtocCDVNE9inepYeCoChFQ7MXxC49ytbEjLL8xcv57MSnFgOtMuVxzikjkrplBlDe0+gNtTW8vQQWMg6n2I/rkgI8tIJ+RAwWMBvVDNjtdziBkVlkcfOFHYZ6NHZ1SH/FQ1GCicQF8LSsBnMLJZOJ+RVjs5Q=
+  on:
+    tags: true
+    repo: wcdolphin/flask-cors
