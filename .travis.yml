@@ -6,6 +6,8 @@ python:
 - pypy
 install:
 - pip install pep8 coveralls
+- pip install -U "pip>=1.4" "setuptools>=0.9" "wheel>=0.21"
+
 script:
 - python setup.py test
 - python setup.py build install
