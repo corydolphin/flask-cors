@@ -41,8 +41,7 @@ class MaxAgeTestCase(FlaskCorsTestCase):
             return 'Open!'
 
     def test_defaults(self):
-        ''' By default, Access-Control-Allow-Methods should only be returned
-            if the client makes an OPTIONS request.
+        ''' By default, no max-age headers should be returned
         '''
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
@@ -73,6 +72,38 @@ class MaxAgeTestCase(FlaskCorsTestCase):
                     verb('/test_time_delta').headers.get(ACL_MAX_AGE),
                     '600'
                 )
+
+
+class AppConfigMaxAgeTestCase(FlaskCorsTestCase):
+    def setUp(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_MAX_AGE'] = 600
+
+        @self.app.route('/test_string')
+        @cross_origin()
+        def test_string_max_age():
+            return 'Welcome!'
+
+        @self.app.route('/test_override')
+        @cross_origin(max_age=900)
+        def test_override():
+            return 'Welcome!'
+
+    def test_string(self):
+        ''' If the methods parameter is defined, always return the allowed
+            methods defined by the user.
+        '''
+        for resp in self.iter_responses('/test_string'):
+            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
+
+    def test_override(self):
+        ''' If the methods parameter is defined, always return the allowed
+            methods defined by the user.
+        '''
+        # timedelta.total_seconds is not available in older versions of Python
+
+        for resp in self.iter_responses('/test_override'):
+            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '900')
 
 
 if __name__ == "__main__":
