@@ -32,3 +32,9 @@ class FlaskCorsTestCase(unittest.TestCase):
         '''
         for verb in ['get', 'head', 'options']:
             yield getattr(c, verb)
+
+    def iter_responses(self, path, verbs=['get', 'head', 'options']):
+        with self.app.test_client() as c:
+            for verb in verbs:
+                yield getattr(c, verb.lower())(path)
+

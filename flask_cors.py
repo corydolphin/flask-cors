@@ -28,7 +28,7 @@ ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT']
 
 CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_HEADERS',
                   'CORS_EXPOSE_HEADERS', 'CORS_SUPPORTS_CREDENTIALS',
-                  'CORS_SEND_WILDCARD', 'CORS_ALWAYS_SEND',
+                  'CORS_MAX_AGE', 'CORS_SEND_WILDCARD', 'CORS_ALWAYS_SEND',
                   'CORS_AUTOMATIC_OPTIONS', 'CORS_VARY_HEADER']
 
 _defaults_dict = dict(origins='*',
