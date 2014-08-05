@@ -14,8 +14,6 @@ try:
 except ImportError:
     import unittest
 
-from flask import Flask
-
 try:
     # this is how you would normally import
     from flask.ext.cors import *
@@ -33,8 +31,15 @@ class FlaskCorsTestCase(unittest.TestCase):
         for verb in ['get', 'head', 'options']:
             yield getattr(c, verb)
 
-    def iter_responses(self, path, verbs=['get', 'head', 'options']):
+    def iter_responses(self, path, verbs=['get', 'head', 'options'], **kwargs):
         with self.app.test_client() as c:
             for verb in verbs:
-                yield getattr(c, verb.lower())(path)
+                yield getattr(c, verb.lower())(path, **kwargs)
 
+
+class AppConfigTest(object):
+    def setUp(self):
+        self.app = None
+
+    def tearDown(self):
+        self.app = None

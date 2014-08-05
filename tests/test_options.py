@@ -10,7 +10,7 @@
 """
 
 
-from tests.base_test import FlaskCorsTestCase
+from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 try:
@@ -19,6 +19,7 @@ try:
 except:
     # support local usage without installed package
     from flask_cors import *
+
 
 class OptionsTestCase(FlaskCorsTestCase):
     def setUp(self):
@@ -89,6 +90,35 @@ class OptionsTestCase(FlaskCorsTestCase):
             self.assertEqual(result.status_code, 200)
             self.assertEqual(result.headers[ACL_ORIGIN], '*')
             self.assertEqual(result.data.decode("utf-8"), u"Welcome!")
+
+
+class AppOptionsTestCase(AppConfigTest, OptionsTestCase):
+    def __init__(self, *args, **kwargs):
+        super(OptionsTestCase, self).__init__(*args, **kwargs)
+
+    def test_defaults(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/test_default')
+        @cross_origin()
+        def test_default():
+            return 'Welcome!'
+
+        super(AppOptionsTestCase, self).test_defaults()
+
+    def test_no_options_and_not_auto(self):
+        pass
+
+    def test_options_and_not_auto(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_AUTOMATIC_OPTIONS'] = False
+
+        @self.app.route('/test_options_and_not_auto', methods=['OPTIONS'])
+        @cross_origin()
+        def test_options_and_not_auto():
+            return 'Welcome!'
+        super(AppOptionsTestCase, self).test_options_and_not_auto()
+
 
 if __name__ == "__main__":
     unittest.main()

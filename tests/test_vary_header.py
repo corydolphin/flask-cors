@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase
+from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask, Response
 
 try:
@@ -78,6 +78,45 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
                     result.headers.get('Vary'),
                     'Origin, Accept-Encoding'
                 )
+
+
+class AppConfigVaryHeaderTestCase(AppConfigTest,
+                                  VaryHeaderTestCase):
+    def __init__(self, *args, **kwargs):
+        super(AppConfigVaryHeaderTestCase, self).__init__(*args, **kwargs)
+
+    def test_consistent_origin(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/')
+        @cross_origin()
+        def wildcard():
+            return 'Welcome!'
+
+        super(AppConfigVaryHeaderTestCase, self).test_consistent_origin()
+
+    def test_varying_origin(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_ORIGINS'] = ["Foo", "Bar"]
+
+        @self.app.route('/test_vary')
+        @cross_origin()
+        def test_vary():
+            return 'Welcome!'
+
+        super(AppConfigVaryHeaderTestCase, self).test_varying_origin()
+
+    def test_consistent_origin_concat(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_ORIGINS'] = ["Foo", "Bar"]
+
+        @self.app.route('/test_existing_vary_headers')
+        @cross_origin()
+        def test_existing_vary_headers():
+            return Response('', status=200, headers={'Vary': 'Accept-Encoding'})
+
+        super(AppConfigVaryHeaderTestCase, self).test_consistent_origin_concat()
+
 
 
 if __name__ == "__main__":

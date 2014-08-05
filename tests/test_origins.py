@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase
+from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 try:
@@ -49,10 +49,8 @@ class OriginsTestCase(FlaskCorsTestCase):
             Access-Control-Allow-Origin header should not be included,
             according to the w3 spec.
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                result = verb('/')
-                self.assertEqual(result.headers.get(ACL_ORIGIN), '*')
+        for resp in self.iter_responses('/'):
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
     def test_wildcard_defaults_origin(self):
         ''' If there is no Origin header in the request, the
@@ -60,11 +58,10 @@ class OriginsTestCase(FlaskCorsTestCase):
             if the always_send parameter is `True`, which is the default value.
         '''
         example_origin = 'http://example.com'
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                result = verb('/', headers={'Origin': example_origin})
-                self.assertEqual(result.status_code, 200)
-                self.assertEqual(result.headers.get(ACL_ORIGIN), '*')
+        headers = {'Origin': example_origin}
+        for resp in self.iter_responses('/', headers=headers):
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
     def test_list_serialized(self):
         ''' If there is an Origin header in the request, the
@@ -94,21 +91,61 @@ class OriginsTestCase(FlaskCorsTestCase):
             self.assertEqual(allowed, 'Bar, Foo')
 
 
-class AppConfigOriginsTestCase(FlaskCorsTestCase):
-    def setUp(self):
-        self.app = Flask(__name__)
-        self.app.config['CORS_ORIGINS'] = ['Foo', 'Bar']
+class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
+    def __init__(self, *args, **kwargs):
+        super(OriginsTestCase, self).__init__(*args, **kwargs)
 
-        @self.app.route('/test_list')
-        @cross_origin(methods=['GET', 'OPTIONS', 'HEAD', 'PUT', 'POST'])
+    def test_wildcard_defaults_no_origin(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/')
+        @cross_origin()
         def wildcard():
             return 'Welcome!'
 
+        super(AppConfigOriginsTestCase, self).test_wildcard_defaults_no_origin()
+
+    def test_wildcard_defaults_origin(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/')
+        @cross_origin()
+        def wildcard():
+            return 'Welcome!'
+        super(AppConfigOriginsTestCase, self).test_wildcard_defaults_origin()
+
     def test_list_serialized(self):
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                result = verb('/test_list')
-                self.assertEqual(result.headers.get(ACL_ORIGIN), 'Bar, Foo')
+        self.app = Flask(__name__)
+        self.app.config['CORS_ORIGINS'] = ["Foo", "Bar"]
+
+        @self.app.route('/test_list')
+        @cross_origin()
+        def test_list():
+            return 'Welcome!'
+
+        super(AppConfigOriginsTestCase, self).test_list_serialized()
+
+    def test_string_serialized(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_ORIGINS'] = "Foo"
+
+        @self.app.route('/test_string')
+        @cross_origin()
+        def test_string():
+            return 'Welcome!'
+
+        super(AppConfigOriginsTestCase, self).test_string_serialized()
+
+    def test_set_serialized(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_ORIGINS'] = set(["Foo", "Bar"])
+
+        @self.app.route('/test_set')
+        @cross_origin()
+        def test_set():
+            return 'Welcome!'
+
+        super(AppConfigOriginsTestCase, self).test_set_serialized()
 
 
 if __name__ == "__main__":

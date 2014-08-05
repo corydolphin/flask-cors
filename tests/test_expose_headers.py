@@ -6,7 +6,7 @@
     Flask-Cors tests module
 """
 
-from tests.base_test import FlaskCorsTestCase
+from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 try:
@@ -72,22 +72,50 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
             self.assertEqual(result.headers.get(ACL_EXPOSE_HEADERS), 'Bar, Foo')
 
 
-class AppConfigExposeHeadersTestCase(FlaskCorsTestCase):
-    def setUp(self):
-        self.app = Flask(__name__)
-        self.app.config['CORS_EXPOSE_HEADERS'] = ['Foo', 'Bar']
+class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
+    def __init__(self, *args, **kwargs):
+        super(AppConfigExposeHeadersTestCase, self).__init__(*args, **kwargs)
 
-        @self.app.route('/')
-        @cross_origin(methods=['GET', 'OPTIONS', 'HEAD', 'PUT', 'POST'])
-        def wildcard():
+    def test_default(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/test_default')
+        @cross_origin()
+        def test_default():
             return 'Welcome!'
+        super(AppConfigExposeHeadersTestCase, self).test_default()
 
     def test_list_serialized(self):
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                result = verb('/')
-                self.assertEqual(result.headers.get(ACL_EXPOSE_HEADERS),
-                                 'Bar, Foo')
+        self.app = Flask(__name__)
+        self.app.config['CORS_EXPOSE_HEADERS'] = ["Foo", "Bar"]
+
+        @self.app.route('/test_list')
+        @cross_origin()
+        def test_list():
+            return 'Welcome!'
+
+        super(AppConfigExposeHeadersTestCase, self).test_list_serialized()
+
+    def test_string_serialized(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_EXPOSE_HEADERS'] = "Foo"
+
+        @self.app.route('/test_string')
+        @cross_origin()
+        def test_string():
+            return 'Welcome!'
+
+        super(AppConfigExposeHeadersTestCase, self).test_string_serialized()
+
+    def test_set_serialized(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_EXPOSE_HEADERS'] = set(["Foo", "Bar"])
+
+        @self.app.route('/test_set')
+        @cross_origin()
+        def test_string():
+            return 'Welcome!'
+        super(AppConfigExposeHeadersTestCase, self).test_set_serialized()
 
 
 if __name__ == "__main__":

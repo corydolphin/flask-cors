@@ -6,7 +6,7 @@
     Flask-Cors tests module
 """
 
-from tests.base_test import FlaskCorsTestCase
+from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 try:
@@ -72,22 +72,50 @@ class HeadersTestCase(FlaskCorsTestCase):
             self.assertEqual(result.headers.get(ACL_HEADERS), 'Bar, Foo')
 
 
+class AppConfigHeadersTestCase(AppConfigTest, HeadersTestCase):
+    def __init__(self, *args, **kwargs):
+        super(AppConfigHeadersTestCase, self).__init__(*args, **kwargs)
 
-class AppConfigHeadersTestCase(FlaskCorsTestCase):
-    def setUp(self):
+    def test_list_serialized(self):
         self.app = Flask(__name__)
         self.app.config['CORS_HEADERS'] = ['Foo', 'Bar']
 
-        @self.app.route('/')
-        @cross_origin(methods=['GET', 'OPTIONS', 'HEAD', 'PUT', 'POST'])
-        def wildcard():
+        @self.app.route('/test_list')
+        @cross_origin()
+        def test_list():
             return 'Welcome!'
 
-    def test_list_serialized(self):
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                result = verb('/')
-                self.assertEqual(result.headers.get(ACL_HEADERS), 'Bar, Foo')
+        super(AppConfigHeadersTestCase, self).test_list_serialized()
+
+    def test_string_serialized(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_HEADERS'] = 'Foo'
+
+        @self.app.route('/test_string')
+        @cross_origin()
+        def test_string():
+            return 'Welcome!'
+
+        super(AppConfigHeadersTestCase, self).test_string_serialized()
+
+    def test_set_serialized(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_HEADERS'] = set(["Foo", "Bar"])
+
+        @self.app.route('/test_set')
+        @cross_origin()
+        def test_set():
+            return 'Welcome!'
+        super(AppConfigHeadersTestCase, self).test_set_serialized()
+
+    def test_default(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/test_default')
+        @cross_origin()
+        def test_default():
+            return 'Welcome!'
+        super(AppConfigHeadersTestCase, self).test_default()
 
 
 if __name__ == "__main__":
