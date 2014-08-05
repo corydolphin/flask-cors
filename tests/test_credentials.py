@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase
+from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 try:
@@ -39,17 +39,41 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
             Access-Control-Allow-Credentials header.
         '''
         with self.app.test_client() as c:
-            result = c.get('/test_credentials')
-            header = result.headers.get(ACL_CREDENTIALS)
+            resp =  c.get('/test_credentials')
+            header = resp.headers.get(ACL_CREDENTIALS)
             self.assertEquals(header, 'true')
 
     def test_open_request(self):
         ''' The default behavior should be to disallow credentials.
         '''
         with self.app.test_client() as c:
-            result = c.get('/test_open')
-            self.assertTrue(ACL_CREDENTIALS not in result.headers)
+            resp =  c.get('/test_open')
+            self.assertTrue(ACL_CREDENTIALS not in resp.headers)
 
+
+class AppConfigExposeHeadersTestCase(AppConfigTest, SupportsCredentialsCase):
+    def __init__(self, *args, **kwargs):
+        super(SupportsCredentialsCase, self).__init__(*args, **kwargs)
+
+    def test_credentialed_request(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_SUPPORTS_CREDENTIALS'] = True
+
+        @self.app.route('/test_credentials')
+        @cross_origin()
+        def test_credentials():
+            return 'Credentials!'
+
+        super(AppConfigExposeHeadersTestCase, self).test_credentialed_request()
+
+    def test_open_request(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/test_open')
+        @cross_origin()
+        def test_open():
+            return 'Open!'
+        super(AppConfigExposeHeadersTestCase, self).test_open_request()
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,7 +10,7 @@
 """
 from datetime import timedelta
 import sys
-from tests.base_test import FlaskCorsTestCase
+from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 try:
@@ -43,20 +43,15 @@ class MaxAgeTestCase(FlaskCorsTestCase):
     def test_defaults(self):
         ''' By default, no max-age headers should be returned
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                self.assertFalse(ACL_MAX_AGE in verb('/defaults').headers)
+        for resp in self.iter_responses('/defaults'):
+            self.assertFalse(ACL_MAX_AGE in resp.headers)
 
     def test_string(self):
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                self.assertEqual(
-                    verb('/test_string').headers.get(ACL_MAX_AGE),
-                    '600'
-                )
+        for resp in self.iter_responses('/test_string'):
+            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
     def test_time_delta(self):
         ''' If the methods parameter is defined, always return the allowed
@@ -66,41 +61,58 @@ class MaxAgeTestCase(FlaskCorsTestCase):
         if sys.version_info < (2, 7):
             return
 
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                self.assertEqual(
-                    verb('/test_time_delta').headers.get(ACL_MAX_AGE),
-                    '600'
-                )
+        for resp in self.iter_responses('/test_time_delta'):
+            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
 
-class AppConfigMaxAgeTestCase(FlaskCorsTestCase):
-    def setUp(self):
+class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
+    def __init__(self, *args, **kwargs):
+        super(AppConfigMaxAgeTestCase, self).__init__(*args, **kwargs)
+
+    def test_defaults(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/defaults')
+        @cross_origin()
+        def defaults():
+            return 'Should only return headers on OPTIONS'
+
+        super(AppConfigMaxAgeTestCase, self).test_defaults()
+
+    def test_string(self):
         self.app = Flask(__name__)
         self.app.config['CORS_MAX_AGE'] = 600
 
         @self.app.route('/test_string')
         @cross_origin()
-        def test_string_max_age():
-            return 'Welcome!'
+        def test_string():
+            return 'Open!'
 
-        @self.app.route('/test_override')
-        @cross_origin(max_age=900)
-        def test_override():
-            return 'Welcome!'
+        super(AppConfigMaxAgeTestCase, self).test_string()
 
-    def test_string(self):
-        ''' If the methods parameter is defined, always return the allowed
-            methods defined by the user.
-        '''
-        for resp in self.iter_responses('/test_string'):
-            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
+    def test_time_delta(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_MAX_AGE'] = timedelta(minutes=10)
+
+        @self.app.route('/test_time_delta')
+        @cross_origin()
+        def test_time_delta():
+            return 'Open!'
+
+        super(AppConfigMaxAgeTestCase, self).test_time_delta()
 
     def test_override(self):
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
         # timedelta.total_seconds is not available in older versions of Python
+        self.app = Flask(__name__)
+        self.app.config['CORS_MAX_AGE'] = 600
+
+        @self.app.route('/test_override')
+        @cross_origin(max_age=900)
+        def test_override():
+            return 'Welcome!'
 
         for resp in self.iter_responses('/test_override'):
             self.assertEqual(resp.headers.get(ACL_MAX_AGE), '900')

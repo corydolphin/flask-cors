@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase
+from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 try:
@@ -31,8 +31,8 @@ class MethodsCase(FlaskCorsTestCase):
 
         @self.app.route('/get')
         @cross_origin(methods=['GET'])
-        def test_open():
-            return 'Open!'
+        def test_get():
+            return 'Get only!'
 
     def test_defaults(self):
         ''' By default, Access-Control-Allow-Methods should only be returned
@@ -47,10 +47,35 @@ class MethodsCase(FlaskCorsTestCase):
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                self.assertTrue(ACL_METHODS in verb('/get').headers)
-                self.assertTrue('GET' in verb('/get').headers[ACL_METHODS])
+        for resp in self.iter_responses('/get'):
+            self.assertTrue(ACL_METHODS in resp.headers)
+            self.assertTrue('GET' in resp.headers[ACL_METHODS])
+
+
+class AppConfigMethodsTestCase(AppConfigTest, MethodsCase):
+    def __init__(self, *args, **kwargs):
+        super(AppConfigMethodsTestCase, self).__init__(*args, **kwargs)
+
+    def test_defaults(self):
+        self.app = Flask(__name__)
+
+        @self.app.route('/defaults')
+        @cross_origin()
+        def defaults():
+            return 'Should only return headers on OPTIONS'
+
+        super(AppConfigMethodsTestCase, self).test_defaults()
+
+    def test_methods_defined(self):
+        self.app = Flask(__name__)
+        self.app.config['CORS_METHODS'] = ['GET']
+
+        @self.app.route('/get')
+        @cross_origin()
+        def defaults():
+            return 'Should only return headers on OPTIONS'
+
+        super(AppConfigMethodsTestCase, self).test_methods_defined()
 
 
 if __name__ == "__main__":

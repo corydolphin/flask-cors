@@ -19,6 +19,7 @@ except:
     # support local usage without installed package
     from flask_cors import *
 
+
 class OriginsW3TestCase(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
@@ -49,9 +50,9 @@ class OriginsW3TestCase(FlaskCorsTestCase):
         example_origin = 'http://example.com'
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
-                result = verb('/', headers={'Origin': example_origin})
+                resp =  verb('/', headers={'Origin': example_origin})
                 self.assertEqual(
-                    result.headers.get(ACL_ORIGIN),
+                    resp.headers.get(ACL_ORIGIN),
                     example_origin
                 )
 
@@ -61,8 +62,8 @@ class OriginsW3TestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
-                result = verb('/')
-                self.assertTrue(ACL_ORIGIN not in result.headers)
+                resp =  verb('/')
+                self.assertTrue(ACL_ORIGIN not in resp.headers)
 
     def test_wildcard_default_origins(self):
         ''' If there is an Origin header in the request, the
@@ -71,12 +72,12 @@ class OriginsW3TestCase(FlaskCorsTestCase):
         example_origin = 'http://example.com'
         with self.app.test_client() as c:
             for verb in self.iter_verbs(c):
-                result = verb(
+                resp =  verb(
                     '/default-origins',
                     headers={'Origin': example_origin}
                 )
                 self.assertEqual(
-                    result.headers.get(ACL_ORIGIN),
+                    resp.headers.get(ACL_ORIGIN),
                     example_origin
                 )
 
