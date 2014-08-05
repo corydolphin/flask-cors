@@ -43,8 +43,8 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
 
     def test_default(self):
         with self.app.test_client() as c:
-            result = c.get('/test_default')
-            self.assertTrue(result.headers.get(ACL_EXPOSE_HEADERS) is None,
+            resp =  c.get('/test_default')
+            self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
                             "Default should have no allowed headers")
 
     def test_list_serialized(self):
@@ -52,24 +52,24 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
             the Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
-            result = c.get('/test_list')
-            self.assertEqual(result.headers.get(ACL_EXPOSE_HEADERS), 'Bar, Foo')
+            resp =  c.get('/test_list')
+            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'Bar, Foo')
 
     def test_string_serialized(self):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
-            result = c.get('/test_string')
-            self.assertEqual(result.headers.get(ACL_EXPOSE_HEADERS), 'Foo')
+            resp =  c.get('/test_string')
+            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'Foo')
 
     def test_set_serialized(self):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
-            result = c.get('/test_set')
-            self.assertEqual(result.headers.get(ACL_EXPOSE_HEADERS), 'Bar, Foo')
+            resp =  c.get('/test_set')
+            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'Bar, Foo')
 
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):

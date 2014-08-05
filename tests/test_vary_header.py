@@ -45,10 +45,8 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             dynamically, there is no need to Vary:Origin header should not
             be set.
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                result = verb('/')
-                self.assertFalse('Vary' in result.headers)
+        for resp in self.iter_responses('/'):
+            self.assertFalse('Vary' in resp.headers)
 
     def test_varying_origin(self):
         ''' Resources that wish to enable themselves to be shared with
@@ -62,10 +60,9 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             re-used across-origins.
         '''
         example_origin = 'http://example.com'
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                result = verb('/test_vary', headers={'Origin': example_origin})
-                self.assertEqual(result.headers.get('Vary'), 'Origin')
+        for resp in self.iter_responses('/test_vary',
+                                        headers={'Origin': example_origin}):
+            self.assertEqual(resp.headers.get('Vary'), 'Origin')
 
     def test_consistent_origin_concat(self):
         '''
@@ -73,11 +70,11 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             header set, the headers should be combined and comma-separated.
         '''
         with self.app.test_client() as c:
-                result = c.get('/test_existing_vary_headers')
-                self.assertEqual(
-                    result.headers.get('Vary'),
-                    'Origin, Accept-Encoding'
-                )
+            resp =  c.get('/test_existing_vary_headers')
+            self.assertEqual(
+                resp.headers.get('Vary'),
+                'Origin, Accept-Encoding'
+            )
 
 
 class AppConfigVaryHeaderTestCase(AppConfigTest,

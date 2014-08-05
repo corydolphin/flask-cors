@@ -43,20 +43,15 @@ class MaxAgeTestCase(FlaskCorsTestCase):
     def test_defaults(self):
         ''' By default, no max-age headers should be returned
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                self.assertFalse(ACL_MAX_AGE in verb('/defaults').headers)
+        for resp in self.iter_responses('/defaults'):
+            self.assertFalse(ACL_MAX_AGE in resp.headers)
 
     def test_string(self):
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                self.assertEqual(
-                    verb('/test_string').headers.get(ACL_MAX_AGE),
-                    '600'
-                )
+        for resp in self.iter_responses('/test_string'):
+            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
     def test_time_delta(self):
         ''' If the methods parameter is defined, always return the allowed
@@ -66,12 +61,8 @@ class MaxAgeTestCase(FlaskCorsTestCase):
         if sys.version_info < (2, 7):
             return
 
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                self.assertEqual(
-                    verb('/test_time_delta').headers.get(ACL_MAX_AGE),
-                    '600'
-                )
+        for resp in self.iter_responses('/test_time_delta'):
+            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
 
 class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):

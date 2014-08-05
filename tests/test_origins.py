@@ -68,25 +68,25 @@ class OriginsTestCase(FlaskCorsTestCase):
             Access-Control-Allow-Origin header should be echoed.
         '''
         with self.app.test_client() as c:
-            result = c.get('/test_list')
-            self.assertEqual(result.headers.get(ACL_ORIGIN), 'Bar, Foo')
+            resp =  c.get('/test_list')
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'Bar, Foo')
 
     def test_string_serialized(self):
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
-            result = c.get('/test_string')
-            self.assertEqual(result.headers.get(ACL_ORIGIN), 'Foo')
+            resp =  c.get('/test_string')
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'Foo')
 
     def test_set_serialized(self):
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
         with self.app.test_client() as c:
-            result = c.get('/test_set')
+            resp =  c.get('/test_set')
 
-            allowed = result.headers.get(ACL_ORIGIN)
+            allowed = resp.headers.get(ACL_ORIGIN)
             # Order is not garaunteed
             self.assertEqual(allowed, 'Bar, Foo')
 

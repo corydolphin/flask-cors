@@ -47,10 +47,9 @@ class MethodsCase(FlaskCorsTestCase):
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                self.assertTrue(ACL_METHODS in verb('/get').headers)
-                self.assertTrue('GET' in verb('/get').headers[ACL_METHODS])
+        for resp in self.iter_responses('/get'):
+            self.assertTrue(ACL_METHODS in resp.headers)
+            self.assertTrue('GET' in resp.headers[ACL_METHODS])
 
 
 class AppConfigMethodsTestCase(AppConfigTest, MethodsCase):
