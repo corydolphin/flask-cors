@@ -10,6 +10,7 @@
 """
 import collections
 from datetime import timedelta
+import re
 from functools import update_wrapper
 
 from flask import make_response, request, current_app
@@ -138,6 +139,38 @@ def cross_origin(*args, **kwargs):
 
         return update_wrapper(wrapped_function, f)
     return decorator
+
+
+class CORS(object):
+    def __init__(self, app, resources=[r'/*'], **kwargs):
+        options = {}
+        options.update(_defaults_dict)
+        options.update(_get_app_kwarg_dict(app))
+        options.update(kwargs)
+
+        self.options = options
+
+        if isinstance(resources, string_types):
+            self.resources = {resources: {}}
+        elif isinstance(resources, collections.Iterable):
+            self.resources = {r: {} for r in resources}
+        else:
+            self.resources = dict(resources)
+
+        app.after_request(self.cors_after_request)
+
+    def cors_after_request(self, resp):
+        if resp.headers.get(ACL_ORIGIN):
+            return resp
+
+        for resource, resource_options in self.resources.items():
+            if re.match(resource, request.path):
+                options = self.options.copy()
+                options.update(resource_options)
+                _serialize_options(options)
+                _set_cors_headers(resp, options)
+                break
+        return resp
 
 
 def _set_cors_headers(resp, options):
