@@ -127,6 +127,6 @@ with ``CORS_``.  For example:
 
 
 Full description of options
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: flask_cors.cross_origin

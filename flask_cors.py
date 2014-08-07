@@ -94,11 +94,9 @@ def cross_origin(*args, **kwargs):
         as per suggestion by the W3 implementation guidelines. Setting this
         header when the `Access-Control-Allow-Origin` is dynamically generated
         e.g. when there is more than one allowed origin, and any Origin other
-        than '*' is returned,
-        informing CDNs and other caches that the CORS headers are dynamic, and
-        cannot be re-used.
-
-        If Fals, the Vary header will never be injected or altered.
+        than '*' is returned, informing CDNs and other caches that the CORS
+        headers are dynamic, and cannot be re-used.
+        If False, the Vary header will never be injected or altered.
     :type vary_header: bool
 
     '''
