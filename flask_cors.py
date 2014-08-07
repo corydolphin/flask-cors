@@ -99,7 +99,7 @@ def cross_origin(*args, **kwargs):
         cannot be re-used.
 
         If Fals, the Vary header will never be injected or altered.
-    :type automatic_options: bool
+    :type vary_header: bool
 
     '''
 
