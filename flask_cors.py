@@ -142,35 +142,47 @@ def cross_origin(*args, **kwargs):
 
 
 class CORS(object):
-    def __init__(self, app, resources=[r'/*'], **kwargs):
+    def __init__(self, app=None, **kwargs):
+        if app is not None:
+            self.init_app(app, **kwargs)
+
+    def init_app(self, app, **kwargs):
         options = {}
         options.update(_defaults_dict)
         options.update(_get_app_kwarg_dict(app))
         options.update(kwargs)
 
-        self.options = options
+        options = options
+
+        resources = kwargs.get('resources',
+                               app.config.get('CORS_RESOURCES',
+                               [r'/*']))
 
         if isinstance(resources, string_types):
-            self.resources = {resources: {}}
+            resources = {resources: {}}
         elif isinstance(resources, collections.Iterable):
-            self.resources = {r: {} for r in resources}
+            resources = {r: {} for r in resources}
         else:
-            self.resources = dict(resources)
+            resources = dict(resources)
 
-        app.after_request(self.cors_after_request)
+        def cors_after_request(resp):
+            '''
+                The actual after-request handler, retains references to the
+                the options, and definitions of resources through a closure.
+            '''
+            if resp.headers.get(ACL_ORIGIN):
+                return resp
 
-    def cors_after_request(self, resp):
-        if resp.headers.get(ACL_ORIGIN):
+            for resource, resource_options in resources.items():
+                if re.match(resource, request.path):
+                    _options = options.copy()
+                    _options.update(resource_options)
+                    _serialize_options(_options)
+                    _set_cors_headers(resp, _options)
+                    break
             return resp
 
-        for resource, resource_options in self.resources.items():
-            if re.match(resource, request.path):
-                options = self.options.copy()
-                options.update(resource_options)
-                _serialize_options(options)
-                _set_cors_headers(resp, options)
-                break
-        return resp
+        app.after_request(cors_after_request)
 
 
 def _set_cors_headers(resp, options):
