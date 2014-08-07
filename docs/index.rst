@@ -22,11 +22,10 @@ Install the extension with using pip, or easy\_install.
 Usage
 -----
 
-| This extension exposes a simple decorator to decorate flask routes
-with. Simply
-| add ``@cross_origin()`` below a call to Flask's ``@app.route(..)``
-incanation to
-| accept the default options and allow CORS on a given route.
+This extension exposes a simple decorator to decorate flask routes
+with. Simply add ``@cross_origin()`` below a call to Flask's
+``@app.route(..)`` incanation to accept the default options and allow
+CORS on a given route.
 
 Simple Usage
 ~~~~~~~~~~~~
@@ -41,11 +40,10 @@ Simple Usage
 Using JSON with Cross Origin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| When using JSON cross origin, browsers will issue a pre-flight OPTIONS
-request
-| for POST requests. In order for browsers to allow POST requests with a
-JSON
-| content type, you must allow the Content-Type header.
+When using JSON cross origin, browsers will issue a pre-flight OPTIONS
+request for POST requests. In order for browsers to allow POST
+requests with a JSON content type, you must allow the Content-Type
+header.
 
 .. code:: python
 
@@ -57,25 +55,23 @@ JSON
 Application-wide settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| Alternatively, you can set any of these options in an app's config
-| object. Setting these at the application level effectively changes the
-| default value for your application, while still allowing you to
-override
-| it on a per-resource basis.
+Alternatively, you can set any of these options in an app's config
+object. Setting these at the application level effectively changes the
+default value for your application, while still allowing you to
+override it on a per-resource basis.
 
-| The application-wide configuration options are creatively prefixed
-with CORS\_
-| e.g.
+The application-wide configuration options are creatively prefixed
+with ``CORS_``.  For example:
 
--  CORS\_ORIGINS
--  CORS\_METHODS
--  CORS\_HEADERS
--  CORS\_EXPOSE\_HEADERS
--  CORS\_ALWAYS\_SEND
--  CORS\_MAX\_AGE
--  CORS\_SEND\_WILDCARD
--  CORS\_ALWAYS\_SEND
--  CORS\_AUTOMATIC\_OPTIONS
+-  ``CORS_ORIGINS``
+-  ``CORS_METHODS``
+-  ``CORS_HEADERS``
+-  ``CORS_EXPOSE_HEADERS``
+-  ``CORS_ALWAYS_SEND``
+-  ``CORS_MAX_AGE``
+-  ``CORS_SEND_WILDCARD``
+-  ``CORS_ALWAYS_SEND``
+-  ``CORS_AUTOMATIC_OPTIONS``
 
 .. code:: python
 
