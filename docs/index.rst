@@ -153,6 +153,6 @@ Questions, comments or improvements? Please create an issue on
 
 
 Full list of options
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: flask_cors.cross_origin
