@@ -161,7 +161,7 @@ class CORS(object):
         if isinstance(resources, string_types):
             resources = {resources: {}}
         elif isinstance(resources, collections.Iterable):
-            resources = {r: {} for r in resources}
+            resources = dict((r, {}) for r in resources)
         else:
             resources = dict(resources)
 
