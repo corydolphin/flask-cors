@@ -10,10 +10,12 @@
 """
 import collections
 from datetime import timedelta
+import re
 from functools import update_wrapper
 
 from flask import make_response, request, current_app
 from six import string_types
+
 
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
@@ -94,11 +96,9 @@ def cross_origin(*args, **kwargs):
         as per suggestion by the W3 implementation guidelines. Setting this
         header when the `Access-Control-Allow-Origin` is dynamically generated
         e.g. when there is more than one allowed origin, and any Origin other
-        than '*' is returned,
-        informing CDNs and other caches that the CORS headers are dynamic, and
-        cannot be re-used.
-
-        If Fals, the Vary header will never be injected or altered.
+        than '*' is returned, informing CDNs and other caches that the CORS
+        headers are dynamic, and cannot be re-used.
+        If False, the Vary header will never be injected or altered.
     :type vary_header: bool
 
     '''
@@ -138,6 +138,91 @@ def cross_origin(*args, **kwargs):
 
         return update_wrapper(wrapped_function, f)
     return decorator
+
+
+class CORS(object):
+    def __init__(self, app=None, **kwargs):
+        '''
+            Initializes Cross Origin Resource sharing for the application. The
+            arguments are identical to :py:func:`cross_origin`, with the
+            addition of a `resources` parameter. The resources parameter
+            defines a series of regular expressions for resource paths to match
+            and optionally, the associated :py:func:`cross_origin` options
+            to be applied to the particular resource.
+
+            The settings for CORS are determined in the following order:
+                Resource level settings (e.g when passed as a dictionary)
+                Keyword argument settings
+                App level configuration settings (e.g. CORS_*)
+                Default settings
+
+            Note: as it is possible for multiple regular expressions to match a
+            resource path, the regular expressions are first sorted by length,
+            from longest to shortest, in order to attempt to match the most
+            specific regular expression. This allows the definition of a
+            number of specific resource options, with a wildcard fallback
+            for all other resources.
+
+            :param resources: the series of regular expression and (optionally)
+            associated CORS options to be applied to the given resource path.
+
+            If the argument is a dictionary, it is expected to be of the form:
+            regexp : dict_of_options
+
+            If the argument is a list, it is expected to be a list of regular
+            expressions, for which the app-wide configured options are applied.
+
+            If the argument is a string, it is expected to be a regular
+            expression for which the app-wide configured options are applied.
+            :type resources: dict, iterable or string
+
+        '''
+
+        if app is not None:
+            self.init_app(app, **kwargs)
+
+    def init_app(self, app, **kwargs):
+        options = {}
+        options.update(_defaults_dict)
+        options.update(_get_app_kwarg_dict(app))
+        options.update(kwargs)
+
+        _kwarg_resources = kwargs.get('resources')
+        _app_resources = app.config.get('CORS_RESOURCES')
+        _resources = _kwarg_resources or _app_resources or [r'/*']
+
+        if isinstance(_resources, dict):  # sort the regexps by length
+            resources = sorted(_resources.items(),
+                               key=lambda r: len(r[0]),
+                               reverse=True
+                               )
+        elif isinstance(_resources, string_types):
+            resources = [(_resources, {})]
+        elif isinstance(_resources, collections.Iterable):
+            resources = [(r, {}) for r in _resources]
+        else:
+            raise ValueError("Unexpected value for resources argument.")
+
+        def cors_after_request(resp):
+            '''
+                The actual after-request handler, retains references to the
+                the options, and definitions of resources through a closure.
+            '''
+            # If CORS headers are set in a view decorator, pass
+            if resp.headers.get(ACL_ORIGIN):
+                return resp
+
+            for res_regex, res_options in resources:
+                print (res_regex, request.path)
+                if re.match(res_regex, request.path):
+                    _options = options.copy()
+                    _options.update(res_options)
+                    _serialize_options(_options)
+                    _set_cors_headers(resp, _options)
+                    break
+            return resp
+
+        app.after_request(cors_after_request)
 
 
 def _set_cors_headers(resp, options):

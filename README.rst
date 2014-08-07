@@ -1,15 +1,11 @@
 Flask-CORS
 ==========
 
-| |Build Status|
-| |Latest Version|
-| |Downloads|
-| |Supported Python versions|
-| |License|
+|Build Status| |Latest Version| |Downloads| |Supported Python versions|
+|License|
 
-| A Flask extension for handling Cross Origin Resource Sharing (CORS),
-making
-| cross-origin AJAX possible.
+A Flask extension for handling Cross Origin Resource Sharing (CORS),
+making cross-origin AJAX possible.
 
 Installation
 ------------
@@ -23,11 +19,10 @@ Install the extension with using pip, or easy\_install.
 Usage
 -----
 
-| This extension exposes a simple decorator to decorate flask routes
-with. Simply
-| add ``@cross_origin()`` below a call to Flask's ``@app.route(..)``
-incanation to
-| accept the default options and allow CORS on a given route.
+This extension exposes a simple decorator to decorate flask routes with.
+Simply add ``@cross_origin()`` below a call to Flask's
+``@app.route(..)`` incanation to accept the default options and allow
+CORS on a given route.
 
 Simple Usage
 ~~~~~~~~~~~~
@@ -42,11 +37,9 @@ Simple Usage
 Using JSON with Cross Origin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| When using JSON cross origin, browsers will issue a pre-flight OPTIONS
-request
-| for POST requests. In order for browsers to allow POST requests with a
-JSON
-| content type, you must allow the Content-Type header.
+When using JSON cross origin, browsers will issue a pre-flight OPTIONS
+request for POST requests. In order for browsers to allow POST requests
+with a JSON content type, you must allow the Content-Type header.
 
 .. code:: python
 
@@ -58,25 +51,15 @@ JSON
 Application-wide settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| Alternatively, you can set all but the 'automatic\_options' parameter
-in an app's config
-| object. Setting these at the application level effectively changes the
-| default value for your application, while still allowing you to
-override
-| it on a per-resource basis.
+Alternatively, you can set all parameters **except automatic\_options**
+in an app's config object. Setting these at the application level
+effectively changes the default value for your application, while still
+allowing you to override it on a per-resource basis.
 
-| The application-wide configuration options are creatively prefixed
-with CORS\_
-| e.g.
-
--  CORS\_ORIGINS
--  CORS\_METHODS
--  CORS\_HEADERS
--  CORS\_EXPOSE\_HEADERS
--  CORS\_ALWAYS\_SEND
--  CORS\_MAX\_AGE
--  CORS\_SEND\_WILDCARD
--  CORS\_ALWAYS\_SEND
+The application-wide configuration options are creatively prefixed with
+CORS\_ e.g. \* CORS\_ORIGINS \* CORS\_METHODS \* CORS\_HEADERS \*
+CORS\_EXPOSE\_HEADERS \* CORS\_ALWAYS\_SEND \* CORS\_MAX\_AGE \*
+CORS\_SEND\_WILDCARD \* CORS\_ALWAYS\_SEND
 
 For a full list of options, please see the full
 `documentation <http://flask-cors.readthedocs.org/en/latest/>`__
@@ -93,7 +76,7 @@ Contributing
 
 Questions, comments or improvements? Please create an issue on
 `Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
-`@wcdolphin <https://twitter.com/wcdolphin>`__ or send me an email.
+[@wcdolphin](https://twitter.com/wcdolphin) or send me an email.
 
 .. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.png?branch=master
    :target: https://travis-ci.org/wcdolphin/flask-cors

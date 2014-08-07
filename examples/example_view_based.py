@@ -1,7 +1,7 @@
 """
 Flask-Cors example
 ===================
-This is a tiny Flask Application demonstrating Flask-Cors, makign it simple
+This is a tiny Flask Application demonstrating Flask-Cors, making it simple
 to add cross origin support to your flask app!
 
 :copyright: (C) 2013 by Cory Dolphin.
