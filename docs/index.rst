@@ -1,14 +1,17 @@
 Flask-CORS
 ==========
 
-|Build Status|
-|Latest Version|
-|Downloads|
-|Supported Python versions|
-|License|
-
 A Flask extension for handling Cross Origin Resource Sharing (CORS),
 making cross-origin AJAX possible.
+
+Contact
+-------
+
+Questions, comments or improvements? Please create an issue on
+`Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
+`@wcdolphin <https://twitter.com/wcdolphin>`__ or send me an email.
+
+
 
 Installation
 ------------
@@ -121,38 +124,9 @@ with ``CORS_``.  For example:
     def helloGoogle():
       return "Hello, google-cross-origin-world!"
 
-For a full list of options, please see the full
-`documentation <http://flask-cors.readthedocs.org/en/latest/>`__
-
-Tests
------
-
-A simple set of tests is included in ``test/``. To run, install nose,
-and simply invoke ``nosetests`` or ``python setup.py test`` to exercise
-the tests.
-
-Contributing
-------------
-
-Questions, comments or improvements? Please create an issue on
-`Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
-`@wcdolphin <https://twitter.com/wcdolphin>`__ or send me an email.
-
-.. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.png?branch=master
-   :target: https://travis-ci.org/wcdolphin/flask-cors
-.. |Latest Version| image:: https://pypip.in/version/Flask-Cors/badge.svg
-   :target: https://pypi.python.org/pypi/Flask-Cors/
-.. |Downloads| image:: https://pypip.in/download/Flask-Cors/badge.svg
-   :target: https://pypi.python.org/pypi/Flask-Cors/
-.. |Supported Python versions| image:: https://pypip.in/py_versions/Flask-Cors/badge.svg
-   :target: https://pypi.python.org/pypi/Flask-Cors/
-.. |License| image:: https://pypip.in/license/Flask-Cors/badge.svg
-   :target: https://pypi.python.org/pypi/Flask-Cors/
 
 
-
-
-Full list of options
-~~~~~~~~~~~~~~~~~~~~
+Full description of options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: flask_cors.cross_origin
