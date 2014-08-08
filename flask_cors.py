@@ -10,6 +10,7 @@
 """
 import collections
 from datetime import timedelta
+import re
 from functools import update_wrapper
 
 from flask import make_response, request, current_app
@@ -136,6 +137,50 @@ def cross_origin(*args, **kwargs):
 
         return update_wrapper(wrapped_function, f)
     return decorator
+
+
+class CORS(object):
+    def __init__(self, app=None, **kwargs):
+        if app is not None:
+            self.init_app(app, **kwargs)
+
+    def init_app(self, app, **kwargs):
+        options = {}
+        options.update(_defaults_dict)
+        options.update(_get_app_kwarg_dict(app))
+        options.update(kwargs)
+
+        options = options
+
+        resources = kwargs.get('resources',
+                               app.config.get('CORS_RESOURCES',
+                               [r'/*']))
+
+        if isinstance(resources, string_types):
+            resources = {resources: {}}
+        elif isinstance(resources, collections.Iterable):
+            resources = dict((r, {}) for r in resources)
+        else:
+            resources = dict(resources)
+
+        def cors_after_request(resp):
+            '''
+                The actual after-request handler, retains references to the
+                the options, and definitions of resources through a closure.
+            '''
+            if resp.headers.get(ACL_ORIGIN):
+                return resp
+
+            for resource, resource_options in resources.items():
+                if re.match(resource, request.path):
+                    _options = options.copy()
+                    _options.update(resource_options)
+                    _serialize_options(_options)
+                    _set_cors_headers(resp, _options)
+                    break
+            return resp
+
+        app.after_request(cors_after_request)
 
 
 def _set_cors_headers(resp, options):
