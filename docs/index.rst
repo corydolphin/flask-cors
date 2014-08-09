@@ -11,7 +11,14 @@ Questions, comments or improvements? Please create an issue on
 `Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
 `@wcdolphin <https://twitter.com/wcdolphin>`__ or send me an email.
 
+Flask-CORS
+==========
 
+|Build Status| |Latest Version| |Downloads| |Supported Python versions|
+|License|
+
+A Flask extension for handling Cross Origin Resource Sharing (CORS),
+making cross-origin AJAX possible.
 
 Installation
 ------------
@@ -25,13 +32,55 @@ Install the extension with using pip, or easy\_install.
 Usage
 -----
 
-This extension exposes a simple decorator to decorate flask routes
-with. Simply add ``@cross_origin()`` below a call to Flask's
-``@app.route(..)`` incanation to accept the default options and allow
-CORS on a given route.
+This extension enables CORS support either via a decorator, or a Flask
+extension. This extension enables CORS support either via a decorator, or a Flask
+extension. There are three examples shown in the examples directory, showing
+the major use cases.
 
 Simple Usage
 ~~~~~~~~~~~~
+
+In the simplest case, initialize the Flask-Cors extension with default
+arguments in order to allow CORS on all routes.
+
+.. code:: python
+
+
+    app = Flask(__name__)
+    cors = CORS(app)
+
+    @app.route("/")
+    def helloWorld():
+      return "Hello, cross-origin-world!"
+
+Resource specific CORS
+^^^^^^^^^^^^^^^^^^^^^^
+
+Alternatively, a list of resources and associated settings for CORS
+can be supplied, selectively enables CORS support on a set of paths on your
+app.
+
+Note: this resources parameter can also be set in your application's
+config.
+
+.. code:: python
+
+    app = Flask(__name__)
+    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+    @app.route("/api/v1/users")
+    def list_users():
+      return "user example"
+
+Route specific CORS via decorator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This extension also exposes a simple decorator to decorate flask
+routes with.
+Simply add ``@cross_origin()`` below a call to Flask's
+``@app.route(..)``
+incanation to accept the default options and allow CORS on a given
+route.
 
 .. code:: python
 
@@ -40,93 +89,65 @@ Simple Usage
     def helloWorld():
       return "Hello, cross-origin-world!"
 
-Using JSON with Cross Origin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using JSON with CORS
+~~~~~~~~~~~~~~~~~~~~
 
 When using JSON cross origin, browsers will issue a pre-flight OPTIONS
-request for POST requests. In order for browsers to allow POST
-requests with a JSON content type, you must allow the Content-Type
-header.
+request for POST requests. In order for browsers to allow POST requests with a
+JSON content type, you must allow the Content-Type header. The simplest way
+to do this is to simply set the CORS\_HEADERS configuration value on your
+application:
+e.g.
 
 .. code:: python
 
-    @app.route("/user/create", methods=['GET','POST'])
-    @cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
-    def cross_origin_json_post():
-      return jsonify(success=True)
-
-Application-wide settings
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Alternatively, you can set any of these options in an app's config
-object. Setting these at the application level effectively changes the
-default value for your application, while still allowing you to
-override it on a per-resource basis.
-
-The application-wide configuration options are creatively prefixed
-with ``CORS_``.  For example:
-
--  ``CORS_ORIGINS``
--  ``CORS_METHODS``
--  ``CORS_HEADERS``
--  ``CORS_EXPOSE_HEADERS``
--  ``CORS_ALWAYS_SEND``
--  ``CORS_MAX_AGE``
--  ``CORS_SEND_WILDCARD``
--  ``CORS_ALWAYS_SEND``
--  ``CORS_AUTOMATIC_OPTIONS``
-
-.. code:: python
-
-    app.config['CORS_ORIGINS'] = ['https://foo.com', 'http://www.bar.com']
-    app.config['CORS_HEADERS'] = ['Content-Type']
-
-    # Will return CORS headers for origins 'https://foo.com'and 'http://www.bar.com'
-    # and an Access-Control-Allow-Headers of 'Content-Type'
-    """
-    Will return CORS headers for origins 'https://foo.com'and
-    'http://www.bar.com' and an Access-Control-Allow-Headers of 'Content-Type'
-    E.G. Testing with httpie
-        ➜  ~  http GET http://127.0.0.1:5000/
-        HTTP/1.0 200 OK
-        Access-Control-Allow-Headers: Content-Type
-        Access-Control-Allow-Origin: https://foo.com, http://www.bar.com
-        Content-Length: 26
-        Content-Type: text/html; charset=utf-8
-        Date: Tue, 22 Jul 2014 23:55:53 GMT
-        Server: Werkzeug/0.9.4 Python/2.7.8
-
-        Hello, cross-origin-world!
-    """
-    @app.route("/")
-    @cross_origin()
-    def helloWorld():
-      return "Hello, cross-origin-world!"
-
-
-    """
-    Will return CORS headers for 'google.com' and  Access-Control-Allow-Headers of
-    'Content-Type'.
-    E.G. Testing with httpie
-         ➜  ~  http GET http://127.0.0.1:5000/special
-        HTTP/1.0 200 OK
-        Access-Control-Allow-Headers: Content-Type
-        Access-Control-Allow-Origin: http://google.com
-        Content-Length: 33
-        Content-Type: text/html; charset=utf-8
-        Date: Tue, 22 Jul 2014 23:55:29 GMT
-        Server: Werkzeug/0.9.4 Python/2.7.8
-
-        Hello, google-cross-origin-world!
-    """
-    @app.route("/special")
-    @cross_origin(origins="http://google.com")
-    def helloGoogle():
-      return "Hello, google-cross-origin-world!"
+    app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 
 Full description of options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. autofunction:: flask_cors.cross_origin
+
+
+More examples
+~~~~~~~~~~~~~
+
+A simple, and suggested example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This is the suggested approach to enabling CORS. The default configuration
+will work well for most use cases.
+
+.. literalinclude:: ../examples/simple_example.py
+   :language: python
+
+A more complicated example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you require advanced configuration and more specific configuration of CORS
+support for your application, this example provides a useful example of
+multiple regular expressions and options.
+
+.. literalinclude:: ../examples/app_based_example.py
+   :language: python
+
+A view-based example
+~~~~~~~~~~~~~~~~~~~~~
+Alternatively, using the decorator on a per view basis enables CORS for only
+a particular view.
+
+.. literalinclude:: ../examples/view_based_example.py
+   :language: python
+
+
+.. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.png?branch=master
+   :target: https://travis-ci.org/wcdolphin/flask-cors
+.. |Latest Version| image:: https://pypip.in/version/Flask-Cors/badge.svg
+   :target: https://pypi.python.org/pypi/Flask-Cors/
+.. |Downloads| image:: https://pypip.in/download/Flask-Cors/badge.svg
+   :target: https://pypi.python.org/pypi/Flask-Cors/
+.. |Supported Python versions| image:: https://pypip.in/py_versions/Flask-Cors/badge.svg
+   :target: https://pypi.python.org/pypi/Flask-Cors/
+.. |License| image:: https://pypip.in/license/Flask-Cors/badge.svg
+   :target: https://pypi.python.org/pypi/Flask-Cors/
+
+
