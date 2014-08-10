@@ -32,7 +32,7 @@ Simple Usage
 In the simplest case, initialize the Flask-Cors extension with default
 arguments in order to allow CORS on all routes.
 
-.. code:: python
+.. code-block:: python
 
 
     app = Flask(__name__)
@@ -52,7 +52,7 @@ app.
 Note: this resources parameter can also be set in your application's
 config.
 
-.. code:: python
+.. code-block:: python
 
     app = Flask(__name__)
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -69,7 +69,7 @@ with. Simply add ``@cross_origin()`` below a call to Flask's
 ``@app.route(..)`` incanation to accept the default options and allow
 CORS on a given route.
 
-.. code:: python
+.. code-block:: python
 
     @app.route("/")
     @cross_origin() # allow all origins all methods.
@@ -85,7 +85,7 @@ with a JSON content type, you must allow the Content-Type header. The
 simplest way to do this is to simply set the CORS\_HEADERS configuration
 value on your application: e.g.
 
-.. code:: python
+.. code-block:: python
 
     app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -121,6 +121,11 @@ Questions, comments or improvements? Please create an issue on
 `Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
 [@wcdolphin](https://twitter.com/wcdolphin) or send me an email.
 
+
+Credits
+-------
+This Flask extension is based upon the [Decorator for the HTTP Access Control](http://flask.pocoo.org/snippets/56/) written by Armin Ronacher.
+
 .. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.png?branch=master
    :target: https://travis-ci.org/wcdolphin/flask-cors
 .. |Latest Version| image:: https://pypip.in/version/Flask-Cors/badge.svg
@@ -131,7 +136,3 @@ Questions, comments or improvements? Please create an issue on
    :target: https://pypi.python.org/pypi/Flask-Cors/
 .. |License| image:: https://pypip.in/license/Flask-Cors/badge.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
-
-Credits
--------
-This Flask extension is based upon the [Decorator for the HTTP Access Control](http://flask.pocoo.org/snippets/56/) written by Armin Ronacher.
