@@ -1,8 +1,11 @@
 Flask-CORS
 ==========
 
-|Build Status| |Latest Version| |Downloads| |Supported Python versions|
-|License|
+| |Build Status|
+| |Latest Version|
+| |Downloads|
+| |Supported Python versions|
+| |License|
 
 A Flask extension for handling Cross Origin Resource Sharing (CORS),
 making cross-origin AJAX possible.
@@ -21,10 +24,12 @@ Usage
 
 This extension enables CORS support either via a decorator, or a Flask
 extension. There are three examples shown in the
-`examples <./examples>`__ directory, showing the major use cases. The
-suggested configuration is the
-`simple\_example.py <./examples/simple_example.py>`__, or the
-`app\_example.py <./examples/app_example.py>`__.
+`examples <https://github.com/wcdolphin/flask-cors/blob/master/examples/>`__
+directory, showing the major use cases. The suggested configuration is
+the
+`simple\_example.py <https://github.com/wcdolphin/flask-cors/blob/master/examples/simple_example.py>`__,
+or the
+`app\_example.py <https://github.com/wcdolphin/flask-cors/blob/master/examples/app_based_example.py>`__.
 
 Simple Usage
 ~~~~~~~~~~~~
@@ -100,9 +105,16 @@ CORSEnabler and regular expressions, or via the ``@cross_origin()``
 decorator.
 
 The application-wide configuration options are creatively prefixed with
-CORS\_ e.g. \* CORS\_ORIGINS \* CORS\_METHODS \* CORS\_HEADERS \*
-CORS\_EXPOSE\_HEADERS \* CORS\_ALWAYS\_SEND \* CORS\_MAX\_AGE \*
-CORS\_SEND\_WILDCARD \* CORS\_ALWAYS\_SEND
+'CORS\_' e.g.
+
+-  CORS\_ORIGINS~
+-  CORS\_METHODS
+-  CORS\_HEADERS
+-  CORS\_EXPOSE\_HEADERS
+-  CORS\_ALWAYS\_SEND
+-  CORS\_MAX\_AGE
+-  CORS\_SEND\_WILDCARD
+-  CORS\_ALWAYS\_SEND
 
 For a full list of options, please see the full
 `documentation <http://flask-cors.readthedocs.org/en/latest/>`__
@@ -119,7 +131,14 @@ Contributing
 
 Questions, comments or improvements? Please create an issue on
 `Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
-[@wcdolphin](https://twitter.com/wcdolphin) or send me an email.
+`@wcdolphin <https://twitter.com/wcdolphin>`__ or send me an email.
+
+Credits
+-------
+
+This Flask extension is based upon the `Decorator for the HTTP Access
+Control <http://flask.pocoo.org/snippets/56/>`__ written by Armin
+Ronacher.
 
 .. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.png?branch=master
    :target: https://travis-ci.org/wcdolphin/flask-cors
@@ -131,7 +150,3 @@ Questions, comments or improvements? Please create an issue on
    :target: https://pypi.python.org/pypi/Flask-Cors/
 .. |License| image:: https://pypip.in/license/Flask-Cors/badge.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
-
-Credits
--------
-This Flask extension is based upon the [Decorator for the HTTP Access Control](http://flask.pocoo.org/snippets/56/) written by Armin Ronacher.
