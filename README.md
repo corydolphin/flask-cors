@@ -18,10 +18,10 @@ $ pip install flask-cors
 
 ## Usage
 This extension enables CORS support either via a decorator, or a Flask
-extension. There are three examples shown in the [examples](./examples) directory, showing
+extension. There are three examples shown in the [examples](https://github.com/wcdolphin/flask-cors/tree/master/examples) directory, showing
 the major use cases. The suggested configuration is the
-[simple_example.py](./examples/simple_example.py), or the
-[app_example.py](./examples/app_example.py).
+[simple_example.py](https://github.com/wcdolphin/flask-cors/tree/master/examples/simple_example.py), or the
+[app_example.py](https://github.com/wcdolphin/flask-cors/tree/master/examples/app_based_example.py).
 
 
 ### Simple Usage
