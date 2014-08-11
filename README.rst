@@ -1,11 +1,15 @@
 Flask-CORS
 ==========
 
-|Build Status| |Latest Version| |Downloads| |Supported Python versions|
-|License|
+| |Build Status|
+| |Latest Version|
+| |Downloads|
+| |Supported Python versions|
+| |License|
 
-A Flask extension for handling Cross Origin Resource Sharing (CORS),
-making cross-origin AJAX possible.
+| A Flask extension for handling Cross Origin Resource Sharing (CORS),
+making
+| cross-origin AJAX possible.
 
 Installation
 ------------
@@ -21,10 +25,12 @@ Usage
 
 This extension enables CORS support either via a decorator, or a Flask
 extension. There are three examples shown in the
-`examples <./examples>`__ directory, showing the major use cases. The
-suggested configuration is the
-`simple\_example.py <./examples/simple_example.py>`__, or the
-`app\_example.py <./examples/app_example.py>`__.
+`examples <https://github.com/wcdolphin/flask-cors/tree/master/examples>`__
+directory, showing the major use cases. The suggested configuration is
+the
+`simple\_example.py <https://github.com/wcdolphin/flask-cors/tree/master/examples/simple_example.py>`__,
+or the
+`app\_example.py <https://github.com/wcdolphin/flask-cors/tree/master/examples/app_based_example.py>`__.
 
 Simple Usage
 ~~~~~~~~~~~~
@@ -32,7 +38,7 @@ Simple Usage
 In the simplest case, initialize the Flask-Cors extension with default
 arguments in order to allow CORS on all routes.
 
-.. code-block:: python
+.. code:: python
 
 
     app = Flask(__name__)
@@ -52,7 +58,7 @@ app.
 Note: this resources parameter can also be set in your application's
 config.
 
-.. code-block:: python
+.. code:: python
 
     app = Flask(__name__)
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -69,7 +75,7 @@ with. Simply add ``@cross_origin()`` below a call to Flask's
 ``@app.route(..)`` incanation to accept the default options and allow
 CORS on a given route.
 
-.. code-block:: python
+.. code:: python
 
     @app.route("/")
     @cross_origin() # allow all origins all methods.
@@ -79,13 +85,14 @@ CORS on a given route.
 Using JSON with CORS
 ~~~~~~~~~~~~~~~~~~~~
 
-When using JSON cross origin, browsers will issue a pre-flight OPTIONS
+| When using JSON cross origin, browsers will issue a pre-flight OPTIONS
 request for POST requests. In order for browsers to allow POST requests
 with a JSON content type, you must allow the Content-Type header. The
 simplest way to do this is to simply set the CORS\_HEADERS configuration
-value on your application: e.g.
+value on your application:
+| e.g.
 
-.. code-block:: python
+.. code:: python
 
     app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -100,9 +107,16 @@ CORSEnabler and regular expressions, or via the ``@cross_origin()``
 decorator.
 
 The application-wide configuration options are creatively prefixed with
-CORS\_ e.g. \* CORS\_ORIGINS \* CORS\_METHODS \* CORS\_HEADERS \*
-CORS\_EXPOSE\_HEADERS \* CORS\_ALWAYS\_SEND \* CORS\_MAX\_AGE \*
-CORS\_SEND\_WILDCARD \* CORS\_ALWAYS\_SEND
+'CORS\_' e.g.
+
+-  CORS\_ORIGINS
+-  CORS\_METHODS
+-  CORS\_HEADERS
+-  CORS\_EXPOSE\_HEADERS
+-  CORS\_ALWAYS\_SEND
+-  CORS\_MAX\_AGE
+-  CORS\_SEND\_WILDCARD
+-  CORS\_ALWAYS\_SEND
 
 For a full list of options, please see the full
 `documentation <http://flask-cors.readthedocs.org/en/latest/>`__
@@ -119,12 +133,14 @@ Contributing
 
 Questions, comments or improvements? Please create an issue on
 `Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
-[@wcdolphin](https://twitter.com/wcdolphin) or send me an email.
-
+`@wcdolphin <https://twitter.com/wcdolphin>`__ or send me an email.
 
 Credits
 -------
-This Flask extension is based upon the [Decorator for the HTTP Access Control](http://flask.pocoo.org/snippets/56/) written by Armin Ronacher.
+
+This Flask extension is based upon the `Decorator for the HTTP Access
+Control <http://flask.pocoo.org/snippets/56/>`__ written by Armin
+Ronacher.
 
 .. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.png?branch=master
    :target: https://travis-ci.org/wcdolphin/flask-cors
