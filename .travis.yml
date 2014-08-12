@@ -26,5 +26,6 @@ deploy:
     all_branches: true
     tags: true
     repo: wcdolphin/flask-cors
+    condition: $TRAVIS_PYTHON_VERSION != *2.6*
 
 
