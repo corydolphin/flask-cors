@@ -1,15 +1,11 @@
 Flask-CORS
 ==========
 
-| |Build Status|
-| |Latest Version|
-| |Downloads|
-| |Supported Python versions|
-| |License|
+|Build Status| |Latest Version| |Downloads| |Supported Python versions|
+|License|
 
-| A Flask extension for handling Cross Origin Resource Sharing (CORS),
-making
-| cross-origin AJAX possible.
+A Flask extension for handling Cross Origin Resource Sharing (CORS),
+making cross-origin AJAX possible.
 
 Installation
 ------------
@@ -85,12 +81,11 @@ CORS on a given route.
 Using JSON with CORS
 ~~~~~~~~~~~~~~~~~~~~
 
-| When using JSON cross origin, browsers will issue a pre-flight OPTIONS
+When using JSON cross origin, browsers will issue a pre-flight OPTIONS
 request for POST requests. In order for browsers to allow POST requests
 with a JSON content type, you must allow the Content-Type header. The
 simplest way to do this is to simply set the CORS\_HEADERS configuration
-value on your application:
-| e.g.
+value on your application, e.g:
 
 .. code:: python
 
@@ -102,12 +97,12 @@ Application-wide settings
 Alternatively, you can set all parameters **except automatic\_options**
 in an app's config object. Setting these at the application level
 effectively changes the default value for your application, while still
-allowing you to override it on a per-resource basis, either via the
-CORSEnabler and regular expressions, or via the ``@cross_origin()``
+allowing you to override it on a per-resource basis, either via the CORS
+Flask-Extension and regular expressions, or via the ``@cross_origin()``
 decorator.
 
-The application-wide configuration options are creatively prefixed with
-'CORS\_' e.g.
+The application-wide configuration options are identical to the keyword
+arguments to ``cross_origin``, creatively prefixed with ``CORS_``
 
 -  CORS\_ORIGINS
 -  CORS\_METHODS
@@ -117,6 +112,9 @@ The application-wide configuration options are creatively prefixed with
 -  CORS\_MAX\_AGE
 -  CORS\_SEND\_WILDCARD
 -  CORS\_ALWAYS\_SEND
+
+Documentation
+-------------
 
 For a full list of options, please see the full
 `documentation <http://flask-cors.readthedocs.org/en/latest/>`__
