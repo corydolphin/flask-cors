@@ -140,7 +140,7 @@ This Flask extension is based upon the `Decorator for the HTTP Access
 Control <http://flask.pocoo.org/snippets/56/>`__ written by Armin
 Ronacher.
 
-.. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.png?branch=master
+.. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.svg?branch=master
    :target: https://travis-ci.org/wcdolphin/flask-cors
 .. |Latest Version| image:: https://pypip.in/version/Flask-Cors/badge.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
