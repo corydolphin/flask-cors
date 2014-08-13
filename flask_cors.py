@@ -213,7 +213,6 @@ class CORS(object):
                 return resp
 
             for res_regex, res_options in resources:
-                print (res_regex, request.path)
                 if re.match(res_regex, request.path):
                     _options = options.copy()
                     _options.update(res_options)
