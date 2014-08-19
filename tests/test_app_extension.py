@@ -32,17 +32,17 @@ class AppExtensionDefaultTestCase(AppConfigTest, OriginsTestCase):
             return 'Welcome!'
 
         @self.app.route('/test_list')
-        @cross_origin(origins=["Foo", "Bar"])
+        @cross_origin(origins=["http://foo.com", "http://bar.com"])
         def test_list():
             return 'Welcome!'
 
         @self.app.route('/test_string')
-        @cross_origin(origins="Foo")
+        @cross_origin(origins="http://foo.com")
         def test_string():
             return 'Welcome!'
 
         @self.app.route('/test_set')
-        @cross_origin(origins=set(["Foo", "Bar"]))
+        @cross_origin(origins=set(["http://foo.com", "http://bar.com"]))
         def test_set():
             return 'Welcome!'
 
@@ -52,9 +52,9 @@ class AppExtensionRegexp(AppConfigTest, OriginsTestCase):
         self.app = Flask(__name__)
         CORS(self.app, resources={
             r'/': {},
-            r'/test_list': {'origins': ["Foo", "Bar"]},
-            r'/test_string': {'origins': 'Foo'},
-            r'/test_set': {'origins': set(["Foo", "Bar"])}
+            r'/test_list': {'origins': ["http://foo.com", "http://bar.com"]},
+            r'/test_string': {'origins': 'http://foo.com'},
+            r'/test_set': {'origins': set(["http://foo.com", "http://bar.com"])}
         })
 
         @self.app.route('/')
@@ -78,7 +78,7 @@ class AppExtensionList(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
         CORS(self.app, resources=[r'/test_exposed', r'/test_other_exposed'],
-             origins=['foobar'])
+             origins=['http://foo.com, http://bar.com'])
 
         @self.app.route('/unexposed')
         def unexposed():
@@ -95,12 +95,14 @@ class AppExtensionList(FlaskCorsTestCase):
         def test_exposed(self):
             for resp in self.iter_responses('/test_exposed'):
                 self.assertEqual(resp.status_code, 200)
-                self.assertEqual(resp.headers.get(ACL_ORIGIN), 'foobar')
+                self.assertEqual(resp.headers.get(ACL_ORIGIN),
+                                 'http://foo.com, http://bar.com')
 
         def test_exposed2(self):
             for resp in self.iter_responses('/test_exposed2'):
                 self.assertEqual(resp.status_code, 200)
-                self.assertEqual(resp.headers.get(ACL_ORIGIN), 'foobar')
+                self.assertEqual(resp.headers.get(ACL_ORIGIN),
+                                 'http://foo.com, http://bar.com')
 
         def test_unexposed(self):
             for resp in self.iter_responses('/test_exposed2'):
@@ -122,7 +124,7 @@ class AppExtensionString(FlaskCorsTestCase):
             return jsonify(success=True)
 
         @self.app.route('/api/v1/special')
-        @cross_origin(origins='Foo')
+        @cross_origin(origins='http://foo.com')
         def overridden():
             return jsonify(special=True)
 
@@ -147,7 +149,7 @@ class AppExtensionString(FlaskCorsTestCase):
     def test_override(self):
         for resp in self.iter_responses('/api/v1/special'):
             self.assertEqual(resp.status_code, 200)
-            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'Foo')
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
 
             self.assertFalse(ACL_HEADERS in resp.headers)
 

@@ -27,17 +27,17 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
         @self.app.route('/test_list')
-        @cross_origin(expose_headers=["Foo", "Bar"])
+        @cross_origin(expose_headers=["http://foo.com", "http://bar.com"])
         def test_list():
             return 'Welcome!'
 
         @self.app.route('/test_string')
-        @cross_origin(expose_headers="Foo")
+        @cross_origin(expose_headers="http://foo.com")
         def test_string():
             return 'Welcome!'
 
         @self.app.route('/test_set')
-        @cross_origin(expose_headers=set(["Foo", "Bar"]))
+        @cross_origin(expose_headers=set(["http://foo.com", "http://bar.com"]))
         def test_set():
             return 'Welcome!'
 
@@ -53,7 +53,7 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             resp =  c.get('/test_list')
-            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'Bar, Foo')
+            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'http://bar.com, http://foo.com')
 
     def test_string_serialized(self):
         ''' If there is an Origin header in the request, the
@@ -61,7 +61,7 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             resp =  c.get('/test_string')
-            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'Foo')
+            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'http://foo.com')
 
     def test_set_serialized(self):
         ''' If there is an Origin header in the request, the
@@ -69,7 +69,7 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             resp =  c.get('/test_set')
-            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'Bar, Foo')
+            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'http://bar.com, http://foo.com')
 
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
@@ -87,7 +87,7 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
 
     def test_list_serialized(self):
         self.app = Flask(__name__)
-        self.app.config['CORS_EXPOSE_HEADERS'] = ["Foo", "Bar"]
+        self.app.config['CORS_EXPOSE_HEADERS'] = ["http://foo.com", "http://bar.com"]
 
         @self.app.route('/test_list')
         @cross_origin()
@@ -98,7 +98,7 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
 
     def test_string_serialized(self):
         self.app = Flask(__name__)
-        self.app.config['CORS_EXPOSE_HEADERS'] = "Foo"
+        self.app.config['CORS_EXPOSE_HEADERS'] = "http://foo.com"
 
         @self.app.route('/test_string')
         @cross_origin()
@@ -109,7 +109,7 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
 
     def test_set_serialized(self):
         self.app = Flask(__name__)
-        self.app.config['CORS_EXPOSE_HEADERS'] = set(["Foo", "Bar"])
+        self.app.config['CORS_EXPOSE_HEADERS'] = set(["http://foo.com", "http://bar.com"])
 
         @self.app.route('/test_set')
         @cross_origin()

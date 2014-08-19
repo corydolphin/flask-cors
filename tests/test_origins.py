@@ -30,17 +30,17 @@ class OriginsTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
         @self.app.route('/test_list')
-        @cross_origin(origins=["Foo", "Bar"])
+        @cross_origin(origins=["http://foo.com", "http://bar.com"])
         def test_list():
             return 'Welcome!'
 
         @self.app.route('/test_string')
-        @cross_origin(origins="Foo")
+        @cross_origin(origins="http://foo.com")
         def test_string():
             return 'Welcome!'
 
         @self.app.route('/test_set')
-        @cross_origin(origins=set(["Foo", "Bar"]))
+        @cross_origin(origins=set(["http://foo.com", "http://bar.com"]))
         def test_set():
             return 'Welcome!'
 
@@ -69,7 +69,7 @@ class OriginsTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             resp =  c.get('/test_list')
-            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'Bar, Foo')
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://bar.com, http://foo.com')
 
     def test_string_serialized(self):
         ''' If there is an Origin header in the request,
@@ -77,7 +77,7 @@ class OriginsTestCase(FlaskCorsTestCase):
         '''
         with self.app.test_client() as c:
             resp =  c.get('/test_string')
-            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'Foo')
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
 
     def test_set_serialized(self):
         ''' If there is an Origin header in the request,
@@ -88,7 +88,7 @@ class OriginsTestCase(FlaskCorsTestCase):
 
             allowed = resp.headers.get(ACL_ORIGIN)
             # Order is not garaunteed
-            self.assertEqual(allowed, 'Bar, Foo')
+            self.assertEqual(allowed, 'http://bar.com, http://foo.com')
 
     def test_not_matching_origins(self):
         for resp in self.iter_responses('/test_list',
@@ -121,7 +121,7 @@ class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
 
     def test_list_serialized(self):
         self.app = Flask(__name__)
-        self.app.config['CORS_ORIGINS'] = ["Foo", "Bar"]
+        self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
 
         @self.app.route('/test_list')
         @cross_origin()
@@ -132,7 +132,7 @@ class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
 
     def test_string_serialized(self):
         self.app = Flask(__name__)
-        self.app.config['CORS_ORIGINS'] = "Foo"
+        self.app.config['CORS_ORIGINS'] = "http://foo.com"
 
         @self.app.route('/test_string')
         @cross_origin()
@@ -143,7 +143,7 @@ class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
 
     def test_set_serialized(self):
         self.app = Flask(__name__)
-        self.app.config['CORS_ORIGINS'] = set(["Foo", "Bar"])
+        self.app.config['CORS_ORIGINS'] = set(["http://foo.com", "http://bar.com"])
 
         @self.app.route('/test_set')
         @cross_origin()
