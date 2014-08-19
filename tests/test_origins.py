@@ -90,6 +90,11 @@ class OriginsTestCase(FlaskCorsTestCase):
             # Order is not garaunteed
             self.assertEqual(allowed, 'Bar, Foo')
 
+    def test_not_matching_origins(self):
+        for resp in self.iter_responses('/test_list',
+                                        headers={'origin': "http://bazz.com"}):
+            self.assertFalse(ACL_ORIGIN in resp.headers)
+
 
 class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
     def __init__(self, *args, **kwargs):
@@ -146,6 +151,18 @@ class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
             return 'Welcome!'
 
         super(AppConfigOriginsTestCase, self).test_set_serialized()
+
+    def test_not_matching_origins(self):
+        pass
+        # self.app = Flask(__name__)
+        # self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
+
+        # @self.app.route('/test_list')
+        # @cross_origin()
+        # def test_list():
+        #     return 'Welcome!'
+
+        # super(AppConfigOriginsTestCase, self).test_not_matching_origins()
 
 
 if __name__ == "__main__":
