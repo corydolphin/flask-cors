@@ -230,16 +230,15 @@ def _set_cors_headers(resp, options):
 
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
-    #
-    # Unless always_send is set, then ignore W3 spec
-    if request_origin or options.get('always_send'):
-         # If the value of the Origin header is a case-sensitive match
-         # for any of the values in list of origins
-        if request_origin and request_origin in options.get('origins'):
-            resp.headers[ACL_ORIGIN] = request_origin
+    if request_origin:
+
+        # If the value of the Origin header is a case-sensitive match
+        # for any of the values in list of origins
+        if request_origin in options.get('origins'):
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             # -- W3Spec
+            resp.headers[ACL_ORIGIN] = request_origin
 
         # If the allowed origins is an asterisk or 'wildcard', always match
         elif wildcard:
@@ -247,33 +246,38 @@ def _set_cors_headers(resp, options):
                 resp.headers[ACL_ORIGIN] = '*'
             else:
                 resp.headers[ACL_ORIGIN] = request_origin
-        else:
-            resp.headers[ACL_ORIGIN] = options.get('origins')
 
-        if options.get('methods'):
-            resp.headers[ACL_METHODS] = options.get('methods')
+    # Unless always_send is set, then ignore W3 spec
+    elif options.get('always_send'):
+        resp.headers[ACL_ORIGIN] = options.get('origins')
+    # Terminate these steps, return the original request untouched.
+    else:
+        return resp
 
-        if options.get('headers'):
-            resp.headers[ACL_HEADERS] = options.get('headers')
+    if options.get('methods'):
+        resp.headers[ACL_METHODS] = options.get('methods')
 
-        if options.get('expose_headers'):
-            resp.headers[ACL_EXPOSE_HEADERS] = options.get(
-                'expose_headers')
+    if options.get('headers'):
+        resp.headers[ACL_HEADERS] = options.get('headers')
 
-        if options.get('max_age'):
-            resp.headers[ACL_MAX_AGE] = options.get('max_age')
+    if options.get('expose_headers'):
+        resp.headers[ACL_EXPOSE_HEADERS] = options.get(
+            'expose_headers')
 
-        if options.get('supports_credentials'):
-            resp.headers[ACL_CREDENTIALS] = 'true'
+    if options.get('max_age'):
+        resp.headers[ACL_MAX_AGE] = options.get('max_age')
 
-        if request.method == 'OPTIONS':
-            resp.headers[ACL_METHODS] = options.get('methods', _flexible_str(
-                ALL_METHODS))
+    if options.get('supports_credentials'):
+        resp.headers[ACL_CREDENTIALS] = 'true'
 
-        # http://www.w3.org/TR/cors/#resource-implementation
-        if resp.headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
-            vary = ['Origin', resp.headers.get('Vary', None)]
-            resp.headers['Vary'] = ', '. join(v for v in vary if v is not None)
+    if request.method == 'OPTIONS':
+        resp.headers[ACL_METHODS] = options.get('methods',
+                                                _flexible_str(ALL_METHODS))
+
+    # http://www.w3.org/TR/cors/#resource-implementation
+    if resp.headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
+        vary = ['Origin', resp.headers.get('Vary', None)]
+        resp.headers['Vary'] = ', '. join(v for v in vary if v is not None)
 
 
 def _get_app_kwarg_dict(app=current_app):
