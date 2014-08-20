@@ -23,6 +23,17 @@ except:
 
 
 class FlaskCorsTestCase(unittest.TestCase):
+    def shortDescription(self):
+        """
+        Get's the one liner description to be displayed.
+        Source:
+        http://erikzaadi.com/2012/09/13/inheritance-within-python-unit-tests/
+        """
+        doc = self._testMethodDoc
+        doc = doc and doc.split("\n")[0].strip() or ""
+        doc = "%s : %s" % (self.__class__.__name__, doc)
+        return doc
+
     def iter_verbs(self, c):
         ''' A simple helper method to iterate through a range of
             HTTP Verbs and return the test_client bound instance,
