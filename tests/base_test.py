@@ -31,8 +31,7 @@ class FlaskCorsTestCase(unittest.TestCase):
         """
         doc = self._testMethodDoc
         doc = doc and doc.split("\n")[0].strip() or ""
-        doc = "%s : %s" % (self.__class__.__name__, doc)
-        return doc
+        return "%s : %s" % (self.__class__.__name__, doc)
 
     def iter_verbs(self, c):
         ''' A simple helper method to iterate through a range of
@@ -46,6 +45,31 @@ class FlaskCorsTestCase(unittest.TestCase):
         with self.app.test_client() as c:
             for verb in verbs:
                 yield getattr(c, verb.lower())(path, **kwargs)
+
+    def _request(self, verb, *args, **kwargs):
+        with self.app.test_client() as c:
+            return getattr(c, verb)(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        return self._request('get', *args, **kwargs)
+
+    def head(self, *args, **kwargs):
+        return self._request('head', *args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        return self._request('post', *args, **kwargs)
+
+    def options(self, *args, **kwargs):
+        return self._request('options', *args, **kwargs)
+
+    def put(self, *args, **kwargs):
+        return self._request('put', *args, **kwargs)
+
+    def patch(self, *args, **kwargs):
+        return self._request('patch', *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return self._request('delete', *args, **kwargs)
 
 
 class AppConfigTest(object):
