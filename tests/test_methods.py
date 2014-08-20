@@ -43,10 +43,10 @@ class MethodsCase(FlaskCorsTestCase):
         ''' By default, Access-Control-Allow-Methods should only be returned
             if the client makes an OPTIONS request.
         '''
-        with self.app.test_client() as c:
-            self.assertFalse(ACL_METHODS in c.get('/defaults').headers)
-            self.assertFalse(ACL_METHODS in c.head('/defaults').headers)
-            self.assertTrue(ACL_METHODS in c.options('/defaults').headers)
+
+        self.assertFalse(ACL_METHODS in self.get('/defaults').headers)
+        self.assertFalse(ACL_METHODS in self.head('/defaults').headers)
+        self.assertTrue(ACL_METHODS in self.options('/defaults').headers)
 
     def test_methods_defined(self):
         ''' If the methods parameter is defined, always return the allowed
@@ -66,8 +66,6 @@ class AppConfigMethodsTestCase(AppConfigTest, MethodsCase):
         super(AppConfigMethodsTestCase, self).__init__(*args, **kwargs)
 
     def test_defaults(self):
-        self.app = Flask(__name__)
-
         @self.app.route('/defaults')
         @cross_origin()
         def defaults():
@@ -76,7 +74,6 @@ class AppConfigMethodsTestCase(AppConfigTest, MethodsCase):
         super(AppConfigMethodsTestCase, self).test_defaults()
 
     def test_methods_defined(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_METHODS'] = ['GET']
 
         @self.app.route('/get')
@@ -87,8 +84,6 @@ class AppConfigMethodsTestCase(AppConfigTest, MethodsCase):
         super(AppConfigMethodsTestCase, self).test_methods_defined()
 
     def test_all_methods(self):
-        self.app = Flask(__name__)
-
         @self.app.route('/all_methods', methods=ALL_METHODS)
         @cross_origin()
         def test_all_methods():

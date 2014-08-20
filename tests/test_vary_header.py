@@ -69,12 +69,12 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             If Flask-Cors adds a Vary header and there is already a Vary
             header set, the headers should be combined and comma-separated.
         '''
-        with self.app.test_client() as c:
-            resp =  c.get('/test_existing_vary_headers')
-            self.assertEqual(
-                resp.headers.get('Vary'),
-                'Origin, Accept-Encoding'
-            )
+
+        resp = self.get('/test_existing_vary_headers')
+        self.assertEqual(
+            resp.headers.get('Vary'),
+            'Origin, Accept-Encoding'
+        )
 
 
 class AppConfigVaryHeaderTestCase(AppConfigTest,
@@ -83,8 +83,6 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
         super(AppConfigVaryHeaderTestCase, self).__init__(*args, **kwargs)
 
     def test_consistent_origin(self):
-        self.app = Flask(__name__)
-
         @self.app.route('/')
         @cross_origin()
         def wildcard():
@@ -93,7 +91,6 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
         super(AppConfigVaryHeaderTestCase, self).test_consistent_origin()
 
     def test_varying_origin(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
 
         @self.app.route('/test_vary')
@@ -104,7 +101,6 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
         super(AppConfigVaryHeaderTestCase, self).test_varying_origin()
 
     def test_consistent_origin_concat(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
 
         @self.app.route('/test_existing_vary_headers')

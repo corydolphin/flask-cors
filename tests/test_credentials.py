@@ -38,17 +38,15 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
         ''' The specified route should return the
             Access-Control-Allow-Credentials header.
         '''
-        with self.app.test_client() as c:
-            resp =  c.get('/test_credentials')
-            header = resp.headers.get(ACL_CREDENTIALS)
-            self.assertEquals(header, 'true')
+        resp = self.get('/test_credentials')
+        header = resp.headers.get(ACL_CREDENTIALS)
+        self.assertEquals(header, 'true')
 
     def test_open_request(self):
         ''' The default behavior should be to disallow credentials.
         '''
-        with self.app.test_client() as c:
-            resp =  c.get('/test_open')
-            self.assertTrue(ACL_CREDENTIALS not in resp.headers)
+        resp = self.get('/test_open')
+        self.assertTrue(ACL_CREDENTIALS not in resp.headers)
 
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, SupportsCredentialsCase):
@@ -56,7 +54,6 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, SupportsCredentialsCase):
         super(SupportsCredentialsCase, self).__init__(*args, **kwargs)
 
     def test_credentialed_request(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_SUPPORTS_CREDENTIALS'] = True
 
         @self.app.route('/test_credentials')
@@ -67,8 +64,6 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, SupportsCredentialsCase):
         super(AppConfigExposeHeadersTestCase, self).test_credentialed_request()
 
     def test_open_request(self):
-        self.app = Flask(__name__)
-
         @self.app.route('/test_open')
         @cross_origin()
         def test_open():
