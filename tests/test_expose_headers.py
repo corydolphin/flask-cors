@@ -42,34 +42,32 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
     def test_default(self):
-        with self.app.test_client() as c:
-            resp =  c.get('/test_default')
-            self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
-                            "Default should have no allowed headers")
+        resp = self.get('/test_default')
+        self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
+                        "Default should have no allowed headers")
 
     def test_list_serialized(self):
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
-        with self.app.test_client() as c:
-            resp =  c.get('/test_list')
-            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'http://bar.com, http://foo.com')
+        resp = self.get('/test_list')
+        self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
+                         'http://bar.com, http://foo.com')
 
     def test_string_serialized(self):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
         '''
-        with self.app.test_client() as c:
-            resp =  c.get('/test_string')
-            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'http://foo.com')
+        resp = self.get('/test_string')
+        self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'http://foo.com')
 
     def test_set_serialized(self):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
         '''
-        with self.app.test_client() as c:
-            resp =  c.get('/test_set')
-            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'http://bar.com, http://foo.com')
+        resp = self.get('/test_set')
+        self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
+                         'http://bar.com, http://foo.com')
 
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
@@ -77,17 +75,16 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
         super(AppConfigExposeHeadersTestCase, self).__init__(*args, **kwargs)
 
     def test_default(self):
-        self.app = Flask(__name__)
-
         @self.app.route('/test_default')
         @cross_origin()
         def test_default():
             return 'Welcome!'
+
         super(AppConfigExposeHeadersTestCase, self).test_default()
 
     def test_list_serialized(self):
-        self.app = Flask(__name__)
-        self.app.config['CORS_EXPOSE_HEADERS'] = ["http://foo.com", "http://bar.com"]
+        self.app.config['CORS_EXPOSE_HEADERS'] = ["http://foo.com",
+                                                  "http://bar.com"]
 
         @self.app.route('/test_list')
         @cross_origin()
@@ -97,7 +94,6 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
         super(AppConfigExposeHeadersTestCase, self).test_list_serialized()
 
     def test_string_serialized(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_EXPOSE_HEADERS'] = "http://foo.com"
 
         @self.app.route('/test_string')
@@ -108,13 +104,14 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
         super(AppConfigExposeHeadersTestCase, self).test_string_serialized()
 
     def test_set_serialized(self):
-        self.app = Flask(__name__)
-        self.app.config['CORS_EXPOSE_HEADERS'] = set(["http://foo.com", "http://bar.com"])
+        self.app.config['CORS_EXPOSE_HEADERS'] = set(["http://foo.com",
+                                                      "http://bar.com"])
 
         @self.app.route('/test_set')
         @cross_origin()
         def test_string():
             return 'Welcome!'
+
         super(AppConfigExposeHeadersTestCase, self).test_set_serialized()
 
 

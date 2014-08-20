@@ -70,8 +70,6 @@ class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
         super(AppConfigMaxAgeTestCase, self).__init__(*args, **kwargs)
 
     def test_defaults(self):
-        self.app = Flask(__name__)
-
         @self.app.route('/defaults')
         @cross_origin()
         def defaults():
@@ -80,7 +78,6 @@ class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
         super(AppConfigMaxAgeTestCase, self).test_defaults()
 
     def test_string(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_MAX_AGE'] = 600
 
         @self.app.route('/test_string')
@@ -91,7 +88,6 @@ class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
         super(AppConfigMaxAgeTestCase, self).test_string()
 
     def test_time_delta(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_MAX_AGE'] = timedelta(minutes=10)
 
         @self.app.route('/test_time_delta')
@@ -106,7 +102,6 @@ class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
             methods defined by the user.
         '''
         # timedelta.total_seconds is not available in older versions of Python
-        self.app = Flask(__name__)
         self.app.config['CORS_MAX_AGE'] = 600
 
         @self.app.route('/test_override')

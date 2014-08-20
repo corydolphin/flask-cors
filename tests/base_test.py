@@ -8,7 +8,7 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
-
+from flask import Flask
 try:
     import unittest2 as unittest
 except ImportError:
@@ -74,7 +74,7 @@ class FlaskCorsTestCase(unittest.TestCase):
 
 class AppConfigTest(object):
     def setUp(self):
-        self.app = None
+        self.app = Flask(self.__class__.__name__)
 
     def tearDown(self):
         self.app = None

@@ -64,9 +64,8 @@ class HeadersTestCase(FlaskCorsTestCase):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
         '''
-        with self.app.test_client() as c:
-            resp =  c.get('/test_set')
-            self.assertEqual(resp.headers.get(ACL_HEADERS), 'Bar, Foo')
+        resp = self.get('/test_set')
+        self.assertEqual(resp.headers.get(ACL_HEADERS), 'Bar, Foo')
 
 
 class AppConfigHeadersTestCase(AppConfigTest, HeadersTestCase):
@@ -74,7 +73,6 @@ class AppConfigHeadersTestCase(AppConfigTest, HeadersTestCase):
         super(AppConfigHeadersTestCase, self).__init__(*args, **kwargs)
 
     def test_list_serialized(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_HEADERS'] = ['Foo', 'Bar']
 
         @self.app.route('/test_list')
@@ -85,7 +83,6 @@ class AppConfigHeadersTestCase(AppConfigTest, HeadersTestCase):
         super(AppConfigHeadersTestCase, self).test_list_serialized()
 
     def test_string_serialized(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_HEADERS'] = 'Foo'
 
         @self.app.route('/test_string')
@@ -96,7 +93,6 @@ class AppConfigHeadersTestCase(AppConfigTest, HeadersTestCase):
         super(AppConfigHeadersTestCase, self).test_string_serialized()
 
     def test_set_serialized(self):
-        self.app = Flask(__name__)
         self.app.config['CORS_HEADERS'] = set(["Foo", "Bar"])
 
         @self.app.route('/test_set')
@@ -106,8 +102,6 @@ class AppConfigHeadersTestCase(AppConfigTest, HeadersTestCase):
         super(AppConfigHeadersTestCase, self).test_set_serialized()
 
     def test_default(self):
-        self.app = Flask(__name__)
-
         @self.app.route('/test_default')
         @cross_origin()
         def test_default():
