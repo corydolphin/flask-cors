@@ -30,12 +30,12 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
         @self.app.route('/test_vary')
-        @cross_origin(origins=["Foo", "Bar"])
+        @cross_origin(origins=["http://foo.com", "http://bar.com"])
         def test_vary():
             return 'Welcome!'
 
         @self.app.route('/test_existing_vary_headers')
-        @cross_origin(origins=["Foo", "Bar"])
+        @cross_origin(origins=["http://foo.com", "http://bar.com"])
         def test_existing_vary_headers():
             return Response('', status=200, headers={'Vary': 'Accept-Encoding'})
 
@@ -59,7 +59,7 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             to prevent caching of such responses, which may be inaccurate if
             re-used across-origins.
         '''
-        example_origin = 'http://example.com'
+        example_origin = 'http://foo.com'
         for resp in self.iter_responses('/test_vary',
                                         headers={'Origin': example_origin}):
             self.assertEqual(resp.headers.get('Vary'), 'Origin')
@@ -94,7 +94,7 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
 
     def test_varying_origin(self):
         self.app = Flask(__name__)
-        self.app.config['CORS_ORIGINS'] = ["Foo", "Bar"]
+        self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
 
         @self.app.route('/test_vary')
         @cross_origin()
@@ -105,7 +105,7 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
 
     def test_consistent_origin_concat(self):
         self.app = Flask(__name__)
-        self.app.config['CORS_ORIGINS'] = ["Foo", "Bar"]
+        self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
 
         @self.app.route('/test_existing_vary_headers')
         @cross_origin()
@@ -113,7 +113,6 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
             return Response('', status=200, headers={'Vary': 'Accept-Encoding'})
 
         super(AppConfigVaryHeaderTestCase, self).test_consistent_origin_concat()
-
 
 
 if __name__ == "__main__":
