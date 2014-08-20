@@ -121,6 +121,8 @@ def cross_origin(*args, **kwargs):
                 resp = make_response(f(*args, **kwargs))
 
             _set_cors_headers(resp, options)
+            resp._FLASK_CORS_EVALUATED = True  # Mark response as evaluated
+
             return resp
 
         # If True, intercept OPTIONS requests by modifying the view function
@@ -224,6 +226,18 @@ class CORS(object):
 
 
 def _set_cors_headers(resp, options):
+    '''
+        Performs the actual evaluation of Flas-CORS options and actually
+        modifies the response object.
+
+        This function is used both in the decorator and the after_request
+        callback
+    '''
+
+    # If CORS has already been evaluated via the decorator, skip
+    if hasattr(resp, '_FLASK_CORS_EVALUATED'):
+        return resp
+
     request_origin = request.headers.get('Origin', None)
     wildcard = options.get('origins') == '*'
     # If the Origin header is not present terminate this set of steps.
