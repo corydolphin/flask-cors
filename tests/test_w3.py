@@ -48,38 +48,28 @@ class OriginsW3TestCase(FlaskCorsTestCase):
             Access-Control-Allow-Origin header should be echoed back.
         '''
         example_origin = 'http://example.com'
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                resp = verb('/', headers={'Origin': example_origin})
-                self.assertEqual(
-                    resp.headers.get(ACL_ORIGIN),
-                    example_origin
-                )
+        headers = {'Origin': example_origin}
+        for resp in self.iter_responses('/', headers=headers):
+            self.assertEqual(
+                resp.headers.get(ACL_ORIGIN),
+                example_origin
+            )
 
     def test_wildcard_no_origin_header(self):
         ''' If there is no Origin header in the request, the
             Access-Control-Allow-Origin header should not be included.
         '''
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                resp = verb('/')
-                self.assertTrue(ACL_ORIGIN not in resp.headers)
+        for resp in self.iter_responses('/'):
+            self.assertTrue(ACL_ORIGIN not in resp.headers)
 
     def test_wildcard_default_origins(self):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
         '''
         example_origin = 'http://example.com'
-        with self.app.test_client() as c:
-            for verb in self.iter_verbs(c):
-                resp = verb(
-                    '/default-origins',
-                    headers={'Origin': example_origin}
-                )
-                self.assertEqual(
-                    resp.headers.get(ACL_ORIGIN),
-                    example_origin
-                )
+        headers = {'Origin': example_origin}
+        for resp in self.iter_responses('/default-origins', headers=headers):
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), example_origin)
 
 
 if __name__ == "__main__":
