@@ -121,7 +121,6 @@ def cross_origin(*args, **kwargs):
                 resp = make_response(f(*args, **kwargs))
 
             _set_cors_headers(resp, options)
-
             return resp
 
         # If True, intercept OPTIONS requests by modifying the view function
@@ -227,25 +226,26 @@ class CORS(object):
 def _set_cors_headers(resp, options):
     request_origin = request.headers.get('Origin', None)
     wildcard = options.get('origins') == '*'
-
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
     if request_origin:
 
-        # If the value of the Origin header is a case-sensitive match
-        # for any of the values in list of origins
-        if request_origin in options.get('origins'):
-            # Add a single Access-Control-Allow-Origin header, with either
-            # the value of the Origin header or the string "*" as value.
-            # -- W3Spec
-            resp.headers[ACL_ORIGIN] = request_origin
-
         # If the allowed origins is an asterisk or 'wildcard', always match
-        elif wildcard:
+        if wildcard:
             if options.get('send_wildcard'):
                 resp.headers[ACL_ORIGIN] = '*'
             else:
                 resp.headers[ACL_ORIGIN] = request_origin
+
+        # If the value of the Origin header is a case-sensitive match
+        # for any of the values in list of origins
+        elif request_origin in options.get('origins'):
+            # Add a single Access-Control-Allow-Origin header, with either
+            # the value of the Origin header or the string "*" as value.
+            # -- W3Spec
+            resp.headers[ACL_ORIGIN] = request_origin
+        else:
+            return resp
 
     # Unless always_send is set, then ignore W3 spec
     elif options.get('always_send'):
