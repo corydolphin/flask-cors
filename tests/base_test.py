@@ -29,9 +29,8 @@ class FlaskCorsTestCase(unittest.TestCase):
         Source:
         http://erikzaadi.com/2012/09/13/inheritance-within-python-unit-tests/
         """
-        doc = self._testMethodDoc
-        doc = doc and doc.split("\n")[0].strip() or ""
-        return "%s : %s" % (self.__class__.__name__, doc)
+        doc = self.id()[self.id().rfind('.')+1:]
+        return "%s.%s" % (self.__class__.__name__, doc)
 
     def iter_verbs(self, c):
         ''' A simple helper method to iterate through a range of

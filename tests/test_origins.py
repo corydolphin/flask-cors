@@ -11,13 +11,14 @@
 
 from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
-
 try:
     # this is how you would normally import
     from flask.ext.cors import *
 except:
     # support local usage without installed package
     from flask_cors import *
+
+letters = 'abcdefghijklmnopqrstuvwxyz'  # string.letters is not PY3 compatible
 
 
 class OriginsTestCase(FlaskCorsTestCase):
@@ -43,6 +44,21 @@ class OriginsTestCase(FlaskCorsTestCase):
         @cross_origin(origins=set(["http://foo.com", "http://bar.com"]))
         def test_set():
             return 'Welcome!'
+
+        @self.app.route('/test_subdomain_regex')
+        @cross_origin(origins=r"http?://\w*\.?example\.com:?\d*/?.*")
+        def _test_subdomain_regex():
+            return ''
+
+        @self.app.route('/test_regex_list')
+        @cross_origin(origins=[r".*.example.com", r".*.otherexample.com"])
+        def _test_regex_list():
+            return ''
+
+        @self.app.route('/test_regex_mixed_list')
+        @cross_origin(origins=["http://example.com", r".*.otherexample.com"])
+        def _test_regex_mixed_list():
+            return ''
 
     def test_wildcard_defaults_no_origin(self):
         ''' If there is no Origin header in the request, the
@@ -92,6 +108,46 @@ class OriginsTestCase(FlaskCorsTestCase):
         for resp in self.iter_responses('/test_list',
                                         headers={'origin': "http://bazz.com"}):
             self.assertFalse(ACL_ORIGIN in resp.headers)
+
+    def test_subdomain_regex(self):
+        for sub in letters:
+            domain = "http://%s.example.com" % sub
+            for resp in self.iter_responses('/test_subdomain_regex',
+                                            headers={'origin': domain}):
+                self.assertEqual(domain, resp.headers[ACL_ORIGIN])
+
+    def test_regex_list(self):
+        for parent in 'example.com', 'otherexample.com':
+            for sub in letters:
+                domain = "http://%s.%s.com" % (sub, parent)
+                for resp in self.iter_responses('/test_regex_list',
+                                                headers={'origin': domain}):
+                    self.assertEqual(domain, resp.headers[ACL_ORIGIN])
+
+    def test_regex_mixed_list(self):
+        '''
+            Tests  the corner case occurs when the send_always setting is True
+            and no Origin header in the request, it is not possible to match
+            the regular expression(s) to determine the correct
+            Access-Control-Allow-Origin header to be returned. Instead, the
+            list of origins is serialized, and any strings which seem like
+            regular expressions (e.g. are not a '*' and contain either '*'
+            or '?') will be skipped.
+
+            Thus, the list of returned Access-Control-Allow-Origin header
+            is garaunteed to be 'null', the origin or "*", as per the w3
+            http://www.w3.org/TR/cors/#access-control-allow-origin-response-header
+
+        '''
+        for sub in letters:
+            domain = "http://%s.otherexample.com" % sub
+            for resp in self.iter_responses('/test_regex_mixed_list',
+                                            headers={'origin': domain}):
+                self.assertEqual(domain, resp.headers[ACL_ORIGIN])
+
+        self.assertEquals("http://example.com",
+                          self.get('/test_regex_mixed_list').headers[ACL_ORIGIN]
+                          )
 
 
 class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
@@ -154,6 +210,36 @@ class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
 
         super(AppConfigOriginsTestCase, self).test_not_matching_origins()
 
+    def test_regex_list(self):
+        @self.app.route('/test_regex_list')
+        @cross_origin()
+        def _test_regex_list():
+            return 'Welcome!'
+
+        self.app.config['CORS_ORIGINS'] = [r".*.example.com",
+                                           r".*.otherexample.com"]
+        super(AppConfigOriginsTestCase, self).test_regex_list()
+
+    def test_subdomain_regex(self):
+        self.app.config['CORS_ORIGINS'] = r"http?://\w*\.?example\.com:?\d*/?.*"
+
+        @self.app.route('/test_subdomain_regex')
+        @cross_origin()
+        def _test_subdomain_regex():
+            return ''
+
+        super(AppConfigOriginsTestCase, self).test_subdomain_regex()
+
+    def test_regex_mixed_list(self):
+        self.app.config['CORS_ORIGINS'] = ["http://example.com",
+                                           r".*.otherexample.com"]
+
+        @self.app.route('/test_regex_mixed_list')
+        @cross_origin()
+        def _test_regex_mixed_list():
+            return ''
+
+        super(AppConfigOriginsTestCase, self).test_regex_mixed_list()
 
 if __name__ == "__main__":
     unittest.main()

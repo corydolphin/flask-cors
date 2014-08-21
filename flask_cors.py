@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+
 import collections
 from datetime import timedelta
 import re
@@ -239,7 +240,8 @@ def _set_cors_headers(resp, options):
         return resp
 
     request_origin = request.headers.get('Origin', None)
-    wildcard = options.get('origins') == '*'
+    origins = options.get('origins')
+    wildcard = '*' in origins
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
     if request_origin:
@@ -253,7 +255,7 @@ def _set_cors_headers(resp, options):
 
         # If the value of the Origin header is a case-sensitive match
         # for any of the values in list of origins
-        elif request_origin in options.get('origins'):
+        elif any(_try_match(pattern, request_origin) for pattern in origins):
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             # -- W3Spec
@@ -261,9 +263,11 @@ def _set_cors_headers(resp, options):
         else:
             return resp
 
-    # Unless always_send is set, then ignore W3 spec
-    elif options.get('always_send'):
-        resp.headers[ACL_ORIGIN] = options.get('origins')
+    # Unless always_send is set, then ignore W3 spec as long as there is a
+    # valid list of origins, e.g. one that is not merely comrpised of regular
+    # expressions.
+    elif options.get('always_send') and options.get('origins_str'):
+        resp.headers[ACL_ORIGIN] = options.get('origins_str')
     # Terminate these steps, return the original request untouched.
     else:
         return resp
@@ -302,6 +306,18 @@ def _get_app_kwarg_dict(app=current_app):
                 ])
 
 
+def _try_match(pattern, request_origin):
+    '''
+        Safely attempts to match a pattern or string to a request origin.
+
+        If a pattern is an illegal regular expression
+    '''
+    try:
+        return re.match(pattern, request_origin)
+    except:
+        return request_origin == pattern
+
+
 def _flexible_str(obj):
     if(not isinstance(obj, string_types)
             and isinstance(obj, collections.Iterable)):
@@ -310,17 +326,47 @@ def _flexible_str(obj):
         return str(obj)
 
 
-def _serialize_option(d, key, upper=False):
+def _serialize_option(d, key, target_key=None, upper=False):
     if key in d:
-        d[key] = _flexible_str(d[key])
-        if upper:
-            if d[key]:
-                d[key].upper()
+        v = _flexible_str(d[key])
+        if upper and v:
+            v.upper()
+        d[target_key or key] = v
+
+
+def _is_regexp(pattern):
+    '''
+        Returns True if the `pattern` is likely to be a regexp,
+    '''
+    if pattern != '*' and any(c in pattern for c in '?*'):
+        return True
+    return False
+
+
+def _filter_false(predicate, iterable):
+    '''
+        Returns all objects in iterable for which predicate is false.
+        Equivalent to the Python 3 version of itertools.filterfalse
+    '''
+    return filter(lambda x: not predicate(x), iterable)
 
 
 def _serialize_options(options):
+    '''
+        A helper method to serialize and processes the options dictionary
+        where applicable.
+    '''
+    # ensure origins is a list of allowed origins with at least one entry.
+    if isinstance(options.get('origins'), string_types):
+        options['origins'] = [options.get('origins')]
+
+    # remove regular expressions from the list of serialized origins to be
+    # returned in the case of a request with no Origin header, while
+    # always_send is set to True
+    options['origins_str'] = _filter_false(_is_regexp, options.get('origins'))
+
+    _serialize_option(options, 'origins_str')
     _serialize_option(options, 'methods', upper=True)
-    _serialize_option(options, 'origins')
     _serialize_option(options, 'headers')
     _serialize_option(options, 'expose_headers')
 
