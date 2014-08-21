@@ -21,32 +21,6 @@ except:
     from flask_cors import *
 
 
-class AppExtensionDefaultTestCase(AppConfigTest, OriginsTestCase):
-    def setUp(self):
-        self.app = Flask(__name__)
-        CORS(self.app)
-
-        @self.app.route('/')
-        @cross_origin()
-        def wildcard():
-            return 'Welcome!'
-
-        @self.app.route('/test_list')
-        @cross_origin(origins=["http://foo.com", "http://bar.com"])
-        def test_list():
-            return 'Welcome!'
-
-        @self.app.route('/test_string')
-        @cross_origin(origins="http://foo.com")
-        def test_string():
-            return 'Welcome!'
-
-        @self.app.route('/test_set')
-        @cross_origin(origins=set(["http://foo.com", "http://bar.com"]))
-        def test_set():
-            return 'Welcome!'
-
-
 class AppExtensionRegexp(AppConfigTest, OriginsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
@@ -54,7 +28,18 @@ class AppExtensionRegexp(AppConfigTest, OriginsTestCase):
             r'/': {},
             r'/test_list': {'origins': ["http://foo.com", "http://bar.com"]},
             r'/test_string': {'origins': 'http://foo.com'},
-            r'/test_set': {'origins': set(["http://foo.com", "http://bar.com"])}
+            r'/test_set': {
+                'origins': set(["http://foo.com", "http://bar.com"])
+            },
+            r'/test_subdomain_regex': {
+                'origins': r"http?://\w*\.?example\.com:?\d*/?.*"
+            },
+            r'/test_regex_list': {
+                'origins': [r".*.example.com", r".*.otherexample.com"]
+            },
+            r'/test_regex_mixed_list': {
+                'origins': ["http://example.com", r".*.otherexample.com"]
+            }
         })
 
         @self.app.route('/')

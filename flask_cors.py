@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+
 import collections
 from datetime import timedelta
 import re
@@ -262,8 +263,10 @@ def _set_cors_headers(resp, options):
         else:
             return resp
 
-    # Unless always_send is set, then ignore W3 spec
-    elif options.get('always_send'):
+    # Unless always_send is set, then ignore W3 spec as long as there is a
+    # valid list of origins, e.g. one that is not merely comrpised of regular
+    # expressions.
+    elif options.get('always_send') and options.get('origins_str'):
         resp.headers[ACL_ORIGIN] = options.get('origins_str')
     # Terminate these steps, return the original request untouched.
     else:
@@ -331,6 +334,23 @@ def _serialize_option(d, key, target_key=None, upper=False):
         d[target_key or key] = v
 
 
+def _is_regexp(pattern):
+    '''
+        Returns True if the `pattern` is likely to be a regexp,
+    '''
+    if pattern != '*' and any(c in pattern for c in '?*'):
+        return True
+    return False
+
+
+def _filter_false(predicate, iterable):
+    '''
+        Returns all objects in iterable for which predicate is false.
+        Equivalent to the Python 3 version of itertools.filterfalse
+    '''
+    return filter(lambda x: not predicate(x), iterable)
+
+
 def _serialize_options(options):
     '''
         A helper method to serialize and processes the options dictionary
@@ -340,7 +360,12 @@ def _serialize_options(options):
     if isinstance(options.get('origins'), string_types):
         options['origins'] = [options.get('origins')]
 
-    _serialize_option(options, 'origins', target_key='origins_str')
+    # remove regular expressions from the list of serialized origins to be
+    # returned in the case of a request with no Origin header, while
+    # always_send is set to True
+    options['origins_str'] = _filter_false(_is_regexp, options.get('origins'))
+
+    _serialize_option(options, 'origins_str')
     _serialize_option(options, 'methods', upper=True)
     _serialize_option(options, 'headers')
     _serialize_option(options, 'expose_headers')
