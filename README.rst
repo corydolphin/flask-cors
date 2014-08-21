@@ -14,7 +14,7 @@ Install the extension with using pip, or easy\_install.
 
 .. code:: bash
 
-    $ pip install flask-cors
+    $ pip install -U flask-cors
 
 Usage
 -----
@@ -78,21 +78,98 @@ CORS on a given route.
     def helloWorld():
       return "Hello, cross-origin-world!"
 
-Using JSON with CORS
-~~~~~~~~~~~~~~~~~~~~
+Options
+~~~~~~~
 
-When using JSON cross origin, browsers will issue a pre-flight OPTIONS
-request for POST requests. In order for browsers to allow POST requests
-with a JSON content type, you must allow the Content-Type header. The
-simplest way to do this is to simply set the CORS\_HEADERS configuration
-value on your application, e.g:
+origins
+^^^^^^^
 
-.. code:: python
+    Default : '\*'
 
-    app.config['CORS_HEADERS'] = 'Content-Type'
+The origin, or list of origins to allow requests from. The origin(s) may
+be regular expressions, exact origins, or else an asterisk.
 
-Application-wide settings
-~~~~~~~~~~~~~~~~~~~~~~~~~
+methods
+^^^^^^^
+
+    Default : [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE]
+
+The method or list of methods which the allowed origins are allowed to
+access.
+
+headers
+^^^^^^^
+
+    Default : None
+
+The header or list of header field names which can be used when this
+resource is accessed by allowed origins.
+
+expose\_headers
+^^^^^^^^^^^^^^^
+
+    Default : None
+
+The header or list of headers which are are safe to expose to browsers.
+
+supports\_credentials
+^^^^^^^^^^^^^^^^^^^^^
+
+    Default : False
+
+Allows users to make authenticated requests. If true, injects the
+``Access-Control-Allow-Credentials`` header in responses.
+
+max\_age
+^^^^^^^^
+
+    Default : None
+
+The maximum time for which this CORS request maybe cached. This value is
+set as the ``Access-Control-Max-Age`` header.
+
+send\_wildcard
+^^^^^^^^^^^^^^
+
+    Default : True
+
+If True, and the origins parameter is ``*``, a wildcard
+``Access-Control-Allow-Origin`` header is sent, rather than the
+request's ``Origin`` header.
+
+always\_send
+^^^^^^^^^^^^
+
+    Default : True
+
+If True, CORS headers are sent even if there is no ``Origin`` in the
+request's headers.
+
+automatic\_options
+^^^^^^^^^^^^^^^^^^
+
+    Default : True
+
+| If True, CORS headers will be returned for OPTIONS requests. For use
+with cross domain POST requests which preflight OPTIONS requests, you
+will need to specifically allow the Content-Type header.
+| \*\* Only applicable for use in the decorator\*\*
+
+vary\_header
+^^^^^^^^^^^^
+
+    Default : True
+
+If True, the header Vary: Origin will be returned as per suggestion by
+the W3 implementation guidelines. Setting this header when the
+``Access-Control-Allow-Origin`` is dynamically generated (e.g. when
+there is more than one allowed origin, and an Origin than '\*' is
+returned) informs CDNs and other caches that the CORS headers are
+dynamic, and cannot be re-used. If False, the Vary header will never be
+injected or altered.
+
+Application-wide options
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Alternatively, you can set all parameters **except automatic\_options**
 in an app's config object. Setting these at the application level
@@ -112,6 +189,19 @@ arguments to ``cross_origin``, creatively prefixed with ``CORS_``
 -  CORS\_MAX\_AGE
 -  CORS\_SEND\_WILDCARD
 -  CORS\_ALWAYS\_SEND
+
+Using JSON with CORS
+~~~~~~~~~~~~~~~~~~~~
+
+When using JSON cross origin, browsers will issue a pre-flight OPTIONS
+request for POST requests. In order for browsers to allow POST requests
+with a JSON content type, you must allow the Content-Type header. The
+simplest way to do this is to simply set the CORS\_HEADERS configuration
+value on your application, e.g:
+
+.. code:: python
+
+    app.config['CORS_HEADERS'] = 'Content-Type'
 
 Documentation
 -------------

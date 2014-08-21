@@ -27,7 +27,7 @@ Install the extension with using pip, or easy\_install.
 
 .. code:: bash
 
-    $ pip install flask-cors
+    $ pip install -U flask-cors
 
 Usage
 -----
