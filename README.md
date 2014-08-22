@@ -103,8 +103,7 @@ If True, CORS headers are sent even if there is no `Origin` in the request's hea
 #### automatic_options
 > Default : True
 
-If True, CORS headers will be returned for OPTIONS requests. For use with cross domain POST requests which preflight OPTIONS requests, you will need to specifically allow the Content-Type header.
-** Only applicable for use in the decorator**
+If True, CORS headers will be returned for OPTIONS requests. For use with cross domain POST requests which preflight OPTIONS requests, you will need to specifically allow the Content-Type header. ** Only applicable for use in the decorator**
 
 #### vary_header
 > Default : True
