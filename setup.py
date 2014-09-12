@@ -30,7 +30,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask',
+        'Flask >= 0.9',
         'Six'
     ],
     tests_require=[
