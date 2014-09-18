@@ -70,6 +70,12 @@ class FlaskCorsTestCase(unittest.TestCase):
     def delete(self, *args, **kwargs):
         return self._request('delete', *args, **kwargs)
 
+    def assertHasACLOrigin(self, resp, origin=None):
+        if origin is None:
+            self.assertTrue(ACL_ORIGIN in resp.headers)
+        else:
+            self.assertTrue(resp.headers.get(ACL_ORIGIN) == origin)
+
 
 class AppConfigTest(object):
     def setUp(self):

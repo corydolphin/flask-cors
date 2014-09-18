@@ -114,7 +114,7 @@ class OriginsTestCase(FlaskCorsTestCase):
             domain = "http://%s.example.com" % sub
             for resp in self.iter_responses('/test_subdomain_regex',
                                             headers={'origin': domain}):
-                self.assertEqual(domain, resp.headers[ACL_ORIGIN])
+                self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
     def test_regex_list(self):
         for parent in 'example.com', 'otherexample.com':
@@ -122,7 +122,7 @@ class OriginsTestCase(FlaskCorsTestCase):
                 domain = "http://%s.%s.com" % (sub, parent)
                 for resp in self.iter_responses('/test_regex_list',
                                                 headers={'origin': domain}):
-                    self.assertEqual(domain, resp.headers[ACL_ORIGIN])
+                    self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
     def test_regex_mixed_list(self):
         '''
@@ -143,10 +143,10 @@ class OriginsTestCase(FlaskCorsTestCase):
             domain = "http://%s.otherexample.com" % sub
             for resp in self.iter_responses('/test_regex_mixed_list',
                                             headers={'origin': domain}):
-                self.assertEqual(domain, resp.headers[ACL_ORIGIN])
+                self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
         self.assertEquals("http://example.com",
-                          self.get('/test_regex_mixed_list').headers[ACL_ORIGIN]
+                          self.get('/test_regex_mixed_list').headers.get(ACL_ORIGIN)
                           )
 
 
