@@ -3,4 +3,5 @@ include README.rst
 include LICENSE
 recursive-include docs *
 recursive-include examples *.py
+recursive-include tests *.py
 prune docs/_build
