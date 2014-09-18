@@ -54,7 +54,7 @@ class OptionsTestCase(FlaskCorsTestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(ACL_ORIGIN in resp.headers)
-        self.assertEqual(resp.headers[ACL_ORIGIN], '*')
+        self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
     def test_no_options_and_not_auto(self):
         '''
@@ -84,7 +84,7 @@ class OptionsTestCase(FlaskCorsTestCase):
         headers = {'Origin': 'http://foo.bar.com/'}
         resp = self.options('/test_options_and_not_auto', headers=headers)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.headers[ACL_ORIGIN], '*')
+        self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
         self.assertEqual(resp.data.decode("utf-8"), u"Welcome!")
 
 

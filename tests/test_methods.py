@@ -54,7 +54,7 @@ class MethodsCase(FlaskCorsTestCase):
         '''
         for resp in self.iter_responses('/get'):
             self.assertTrue(ACL_METHODS in resp.headers)
-            self.assertTrue('GET' in resp.headers[ACL_METHODS])
+            self.assertTrue('GET' in resp.headers.get(ACL_METHODS))
 
     def test_all_methods(self):
         for resp in self.iter_responses('/all_methods', verbs=ALL_METHODS):
