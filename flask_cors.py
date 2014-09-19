@@ -34,6 +34,8 @@ CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_HEADERS',
                   'CORS_MAX_AGE', 'CORS_SEND_WILDCARD', 'CORS_ALWAYS_SEND',
                   'CORS_AUTOMATIC_OPTIONS', 'CORS_VARY_HEADER']
 
+FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
+
 _defaults_dict = dict(origins='*',
                       always_send=True,
                       automatic_options=True,
@@ -145,7 +147,7 @@ def cross_origin(*args, **kwargs):
                 resp = make_response(f(*args, **kwargs))
 
             _set_cors_headers(resp, options)
-            resp._FLASK_CORS_EVALUATED = True  # Mark response as evaluated
+            setattr(resp, FLASK_CORS_EVALUATED, True)
 
             return resp
 
@@ -259,7 +261,7 @@ def _set_cors_headers(resp, options):
     '''
 
     # If CORS has already been evaluated via the decorator, skip
-    if hasattr(resp, '_FLASK_CORS_EVALUATED'):
+    if hasattr(resp, FLASK_CORS_EVALUATED):
         return resp
 
     request_origin = request.headers.get('Origin', None)
