@@ -79,7 +79,7 @@ class FlaskCorsTestCase(unittest.TestCase):
 
 class AppConfigTest(object):
     def setUp(self):
-        self.app = Flask(self.__class__.__name__)
+        self.app = Flask(import_name=__name__)
 
     def tearDown(self):
         self.app = None
