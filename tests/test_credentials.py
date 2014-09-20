@@ -51,7 +51,7 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, SupportsCredentialsCase):
     def __init__(self, *args, **kwargs):
-        super(SupportsCredentialsCase, self).__init__(*args, **kwargs)
+        super(AppConfigExposeHeadersTestCase, self).__init__(*args, **kwargs)
 
     def test_credentialed_request(self):
         self.app.config['CORS_SUPPORTS_CREDENTIALS'] = True

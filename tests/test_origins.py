@@ -152,7 +152,7 @@ class OriginsTestCase(FlaskCorsTestCase):
 
 class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
     def __init__(self, *args, **kwargs):
-        super(OriginsTestCase, self).__init__(*args, **kwargs)
+        super(AppConfigOriginsTestCase, self).__init__(*args, **kwargs)
 
     def test_wildcard_defaults_no_origin(self):
         @self.app.route('/')
