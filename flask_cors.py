@@ -218,6 +218,10 @@ class CORS(object):
         _app_resources = app.config.get('CORS_RESOURCES')
         _resources = _kwarg_resources or _app_resources or [r'/*']
 
+        # To make the API more consistent with the decorator, allow a resource
+        # of '*', which is not actually a valid regexp.
+        _resources = r'.*' if _resources == '*' else _resources
+
         if isinstance(_resources, dict):  # sort the regexps by length
             resources = sorted(_resources.items(),
                                key=lambda r: len(r[0]),
@@ -240,7 +244,7 @@ class CORS(object):
                 return resp
 
             for res_regex, res_options in resources:
-                if re.match(res_regex, request.path):
+                if _try_match(res_regex, request.path):
                     _options = options.copy()
                     _options.update(res_options)
                     _serialize_options(_options)

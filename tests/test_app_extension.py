@@ -148,5 +148,22 @@ class AppExtensionError(FlaskCorsTestCase):
         except ValueError:
             pass
 
+
+class AppExtensionBadRegexp(FlaskCorsTestCase):
+    def test_value_error(self):
+        '''
+            Ensure we do not error if the user sepcifies an bad regular
+            expression.
+        '''
+
+        self.app = Flask(__name__)
+        CORS(self.app, resources="[")
+
+        @self.app.route('/')
+        def index():
+            return 'Welcome'
+
+        for resp in self.iter_responses('/'):
+            self.assertEqual(resp.status_code, 200)
 if __name__ == "__main__":
     unittest.main()
