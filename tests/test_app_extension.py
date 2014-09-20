@@ -65,7 +65,7 @@ class AppExtensionList(FlaskCorsTestCase):
         CORS(self.app, resources=[r'/test_exposed', r'/test_other_exposed'],
              origins=['http://foo.com, http://bar.com'])
 
-        @self.app.route('/unexposed')
+        @self.app.route('/test_unexposed')
         def unexposed():
             return 'Not exposed over CORS!'
 
@@ -77,22 +77,22 @@ class AppExtensionList(FlaskCorsTestCase):
         def exposed2():
             return 'Welcome!'
 
-        def test_exposed(self):
-            for resp in self.iter_responses('/test_exposed'):
-                self.assertEqual(resp.status_code, 200)
-                self.assertEqual(resp.headers.get(ACL_ORIGIN),
-                                 'http://foo.com, http://bar.com')
+    def test_exposed(self):
+        for resp in self.iter_responses('/test_exposed'):
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.headers.get(ACL_ORIGIN),
+                             'http://foo.com, http://bar.com')
 
-        def test_exposed2(self):
-            for resp in self.iter_responses('/test_exposed2'):
-                self.assertEqual(resp.status_code, 200)
-                self.assertEqual(resp.headers.get(ACL_ORIGIN),
-                                 'http://foo.com, http://bar.com')
+    def test_other_exposed(self):
+        for resp in self.iter_responses('/test_other_exposed'):
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.headers.get(ACL_ORIGIN),
+                             'http://foo.com, http://bar.com')
 
-        def test_unexposed(self):
-            for resp in self.iter_responses('/test_exposed2'):
-                self.assertEqual(resp.status_code, 200)
-                self.assertFalse(ACL_ORIGIN in resp.headers)
+    def test_unexposed(self):
+        for resp in self.iter_responses('/test_unexposed'):
+            self.assertEqual(resp.status_code, 200)
+            self.assertFalse(ACL_ORIGIN in resp.headers)
 
 
 class AppExtensionString(FlaskCorsTestCase):
@@ -148,5 +148,22 @@ class AppExtensionError(FlaskCorsTestCase):
         except ValueError:
             pass
 
+
+class AppExtensionBadRegexp(FlaskCorsTestCase):
+    def test_value_error(self):
+        '''
+            Ensure we do not error if the user sepcifies an bad regular
+            expression.
+        '''
+
+        self.app = Flask(__name__)
+        CORS(self.app, resources="[")
+
+        @self.app.route('/')
+        def index():
+            return 'Welcome'
+
+        for resp in self.iter_responses('/'):
+            self.assertEqual(resp.status_code, 200)
 if __name__ == "__main__":
     unittest.main()
