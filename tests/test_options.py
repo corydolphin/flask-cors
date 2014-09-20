@@ -90,7 +90,7 @@ class OptionsTestCase(FlaskCorsTestCase):
 
 class AppOptionsTestCase(AppConfigTest, OptionsTestCase):
     def __init__(self, *args, **kwargs):
-        super(OptionsTestCase, self).__init__(*args, **kwargs)
+        super(AppOptionsTestCase, self).__init__(*args, **kwargs)
 
     def test_defaults(self):
         @self.app.route('/test_default')
@@ -105,7 +105,8 @@ class AppOptionsTestCase(AppConfigTest, OptionsTestCase):
         @cross_origin(automatic_options=False)
         def test_no_options_and_not_auto():
             return 'Welcome!'
-        pass
+        super(AppOptionsTestCase, self).test_no_options_and_not_auto()
+
 
     def test_options_and_not_auto(self):
         self.app.config['CORS_AUTOMATIC_OPTIONS'] = False
