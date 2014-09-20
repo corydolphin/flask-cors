@@ -28,9 +28,9 @@ app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
 
 cors = CORS(app)
 
-## Equivalent to (but using both is not advised)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}},
-            headers="Content-Type")
+## Equivalent to (but do not use both)
+# cors = CORS(app, resources={r"/api/*": {"origins": "*"}},
+#            headers="Content-Type")
 
 
 @app.route("/")
