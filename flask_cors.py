@@ -168,43 +168,47 @@ def cross_origin(*args, **kwargs):
 
 
 class CORS(object):
+    '''
+        Initializes Cross Origin Resource sharing for the application. The
+        arguments are identical to :py:func:`cross_origin`, with the
+        addition of a `resources` parameter. The resources parameter
+        defines a series of regular expressions for resource paths to match
+        and optionally, the associated options
+        to be applied to the particular resource. These options are
+        identical to the arguments to :py:func:`cross_origin`.
+
+        The settings for CORS are determined in the following order:
+            Resource level settings (e.g when passed as a dictionary)
+            Keyword argument settings
+            App level configuration settings (e.g. CORS_*)
+            Default settings
+
+        Note: as it is possible for multiple regular expressions to match a
+        resource path, the regular expressions are first sorted by length,
+        from longest to shortest, in order to attempt to match the most
+        specific regular expression. This allows the definition of a
+        number of specific resource options, with a wildcard fallback
+        for all other resources.
+
+        :param resources: the series of regular expression and (optionally)
+        associated CORS options to be applied to the given resource path.
+
+        If the argument is a dictionary, it is expected to be of the form:
+        regexp : dict_of_options
+
+        If the argument is a list, it is expected to be a list of regular
+        expressions, for which the app-wide configured options are applied.
+
+        If the argument is a string, it is expected to be a regular
+        expression for which the app-wide configured options are applied.
+
+        Default :'*'
+
+        :type resources: dict, iterable or string
+
+    '''
+
     def __init__(self, app=None, **kwargs):
-        '''
-            Initializes Cross Origin Resource sharing for the application. The
-            arguments are identical to :py:func:`cross_origin`, with the
-            addition of a `resources` parameter. The resources parameter
-            defines a series of regular expressions for resource paths to match
-            and optionally, the associated :py:func:`cross_origin` options
-            to be applied to the particular resource.
-
-            The settings for CORS are determined in the following order:
-                Resource level settings (e.g when passed as a dictionary)
-                Keyword argument settings
-                App level configuration settings (e.g. CORS_*)
-                Default settings
-
-            Note: as it is possible for multiple regular expressions to match a
-            resource path, the regular expressions are first sorted by length,
-            from longest to shortest, in order to attempt to match the most
-            specific regular expression. This allows the definition of a
-            number of specific resource options, with a wildcard fallback
-            for all other resources.
-
-            :param resources: the series of regular expression and (optionally)
-            associated CORS options to be applied to the given resource path.
-
-            If the argument is a dictionary, it is expected to be of the form:
-            regexp : dict_of_options
-
-            If the argument is a list, it is expected to be a list of regular
-            expressions, for which the app-wide configured options are applied.
-
-            If the argument is a string, it is expected to be a regular
-            expression for which the app-wide configured options are applied.
-            :type resources: dict, iterable or string
-
-        '''
-
         if app is not None:
             self.init_app(app, **kwargs)
 
@@ -216,21 +220,24 @@ class CORS(object):
 
         _kwarg_resources = kwargs.get('resources')
         _app_resources = app.config.get('CORS_RESOURCES')
-        _resources = _kwarg_resources or _app_resources or [r'/*']
-
-        # To make the API more consistent with the decorator, allow a resource
-        # of '*', which is not actually a valid regexp.
-        _resources = r'.*' if _resources == '*' else _resources
+        _resources = _kwarg_resources or _app_resources or r'*'
 
         if isinstance(_resources, dict):  # sort the regexps by length
-            resources = sorted(_resources.items(),
-                               key=lambda r: len(r[0]),
-                               reverse=True
-                               )
+            # To make the API more consistent with the decorator, allow a
+            # resource of '*', which is not actually a valid regexp.
+            _resources = map(lambda x: (_re_fix(x[0]), x[1]),
+                             _resources.items())
+
+            # Sort by regex length to provide consistency of matching and
+            # to provide a proxy for specificity of match. E.G. longer
+            # regular expressions are tried first.
+            resources = sorted(_resources, key=lambda r: len(r[0]),
+                               reverse=True)
+
         elif isinstance(_resources, string_types):
-            resources = [(_resources, {})]
+            resources = [(_re_fix(_resources), {})]
         elif isinstance(_resources, collections.Iterable):
-            resources = [(r, {}) for r in _resources]
+            resources = [(_re_fix(r), {}) for r in _resources]
         else:
             raise ValueError("Unexpected value for resources argument.")
 
@@ -328,11 +335,23 @@ def _set_cors_headers(resp, options):
 
 
 def _get_app_kwarg_dict(app=current_app):
+    '''
+        Returns the dictionary of CORS specific app configurations.
+    '''
     return dict([
                 (k.lower().replace('cors_', ''), app.config.get(k))
                 for k in CONFIG_OPTIONS
                 if app.config.get(k) is not None
                 ])
+
+
+def _re_fix(reg):
+    '''
+        Replace the invalid regex r'*' with the valid, wildcard regex r'/.*' to
+        enable the CORS app extension to have a more consistent api with the
+        decorator.
+    '''
+    return r'/.*' if reg == r'*' else reg
 
 
 def _try_match(pattern, request_origin):
@@ -348,6 +367,13 @@ def _try_match(pattern, request_origin):
 
 
 def _flexible_str(obj):
+    '''
+        A more flexible str function which intelligently handles
+        stringifying iterables. The results are lexographically
+        sorted to ensure generated responses are consistent when
+        iterables such as Set are used (whose order is usually platform
+        dependent)
+    '''
     if(not isinstance(obj, string_types)
             and isinstance(obj, collections.Iterable)):
         return ', '.join(str(item) for item in sorted(obj))

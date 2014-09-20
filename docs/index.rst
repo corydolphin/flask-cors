@@ -1,6 +1,9 @@
 Flask-CORS
 ==========
 
+|Build Status| |Latest Version| |Downloads| |Supported Python versions|
+|License|
+
 A Flask extension for handling Cross Origin Resource Sharing (CORS),
 making cross-origin AJAX possible.
 
@@ -11,14 +14,6 @@ Questions, comments or improvements? Please create an issue on
 `Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
 `@wcdolphin <https://twitter.com/wcdolphin>`__ or send me an email.
 
-Flask-CORS
-==========
-
-|Build Status| |Latest Version| |Downloads| |Supported Python versions|
-|License|
-
-A Flask extension for handling Cross Origin Resource Sharing (CORS),
-making cross-origin AJAX possible.
 
 Installation
 ------------
@@ -107,6 +102,8 @@ e.g.
 
 Full description of options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autoclass:: flask_cors.CORS
+
 .. autofunction:: flask_cors.cross_origin
 
 
@@ -149,5 +146,3 @@ a particular view.
    :target: https://pypi.python.org/pypi/Flask-Cors/
 .. |License| image:: https://pypip.in/license/Flask-Cors/badge.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
-
-
