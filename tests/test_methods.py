@@ -46,15 +46,15 @@ class MethodsCase(FlaskCorsTestCase):
 
         self.assertFalse(ACL_METHODS in self.get('/defaults').headers)
         self.assertFalse(ACL_METHODS in self.head('/defaults').headers)
-        self.assertTrue(ACL_METHODS in self.options('/defaults').headers)
+        self.assertEqual(', '.join(sorted(ALL_METHODS)),
+            self.options('/defaults').headers.get(ACL_METHODS))
 
     def test_methods_defined(self):
-        ''' If the methods parameter is defined, always return the allowed
+        ''' If the methods parameter is defined, it should override the default
             methods defined by the user.
         '''
-        for resp in self.iter_responses('/get'):
-            self.assertTrue(ACL_METHODS in resp.headers)
-            self.assertTrue('GET' in resp.headers.get(ACL_METHODS))
+        self.assertEqual('GET' , self.options('/get').headers.get(ACL_METHODS))
+        self.assertFalse(ACL_METHODS in self.get('/get').headers)
 
     def test_all_methods(self):
         for resp in self.iter_responses('/all_methods', verbs=ALL_METHODS):
