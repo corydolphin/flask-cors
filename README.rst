@@ -95,7 +95,14 @@ methods
     Default : [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE]
 
 The method or list of methods which the allowed origins are allowed to
-access.
+access for non-simple requests.
+
+expose\_headers
+^^^^^^^^^^^^^^^
+
+    | Default : None
+    | The header or list of headers which are safe to expose to the API
+    of a CORS API specification
 
 headers
 ^^^^^^^
@@ -104,13 +111,6 @@ headers
 
 The header or list of header field names which can be used when this
 resource is accessed by allowed origins.
-
-expose\_headers
-^^^^^^^^^^^^^^^
-
-    Default : None
-
-The header or list of headers which are are safe to expose to browsers.
 
 supports\_credentials
 ^^^^^^^^^^^^^^^^^^^^^
