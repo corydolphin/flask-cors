@@ -73,9 +73,8 @@ def cross_origin(*args, **kwargs):
         Default : None
     :type expose_headers: list or string
 
-    :param headers: The header or list of headers which are returned as the
-        result of a preflight request, indicating which headers can be
-        used during the actual request.
+    :param headers: The header or list of header field names which can be used
+        when this resource is accessed by allowed origins
 
         Default : None
     :type headers: list or string

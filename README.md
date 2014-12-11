@@ -67,23 +67,21 @@ The origin, or list of origins to allow requests from. The origin(s) may be regu
 #### methods
 > Default : [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE]
 
-The method or list of methods which the allowed origins are allowed to access.
+The method or list of methods which the allowed origins are allowed to access for non-simple requests.
+
+#### expose_headers
+> Default : None
+The header or list of headers which are safe to expose to the API of a CORS API specification
 
 #### headers
 > Default : None
 
 The header or list of header field names which can be used when this resource is accessed by allowed origins.
 
-#### expose_headers
-> Default : None
-
-The header or list of headers which are are safe to expose to browsers.
-
 #### supports_credentials
 > Default : False
 
 Allows users to make authenticated requests. If true, injects the `Access-Control-Allow-Credentials` header in responses.
-
 
 #### max_age
 > Default : None
