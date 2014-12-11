@@ -27,38 +27,39 @@ class MethodsCase(FlaskCorsTestCase):
         @self.app.route('/defaults')
         @cross_origin()
         def defaults():
-            return 'Should only return headers on OPTIONS'
+            return 'Should only return headers on pre-flight OPTIONS request'
 
-        @self.app.route('/get')
-        @cross_origin(methods=['GET'])
+        @self.app.route('/test_methods_defined')
+        @cross_origin(methods=['POST'])
         def test_get():
-            return 'Get only!'
-
-        @self.app.route('/all_methods', methods=ALL_METHODS)
-        @cross_origin()
-        def test_all_methods():
-            return ''
+            return 'Only allow POST'
 
     def test_defaults(self):
-        ''' By default, Access-Control-Allow-Methods should only be returned
+        ''' Access-Control-Allow-Methods headers should only be returned
             if the client makes an OPTIONS request.
         '''
 
         self.assertFalse(ACL_METHODS in self.get('/defaults').headers)
         self.assertFalse(ACL_METHODS in self.head('/defaults').headers)
-        self.assertEqual(', '.join(sorted(ALL_METHODS)),
-            self.options('/defaults').headers.get(ACL_METHODS))
+        res = self.preflight('/defaults', 'POST')
+        for method in ALL_METHODS:
+            self.assertTrue(method in res.headers.get(ACL_METHODS))
 
     def test_methods_defined(self):
         ''' If the methods parameter is defined, it should override the default
             methods defined by the user.
         '''
-        self.assertEqual('GET' , self.options('/get').headers.get(ACL_METHODS))
-        self.assertFalse(ACL_METHODS in self.get('/get').headers)
+        self.assertFalse(ACL_METHODS in self.get('/test_methods_defined').headers)
+        self.assertFalse(ACL_METHODS in self.head('/test_methods_defined').headers)
 
-    def test_all_methods(self):
-        for resp in self.iter_responses('/all_methods', verbs=ALL_METHODS):
-            self.assertTrue(ACL_ORIGIN in resp.headers)
+        res = self.preflight('/test_methods_defined', 'POST')
+        self.assertTrue('POST' in res.headers.get(ACL_METHODS))
+
+        res = self.preflight('/test_methods_defined', 'PUT')
+        self.assertFalse(ACL_METHODS in res.headers)
+
+        res = self.get('/test_methods_defined')
+        self.assertFalse(ACL_METHODS in res.headers)
 
 
 class AppConfigMethodsTestCase(AppConfigTest, MethodsCase):
@@ -69,27 +70,18 @@ class AppConfigMethodsTestCase(AppConfigTest, MethodsCase):
         @self.app.route('/defaults')
         @cross_origin()
         def defaults():
-            return 'Should only return headers on OPTIONS'
+            return ''
 
         super(AppConfigMethodsTestCase, self).test_defaults()
 
     def test_methods_defined(self):
-        self.app.config['CORS_METHODS'] = ['GET']
+        self.app.config['CORS_METHODS'] = ['POST']
 
-        @self.app.route('/get')
+        @self.app.route('/test_methods_defined')
         @cross_origin()
         def defaults():
-            return 'Should only return headers on OPTIONS'
-
-        super(AppConfigMethodsTestCase, self).test_methods_defined()
-
-    def test_all_methods(self):
-        @self.app.route('/all_methods', methods=ALL_METHODS)
-        @cross_origin()
-        def test_all_methods():
             return ''
-
-        super(AppConfigMethodsTestCase, self).test_all_methods()
+        super(AppConfigMethodsTestCase, self).test_methods_defined()
 
 
 if __name__ == "__main__":

@@ -50,8 +50,8 @@ class MaxAgeTestCase(FlaskCorsTestCase):
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
-        for resp in self.iter_responses('/test_string'):
-            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
+        resp = self.preflight('/test_string')
+        self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
     def test_time_delta(self):
         ''' If the methods parameter is defined, always return the allowed
@@ -61,8 +61,8 @@ class MaxAgeTestCase(FlaskCorsTestCase):
         if sys.version_info < (2, 7):
             return
 
-        for resp in self.iter_responses('/test_time_delta'):
-            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
+        resp = self.preflight('/test_time_delta')
+        self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
 
 class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
@@ -109,8 +109,8 @@ class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
         def test_override():
             return 'Welcome!'
 
-        for resp in self.iter_responses('/test_override'):
-            self.assertEqual(resp.headers.get(ACL_MAX_AGE), '900')
+        resp = self.preflight('/test_override')
+        self.assertEqual(resp.headers.get(ACL_MAX_AGE), '900')
 
 
 if __name__ == "__main__":
