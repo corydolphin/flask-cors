@@ -24,7 +24,8 @@ ACL_HEADERS = 'Access-Control-Allow-Headers'
 ACL_EXPOSE_HEADERS = 'Access-Control-Expose-Headers'
 ACL_CREDENTIALS = 'Access-Control-Allow-Credentials'
 ACL_MAX_AGE = 'Access-Control-Max-Age'
-
+ACL_REQUEST_METHOD = 'Access-Control-Request-Method'
+ACL_REQUEST_HEADERS = 'Access-Control-Request-Headers'
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']
 
@@ -61,22 +62,23 @@ def cross_origin(*args, **kwargs):
     :type origins: list or string
 
     :param methods: The method or list of methods which the allowed origins
-        are allowed to access.
+        are allowed to access for non-simple requests.
 
         Default : [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE]
     :type methods: list or string
 
-    :param headers: The header or list of header field names which can be used
-        when this resource is accessed by allowed origins.
-
-        Default : None
-    :type headers: list or string
-
-    :param expose_headers: The header or list of headers which are are safe to
-        expose to browsers.
+    :param expose_headers: The header or list which are safe to expose to the
+        API of a CORS API specification
 
         Default : None
     :type expose_headers: list or string
+
+    :param headers: The header or list of headers which are returned as the
+        result of a preflight request, indicating which headers can be
+        used during the actual request.
+
+        Default : None
+    :type headers: list or string
 
     :param supports_credentials: Allows users to make authenticated requests.
         If true, injects the `Access-Control-Allow-Credentials` header in
@@ -218,15 +220,13 @@ class CORS(object):
         options.update(_get_app_kwarg_dict(app))
         options.update(kwargs)
 
-        _resources = _get_option('resources', kwargs, app, default=[r'/*'])
-        _intercept_exceptions = _get_option('intercept_exceptions', kwargs, app,
-                                            default=True)
+        _resources = options.get('resources', [r'/*'])
+        _intercept_exceptions = options.get('intercept_exceptions', True)
 
         if isinstance(_resources, dict):  # sort the regexps by length
             # To make the API more consistent with the decorator, allow a
             # resource of '*', which is not actually a valid regexp.
-            _resources = map(lambda x: (_re_fix(x[0]), x[1]),
-                             _resources.items())
+            _resources = [(_re_fix(k), v) for k, v in _resources.items()]
 
             # Sort by regex length to provide consistency of matching and
             # to provide a proxy for specificity of match. E.G. longer
@@ -312,29 +312,36 @@ def _get_cors_origin(options, request_origin):
 
 
 def _get_cors_headers(options, request_headers, request_method, response_headers=None):
-    headers = dict(response_headers or {}) # copy dict
+    headers = dict(response_headers or {})  # copy dict
     origin_to_set = _get_cors_origin(options, request_headers.get('Origin'))
 
-    if origin_to_set is None: # CORS is not enabled for this route!
+    if origin_to_set is None:  # CORS is not enabled for this route
         return headers
 
     headers[ACL_ORIGIN] = origin_to_set
     headers[ACL_HEADERS] = options.get('headers')
-    headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
-    headers[ACL_MAX_AGE] = options.get('max_age')
 
     if options.get('supports_credentials'):
         headers[ACL_CREDENTIALS] = 'true' # case sensative
 
+    # This is a preflight request
+    # http://www.w3.org/TR/cors/#resource-preflight-requests
     if request_method == 'OPTIONS':
-        headers[ACL_METHODS] = options.get('methods')
+        acl_request_method = request_headers.get(ACL_REQUEST_METHOD, '').upper()
+        # If there is no Access-Control-Request-Method header or if parsing
+        # failed, do not set any additional headers
+        if acl_request_method and acl_request_method in options.get('methods'):
+            headers[ACL_MAX_AGE] = options.get('max_age')
+            headers[ACL_METHODS] = options.get('methods')
+            headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
 
     # http://www.w3.org/TR/cors/#resource-implementation
     if headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
         vary = ['Origin', headers.get('Vary', None)]
         headers['Vary'] = ', '. join(v for v in vary if v is not None)
 
-    return dict((k,v) for k,v in headers.items() if v is not None)
+    return dict((k, v) for k, v in headers.items() if v is not None)
+
 
 def _set_cors_headers(resp, options):
     '''
@@ -354,33 +361,22 @@ def _set_cors_headers(resp, options):
                                        request.method,
                                        resp.headers)
 
-    for k,v in headers_to_set.items():
+    for k, v in headers_to_set.items():
         resp.headers[k] = v
 
     return resp
 
 
-def _get_option(option_name, kwargs, app, default=None):
-    kwargs_var = kwargs.get(option_name)
-    app_config_var = app.config.get(("cors_%s" % option_name).upper())
-
-    if kwargs_var is not None:
-        return kwargs_var
-    if app_config_var is not None:
-        return app_config_var
-    else:
-        return default
-
-
-def _get_app_kwarg_dict(app=current_app):
+def _get_app_kwarg_dict(appInstance=None):
     '''
         Returns the dictionary of CORS specific app configurations.
     '''
-    return dict([
-                (k.lower().replace('cors_', ''), app.config.get(k))
-                for k in CONFIG_OPTIONS
-                if app.config.get(k) is not None
-                ])
+    app = (appInstance or current_app)
+    return dict(
+        (k.lower().replace('cors_', ''), app.config.get(k))
+        for k in CONFIG_OPTIONS
+        if app.config.get(k) is not None
+    )
 
 
 def _re_fix(reg):

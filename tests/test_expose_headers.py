@@ -26,48 +26,24 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
         def test_default():
             return 'Welcome!'
 
-        @self.app.route('/test_list')
-        @cross_origin(expose_headers=["http://foo.com", "http://bar.com"])
-        def test_list():
-            return 'Welcome!'
-
-        @self.app.route('/test_string')
-        @cross_origin(expose_headers="http://foo.com")
-        def test_string():
-            return 'Welcome!'
-
-        @self.app.route('/test_set')
-        @cross_origin(expose_headers=set(["http://foo.com", "http://bar.com"]))
-        def test_set():
+        @self.app.route('/test_override')
+        @cross_origin(expose_headers=["X-My-Custom-Header", "X-Another-Custom-Header"])
+        def test_override():
             return 'Welcome!'
 
     def test_default(self):
         resp = self.get('/test_default')
         self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
-                        "Default should have no allowed headers")
+                        "Should only be returned in preflight request")
 
-    def test_list_serialized(self):
-        ''' If there is an Origin header in the request,
-            the Access-Control-Allow-Origin header should be echoed back.
+    def test_override(self):
+        ''' If this is a preflight request, the
+            the specified headers should be returned in the ACL_EXPOSE_HEADERS
+            and correctly serialized if it is a list.
         '''
-        resp = self.get('/test_list')
+        resp = self.preflight('/test_override')
         self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
-                         'http://bar.com, http://foo.com')
-
-    def test_string_serialized(self):
-        ''' If there is an Origin header in the request, the
-            Access-Control-Allow-Origin header should be echoed back.
-        '''
-        resp = self.get('/test_string')
-        self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS), 'http://foo.com')
-
-    def test_set_serialized(self):
-        ''' If there is an Origin header in the request, the
-            Access-Control-Allow-Origin header should be echoed back.
-        '''
-        resp = self.get('/test_set')
-        self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
-                         'http://bar.com, http://foo.com')
+                         'X-Another-Custom-Header, X-My-Custom-Header')
 
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
@@ -82,37 +58,16 @@ class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
 
         super(AppConfigExposeHeadersTestCase, self).test_default()
 
-    def test_list_serialized(self):
-        self.app.config['CORS_EXPOSE_HEADERS'] = ["http://foo.com",
-                                                  "http://bar.com"]
+    def test_override(self):
+        self.app.config['CORS_EXPOSE_HEADERS'] = ["X-My-Custom-Header",
+                                                  "X-Another-Custom-Header"]
 
-        @self.app.route('/test_list')
+        @self.app.route('/test_override')
         @cross_origin()
-        def test_list():
+        def test_override():
             return 'Welcome!'
 
-        super(AppConfigExposeHeadersTestCase, self).test_list_serialized()
-
-    def test_string_serialized(self):
-        self.app.config['CORS_EXPOSE_HEADERS'] = "http://foo.com"
-
-        @self.app.route('/test_string')
-        @cross_origin()
-        def test_string():
-            return 'Welcome!'
-
-        super(AppConfigExposeHeadersTestCase, self).test_string_serialized()
-
-    def test_set_serialized(self):
-        self.app.config['CORS_EXPOSE_HEADERS'] = set(["http://foo.com",
-                                                      "http://bar.com"])
-
-        @self.app.route('/test_set')
-        @cross_origin()
-        def test_string():
-            return 'Welcome!'
-
-        super(AppConfigExposeHeadersTestCase, self).test_set_serialized()
+        super(AppConfigExposeHeadersTestCase, self).test_override()
 
 
 if __name__ == "__main__":

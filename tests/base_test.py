@@ -70,6 +70,13 @@ class FlaskCorsTestCase(unittest.TestCase):
     def delete(self, *args, **kwargs):
         return self._request('delete', *args, **kwargs)
 
+    def preflight(self, path, method='GET', json=True):
+        headers = {'Access-Control-Request-Method': method}
+        if json:
+            headers.update({'Content-Type':'application/json'})
+
+        return self.options(path,headers=headers)
+
     def assertHasACLOrigin(self, resp, origin=None):
         if origin is None:
             self.assertTrue(ACL_ORIGIN in resp.headers)
