@@ -36,6 +36,7 @@ CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_HEADERS',
 FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 
 _defaults_dict = dict(origins='*',
+                      methods=ALL_METHODS,
                       always_send=True,
                       automatic_options=True,
                       send_wildcard=True,
@@ -276,6 +277,65 @@ class CORS(object):
                 app.handle_user_exception)
 
 
+def _get_cors_origin(options, request_origin):
+    origins = options.get('origins')
+    wildcard = '*' in origins
+    # If the Origin header is not present terminate this set of steps.
+    # The request is outside the scope of this specification.-- W3Spec
+    if request_origin:
+
+        # If the allowed origins is an asterisk or 'wildcard', always match
+        if wildcard:
+            if options.get('send_wildcard'):
+                return '*'
+            else:
+                return request_origin
+
+        # If the value of the Origin header is a case-sensitive match
+        # for any of the values in list of origins
+        elif any(_try_match(pattern, request_origin) for pattern in origins):
+            # Add a single Access-Control-Allow-Origin header, with either
+            # the value of the Origin header or the string "*" as value.
+            # -- W3Spec
+            return request_origin
+        else:
+            return None
+
+    # Unless always_send is set, then ignore W3 spec as long as there is a
+    # valid list of origins, e.g. one that is not merely comrpised of regular
+    # expressions.
+    elif options.get('always_send') and options.get('origins_str'):
+        return options.get('origins_str')
+    # Terminate these steps, return the original request untouched.
+    else:
+        return None
+
+
+def _get_cors_headers(options, request_headers, request_method, response_headers=None):
+    headers = dict(response_headers or {}) # copy dict
+    origin_to_set = _get_cors_origin(options, request_headers.get('Origin'))
+
+    if origin_to_set is None: # CORS is not enabled for this route!
+        return headers
+
+    headers[ACL_ORIGIN] = origin_to_set
+    headers[ACL_HEADERS] = options.get('headers')
+    headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
+    headers[ACL_MAX_AGE] = options.get('max_age')
+
+    if options.get('supports_credentials'):
+        headers[ACL_CREDENTIALS] = 'true' # case sensative
+
+    if request_method == 'OPTIONS':
+        headers[ACL_METHODS] = options.get('methods')
+
+    # http://www.w3.org/TR/cors/#resource-implementation
+    if headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
+        vary = ['Origin', headers.get('Vary', None)]
+        headers['Vary'] = ', '. join(v for v in vary if v is not None)
+
+    return dict((k,v) for k,v in headers.items() if v is not None)
+
 def _set_cors_headers(resp, options):
     '''
         Performs the actual evaluation of Flas-CORS options and actually
@@ -289,63 +349,15 @@ def _set_cors_headers(resp, options):
     if hasattr(resp, FLASK_CORS_EVALUATED):
         return resp
 
-    request_origin = request.headers.get('Origin', None)
-    origins = options.get('origins')
-    wildcard = '*' in origins
-    # If the Origin header is not present terminate this set of steps.
-    # The request is outside the scope of this specification.-- W3Spec
-    if request_origin:
+    headers_to_set = _get_cors_headers(options,
+                                       request.headers,
+                                       request.method,
+                                       resp.headers)
 
-        # If the allowed origins is an asterisk or 'wildcard', always match
-        if wildcard:
-            if options.get('send_wildcard'):
-                resp.headers[ACL_ORIGIN] = '*'
-            else:
-                resp.headers[ACL_ORIGIN] = request_origin
+    for k,v in headers_to_set.items():
+        resp.headers[k] = v
 
-        # If the value of the Origin header is a case-sensitive match
-        # for any of the values in list of origins
-        elif any(_try_match(pattern, request_origin) for pattern in origins):
-            # Add a single Access-Control-Allow-Origin header, with either
-            # the value of the Origin header or the string "*" as value.
-            # -- W3Spec
-            resp.headers[ACL_ORIGIN] = request_origin
-        else:
-            return resp
-
-    # Unless always_send is set, then ignore W3 spec as long as there is a
-    # valid list of origins, e.g. one that is not merely comrpised of regular
-    # expressions.
-    elif options.get('always_send') and options.get('origins_str'):
-        resp.headers[ACL_ORIGIN] = options.get('origins_str')
-    # Terminate these steps, return the original request untouched.
-    else:
-        return resp
-
-    if options.get('methods'):
-        resp.headers[ACL_METHODS] = options.get('methods')
-
-    if options.get('headers'):
-        resp.headers[ACL_HEADERS] = options.get('headers')
-
-    if options.get('expose_headers'):
-        resp.headers[ACL_EXPOSE_HEADERS] = options.get(
-            'expose_headers')
-
-    if options.get('max_age'):
-        resp.headers[ACL_MAX_AGE] = options.get('max_age')
-
-    if options.get('supports_credentials'):
-        resp.headers[ACL_CREDENTIALS] = 'true'
-
-    if request.method == 'OPTIONS':
-        resp.headers[ACL_METHODS] = options.get('methods',
-                                                _flexible_str(ALL_METHODS))
-
-    # http://www.w3.org/TR/cors/#resource-implementation
-    if resp.headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
-        vary = ['Origin', resp.headers.get('Vary', None)]
-        resp.headers['Vary'] = ', '. join(v for v in vary if v is not None)
+    return resp
 
 
 def _get_option(option_name, kwargs, app, default=None):
@@ -450,6 +462,7 @@ def _serialize_options(options):
     _serialize_option(options, 'methods', upper=True)
     _serialize_option(options, 'headers')
     _serialize_option(options, 'expose_headers')
+    _serialize_option(options, 'supports_credentials')
 
     if isinstance(options.get('max_age'), timedelta):
         options['max_age'] = str(int(options['max_age'].total_seconds()))
