@@ -149,6 +149,69 @@ class AppExtensionError(FlaskCorsTestCase):
         except ValueError:
             pass
 
+class AppExtensionDefault(FlaskCorsTestCase):
+    def test_default(self):
+        '''
+            By default match all.
+        '''
+
+        self.app = Flask(__name__)
+        CORS(self.app)
+
+        @self.app.route('/')
+        def index():
+            return 'Welcome'
+
+        for resp in self.iter_responses('/'):
+            self.assertEqual(resp.status_code, 200)
+            self.assertTrue(ACL_ORIGIN in resp.headers)
+
+class AppExtensionExampleApp(FlaskCorsTestCase):
+    def setUp(self):
+        self.app = Flask(__name__)
+        CORS(self.app, resources={
+            r'/api/*': {'origins': ['http://blah.com', 'http://foo.bar']}
+        })
+
+        @self.app.route('/')
+        def index():
+            return ''
+
+        @self.app.route('/api/foo')
+        def test_wildcard():
+            return ''
+
+        @self.app.route('/api/')
+        def test_exact_match():
+            return ''
+
+    def test_index(self):
+        '''
+            If regex does not match, do not set CORS
+        '''
+        for resp in self.iter_responses('/'):
+            self.assertFalse(ACL_ORIGIN in resp.headers)
+
+    def test_wildcard(self):
+        '''
+            Match anything matching the path /api/* with an origin
+            of 'http://blah.com' or 'http://foo.bar'
+        '''
+        for origin in ['http://foo.bar', 'http://blah.com']:
+            for resp in self.iter_responses('/api/foo', headers={'Origin':origin}):
+                self.assertTrue(ACL_ORIGIN in resp.headers)
+                self.assertEqual(origin, resp.headers.get(ACL_ORIGIN))
+
+    def test_exact_match(self):
+        '''
+            Match anything matching the path /api/* with an origin
+            of 'http://blah.com' or 'http://foo.bar'
+        '''
+        for origin in ['http://foo.bar', 'http://blah.com']:
+            for resp in self.iter_responses('/api/', headers={'Origin':origin}):
+                self.assertTrue(ACL_ORIGIN in resp.headers)
+                self.assertEqual(origin, resp.headers.get(ACL_ORIGIN))
+
 
 class AppExtensionBadRegexp(FlaskCorsTestCase):
     def test_value_error(self):
