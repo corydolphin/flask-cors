@@ -16,7 +16,6 @@ from functools import update_wrapper
 from flask import make_response, request, current_app
 from six import string_types
 
-
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
 ACL_METHODS = 'Access-Control-Allow-Methods'
@@ -32,7 +31,8 @@ ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']
 CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_HEADERS',
                   'CORS_EXPOSE_HEADERS', 'CORS_SUPPORTS_CREDENTIALS',
                   'CORS_MAX_AGE', 'CORS_SEND_WILDCARD', 'CORS_ALWAYS_SEND',
-                  'CORS_AUTOMATIC_OPTIONS', 'CORS_VARY_HEADER']
+                  'CORS_AUTOMATIC_OPTIONS', 'CORS_VARY_HEADER',
+                  'CORS_RESOURCES', 'CORS_INTERCEPT_EXCEPTIONS']
 
 FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 
@@ -300,6 +300,9 @@ def _get_cors_origin(options, request_origin):
     # Unless always_send is set, then ignore W3 spec as long as there is a
     # valid list of origins, e.g. one that is not merely comrpised of regular
     # expressions.
+    # TODO: remove this. It breaks the spec, and practically shouldn't be used
+    # This will only be exceuted it there is no Origin in the request, in which
+    # case, why bother with CORS?
     elif options.get('always_send') and options.get('origins_str'):
         return options.get('origins_str')
     # Terminate these steps, return the original request untouched.
