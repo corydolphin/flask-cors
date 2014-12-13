@@ -12,7 +12,7 @@
 import collections
 from datetime import timedelta
 import re
-from functools import update_wrapper, wraps
+from functools import update_wrapper
 from flask import make_response, request, current_app
 from six import string_types
 
@@ -42,7 +42,6 @@ _defaults_dict = dict(origins='*',
                       automatic_options=True,
                       send_wildcard=True,
                       vary_header=True)
-
 
 def cross_origin(*args, **kwargs):
     '''
@@ -264,11 +263,9 @@ class CORS(object):
         # These error handlers will still respect the behavior of the route
         if _intercept_exceptions:
             def _after_request_decorator(f):
-                @wraps(f)
-                def wrapper(*args, **kwds):
-                    return cors_after_request(app.make_response(
-                        f(*args, **kwds)))
-                return wrapper
+                def wrapped_function(*args, **kwargs):
+                    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                return wrapped_function
 
             app.handle_exception = _after_request_decorator(
                 app.handle_exception)
