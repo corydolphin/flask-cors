@@ -99,7 +99,7 @@ class AppExtensionList(FlaskCorsTestCase):
 class AppExtensionString(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
-        CORS(self.app, resources=r'/api/*', headers='Content-Type')
+        CORS(self.app, resources=r'/api/*', expose_headers='Content-Type')
 
         @self.app.route('/api/v1/foo')
         def exposed1():
@@ -123,21 +123,21 @@ class AppExtensionString(FlaskCorsTestCase):
             for resp in self.iter_responses(path):
                 self.assertEqual(resp.status_code, 200)
                 self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
-                self.assertEqual(resp.headers.get(ACL_HEADERS),
+                self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
                                  'Content-Type')
 
     def test_unexposed(self):
         for resp in self.iter_responses('/'):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
-            self.assertFalse(ACL_HEADERS in resp.headers)
+            self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
     def test_override(self):
         for resp in self.iter_responses('/api/v1/special'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
 
-            self.assertFalse(ACL_HEADERS in resp.headers)
+            self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
 
 class AppExtensionError(FlaskCorsTestCase):
