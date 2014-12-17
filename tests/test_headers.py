@@ -37,11 +37,13 @@ class HeadersTestCase(FlaskCorsTestCase):
                             "Default should have no allowed headers")
 
     def test_override(self):
-        ''' If there is an Origin header in the request,
-            the Access-Control-Allow-Origin header should be echoed back.
+        ''' If there is an Access-Control-Request-Method header in the request
+            and Access-Control-Request-Method is allowed for cross origin requests
+            and request method is OPTIONS,
+            the Access-Control-Allow-Headers header should be echoed back.
         '''
-        for resp in self.iter_responses('/test_override'):
-            self.assertEqual(resp.headers.get(ACL_HEADERS), 'Bar, Foo')
+        resp = self.preflight('/test_override')
+        self.assertEqual(resp.headers.get(ACL_HEADERS), 'Bar, Foo')
 
 
 class AppConfigHeadersTestCase(AppConfigTest, HeadersTestCase):

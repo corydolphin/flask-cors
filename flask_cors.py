@@ -318,7 +318,7 @@ def _get_cors_headers(options, request_headers, request_method, response_headers
         return headers
 
     headers[ACL_ORIGIN] = origin_to_set
-    headers[ACL_HEADERS] = options.get('headers')
+    headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
 
     if options.get('supports_credentials'):
         headers[ACL_CREDENTIALS] = 'true' # case sensative
@@ -332,7 +332,7 @@ def _get_cors_headers(options, request_headers, request_method, response_headers
         if acl_request_method and acl_request_method in options.get('methods'):
             headers[ACL_MAX_AGE] = options.get('max_age')
             headers[ACL_METHODS] = options.get('methods')
-            headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
+            headers[ACL_HEADERS] = options.get('headers')
 
     # http://www.w3.org/TR/cors/#resource-implementation
     if headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
