@@ -19,7 +19,7 @@ from six import string_types
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
 ACL_METHODS = 'Access-Control-Allow-Methods'
-ACL_HEADERS = 'Access-Control-Allow-Headers'
+ACL_ALLOW_HEADERS = 'Access-Control-Allow-Headers'
 ACL_EXPOSE_HEADERS = 'Access-Control-Expose-Headers'
 ACL_CREDENTIALS = 'Access-Control-Allow-Credentials'
 ACL_MAX_AGE = 'Access-Control-Max-Age'
@@ -28,11 +28,16 @@ ACL_REQUEST_HEADERS = 'Access-Control-Request-Headers'
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']
 
-CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_HEADERS',
+CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_ALLOW_HEADERS',
                   'CORS_EXPOSE_HEADERS', 'CORS_SUPPORTS_CREDENTIALS',
                   'CORS_MAX_AGE', 'CORS_SEND_WILDCARD', 'CORS_ALWAYS_SEND',
                   'CORS_AUTOMATIC_OPTIONS', 'CORS_VARY_HEADER',
                   'CORS_RESOURCES', 'CORS_INTERCEPT_EXCEPTIONS']
+
+# headers was renamed to CORS_ALLOW_HEADERS in v1.11.2
+# included for backwards compatibility
+CONFIG_OPTIONS.append('CORS_HEADERS')
+
 
 FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 
@@ -72,11 +77,11 @@ def cross_origin(*args, **kwargs):
         Default : None
     :type expose_headers: list or string
 
-    :param headers: The header or list of header field names which can be used
+    :param allow_headers: The header or list of header field names which can be used
         when this resource is accessed by allowed origins
 
         Default : None
-    :type headers: list or string
+    :type allow_headers: list or string
 
     :param supports_credentials: Allows users to make authenticated requests.
         If true, injects the `Access-Control-Allow-Credentials` header in
@@ -318,7 +323,7 @@ def _get_cors_headers(options, request_headers, request_method, response_headers
         return headers
 
     headers[ACL_ORIGIN] = origin_to_set
-    headers[ACL_HEADERS] = options.get('headers')
+    headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
 
     if options.get('supports_credentials'):
         headers[ACL_CREDENTIALS] = 'true' # case sensative
@@ -332,7 +337,7 @@ def _get_cors_headers(options, request_headers, request_method, response_headers
         if acl_request_method and acl_request_method in options.get('methods'):
             headers[ACL_MAX_AGE] = options.get('max_age')
             headers[ACL_METHODS] = options.get('methods')
-            headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
+            headers[ACL_ALLOW_HEADERS] = options.get('allow_headers')
 
     # http://www.w3.org/TR/cors/#resource-implementation
     if headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
@@ -453,9 +458,12 @@ def _serialize_options(options):
     # always_send is set to True
     options['origins_str'] = _filter_false(_is_regexp, options.get('origins'))
 
+    if 'headers' in options:
+        options['allow_headers'] = options.pop('headers')
+
     _serialize_option(options, 'origins_str')
     _serialize_option(options, 'methods', upper=True)
-    _serialize_option(options, 'headers')
+    _serialize_option(options, 'allow_headers')
     _serialize_option(options, 'expose_headers')
     _serialize_option(options, 'supports_credentials')
 
