@@ -32,18 +32,17 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
     def test_default(self):
-        resp = self.get('/test_default')
-        self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
-                        "Should only be returned in preflight request")
+        for resp in self.iter_responses('/test_default'):
+            self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
+                            "No Access-Control-Expose-Headers by default")
 
     def test_override(self):
-        ''' If this is a preflight request, the
-            the specified headers should be returned in the ACL_EXPOSE_HEADERS
+        ''' The specified headers should be returned in the ACL_EXPOSE_HEADERS
             and correctly serialized if it is a list.
         '''
-        resp = self.preflight('/test_override')
-        self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
-                         'X-Another-Custom-Header, X-My-Custom-Header')
+        for resp in self.iter_responses('/test_override'):
+            self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
+                             'X-Another-Custom-Header, X-My-Custom-Header')
 
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, ExposeHeadersTestCase):
