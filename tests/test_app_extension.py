@@ -125,23 +125,20 @@ class AppExtensionString(FlaskCorsTestCase):
                 self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
                 self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
                                  'X-Total-Count')
-            resp = self.preflight(path)
-            self.assertEqual(resp.status_code, 200)
-            self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
-            self.assertEqual(resp.headers.get(ACL_HEADERS), 'Content-Type')
+
 
     def test_unexposed(self):
         for resp in self.iter_responses('/'):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
-            self.assertFalse(ACL_HEADERS in resp.headers)
+            self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
     def test_override(self):
         for resp in self.iter_responses('/api/v1/special'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
 
-            self.assertFalse(ACL_HEADERS in resp.headers)
+            self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
 
 class AppExtensionError(FlaskCorsTestCase):
