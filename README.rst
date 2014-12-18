@@ -105,8 +105,8 @@ expose\_headers
 The header or list of headers which are safe to expose to the API of a
 CORS API specification
 
-headers
-^^^^^^^
+allow\_headers
+^^^^^^^^^^^^^^
 
     Default : None
 

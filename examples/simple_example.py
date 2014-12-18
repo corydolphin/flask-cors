@@ -23,7 +23,7 @@ app = Flask(__name__)
 # One of the simplest configurations. Exposes all resources matching /api/* to
 # CORS and allows the Content-Type header, which is necessary to POST JSON
 # cross origin.
-CORS(app, resources=r'/api/*', headers='Content-Type')
+CORS(app, resources=r'/api/*', allow_headers='Content-Type')
 
 
 @app.route("/")

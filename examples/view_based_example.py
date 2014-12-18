@@ -51,7 +51,7 @@ on <a href="https://github.com/wcdolphin/flask-cors">Github</a>'''
 
 
 @app.route("/user/create", methods=['GET', 'POST'])
-@cross_origin(headers=['Content-Type'])
+@cross_origin(allow_headers=['Content-Type'])
 def cross_origin_json_post():
     '''
         This view has CORS enabled for all domains, and allows browsers
