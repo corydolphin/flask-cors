@@ -100,9 +100,10 @@ access for non-simple requests.
 expose\_headers
 ^^^^^^^^^^^^^^^
 
-    | Default : None
-    | The header or list of headers which are safe to expose to the API
-    of a CORS API specification
+    Default : None
+
+The header or list of headers which are safe to expose to the API of a
+CORS API specification
 
 headers
 ^^^^^^^

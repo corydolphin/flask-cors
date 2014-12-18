@@ -71,6 +71,7 @@ The method or list of methods which the allowed origins are allowed to access fo
 
 #### expose_headers
 > Default : None
+
 The header or list of headers which are safe to expose to the API of a CORS API specification
 
 #### headers
