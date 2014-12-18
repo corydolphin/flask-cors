@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 
 # Set CORS options on app configuration
-app.config['CORS_HEADERS'] = "Content-Type"
+app.config['CORS_ALLOW_HEADERS'] = "Content-Type"
 app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
 
 cors = CORS(app)
