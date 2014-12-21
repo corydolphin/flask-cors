@@ -11,7 +11,9 @@
 
 from setuptools import setup
 
-from _version import __version__
+from os.path import join, dirname
+with open(join(dirname(__file__), 'flask_cors/_version.py'), 'r') as f:
+    exec(f.read())
 
 setup(
     name='Flask-Cors',
@@ -22,10 +24,7 @@ setup(
     author_email='wcdolphin@gmail.com',
     description="A Flask extension adding a decorator for CORS support",
     long_description=open('README.rst').read(),
-    py_modules=['flask_cors', '_version'],
-    # if you would be using a package instead use packages instead
-    # of py_modules:
-    # packages=['flask_sqlite3'],
+    packages=['flask_cors'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',

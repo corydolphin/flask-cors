@@ -16,6 +16,8 @@ from functools import update_wrapper
 from flask import make_response, request, current_app
 from six import string_types
 
+from ._version import __version__
+
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
 ACL_METHODS = 'Access-Control-Allow-Methods'
