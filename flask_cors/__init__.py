@@ -433,7 +433,8 @@ def _is_regexp(pattern):
     '''
         Returns True if the `pattern` is likely to be a regexp,
     '''
-    if pattern != '*' and any(c in pattern for c in '?*'):
+    if isinstance(pattern, re._pattern_type) \
+            or (pattern != '*' and any(c in pattern for c in '?*')):
         return True
     return False
 
