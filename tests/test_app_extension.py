@@ -99,7 +99,9 @@ class AppExtensionList(FlaskCorsTestCase):
 class AppExtensionString(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
-        CORS(self.app, resources=r'/api/*', headers='Content-Type', expose_headers='X-Total-Count')
+        CORS(self.app, resources=r'/api/*',
+             headers='Content-Type',
+             expose_headers='X-Total-Count')
 
         @self.app.route('/api/v1/foo')
         def exposed1():
@@ -126,7 +128,6 @@ class AppExtensionString(FlaskCorsTestCase):
                 self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
                                  'X-Total-Count')
 
-
     def test_unexposed(self):
         for resp in self.iter_responses('/'):
             self.assertEqual(resp.status_code, 200)
@@ -150,6 +151,7 @@ class AppExtensionError(FlaskCorsTestCase):
         except ValueError:
             pass
 
+
 class AppExtensionDefault(FlaskCorsTestCase):
     def test_default(self):
         '''
@@ -166,6 +168,7 @@ class AppExtensionDefault(FlaskCorsTestCase):
         for resp in self.iter_responses('/'):
             self.assertEqual(resp.status_code, 200)
             self.assertTrue(ACL_ORIGIN in resp.headers)
+
 
 class AppExtensionExampleApp(FlaskCorsTestCase):
     def setUp(self):
@@ -199,7 +202,7 @@ class AppExtensionExampleApp(FlaskCorsTestCase):
             of 'http://blah.com' or 'http://foo.bar'
         '''
         for origin in ['http://foo.bar', 'http://blah.com']:
-            for resp in self.iter_responses('/api/foo', headers={'Origin':origin}):
+            for resp in self.iter_responses('/api/foo', origin=origin):
                 self.assertTrue(ACL_ORIGIN in resp.headers)
                 self.assertEqual(origin, resp.headers.get(ACL_ORIGIN))
 
@@ -209,9 +212,34 @@ class AppExtensionExampleApp(FlaskCorsTestCase):
             of 'http://blah.com' or 'http://foo.bar'
         '''
         for origin in ['http://foo.bar', 'http://blah.com']:
-            for resp in self.iter_responses('/api/', headers={'Origin':origin}):
+            for resp in self.iter_responses('/api/', origin=origin):
                 self.assertTrue(ACL_ORIGIN in resp.headers)
                 self.assertEqual(origin, resp.headers.get(ACL_ORIGIN))
+
+
+class AppExtensionCompiledRegexp(FlaskCorsTestCase):
+    def test_compiled_regex(self):
+        '''
+            Ensure we do not error if the user sepcifies an bad regular
+            expression.
+        '''
+        import re
+        self.app = Flask(__name__)
+        CORS(self.app, resources=re.compile('/api/.*'))
+
+        @self.app.route('/')
+        def index():
+            return 'Welcome'
+
+        @self.app.route('/api/v1')
+        def example():
+            return 'Welcome'
+
+        for resp in self.iter_responses('/'):
+            self.assertFalse(ACL_ORIGIN in resp.headers)
+
+        for resp in self.iter_responses('/api/v1'):
+            self.assertTrue(ACL_ORIGIN in resp.headers)
 
 
 class AppExtensionBadRegexp(FlaskCorsTestCase):
@@ -261,6 +289,35 @@ class AppExtensionOptionsTestCase(OptionsTestCase):
         def test_options_and_not_auto():
             return 'Welcome!'
         super(AppExtensionOptionsTestCase, self).test_options_and_not_auto()
+
+
+class AppExtensionSortedResourcesTestCase(FlaskCorsTestCase):
+    def setUp(self):
+
+        from flask_cors import _parse_resources
+
+        self.resources = _parse_resources({
+            '/foo': {'origins': 'http://foo.com'},
+            re.compile(r'/.*'): {
+                'origins': 'http://some-domain.com'
+            },
+            re.compile(r'/api/v1/.*'): {
+                'origins': 'http://specific-domain.com'
+            }
+        })
+
+    def test_sorted_order(self):
+        def _get_pattern(p):
+            try:
+                return p.pattern
+            except AttributeError:
+                return p
+
+        self.assertEqual(
+            [_get_pattern(reg) for reg, opt in self.resources],
+            [r'/api/v1/.*', '/foo', r'/.*']
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
