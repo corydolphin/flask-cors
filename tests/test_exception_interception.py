@@ -37,6 +37,7 @@ def add_routes(app):
     def test_no_acl_uncaught_exception_500():
         raise Exception("This could've been any exception")
 
+
 class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)

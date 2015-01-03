@@ -37,7 +37,8 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
         @self.app.route('/test_existing_vary_headers')
         @cross_origin(origins=["http://foo.com", "http://bar.com"])
         def test_existing_vary_headers():
-            return Response('', status=200, headers={'Vary': 'Accept-Encoding'})
+            return Response('', status=200,
+                            headers={'Vary': 'Accept-Encoding'})
 
     def test_consistent_origin(self):
         '''
@@ -106,7 +107,8 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
         @self.app.route('/test_existing_vary_headers')
         @cross_origin()
         def test_existing_vary_headers():
-            return Response('', status=200, headers={'Vary': 'Accept-Encoding'})
+            return Response('', status=200,
+                            headers={'Vary': 'Accept-Encoding'})
 
         super(AppConfigVaryHeaderTestCase, self).test_consistent_origin_concat()
 
