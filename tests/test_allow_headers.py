@@ -57,10 +57,13 @@ class AllowHeadersTestCase(FlaskCorsTestCase):
             to 'allow_headers'
         '''
         resp = self.preflight('/test_backwards_compatible')
-        self.assertEqual(resp.headers.get(ACL_ALLOW_HEADERS), 'X-Example-Header-A, X-Example-Header-B')
+        self.assertEqual(resp.headers.get(ACL_ALLOW_HEADERS),
+                         'X-Example-Header-A, X-Example-Header-B')
 
-        for resp in self.iter_responses('/test_backwards_compatible', verbs=['HEAD','GET']):
+        for resp in self.iter_responses('/test_backwards_compatible',
+                                        verbs=['HEAD', 'GET']):
             self.assertTrue(resp.headers.get(ACL_ALLOW_HEADERS) is None)
+
 
 class AppConfigAllowHeadersTestCase(AppConfigTest, AllowHeadersTestCase):
     def __init__(self, *args, **kwargs):
@@ -74,7 +77,8 @@ class AppConfigAllowHeadersTestCase(AppConfigTest, AllowHeadersTestCase):
         super(AppConfigAllowHeadersTestCase, self).test_default()
 
     def test_override(self):
-        self.app.config['CORS_ALLOW_HEADERS'] = ['X-Example-Header-B', 'X-Example-Header-A']
+        self.app.config['CORS_ALLOW_HEADERS'] = ['X-Example-Header-B',
+                                                 'X-Example-Header-A']
 
         @self.app.route('/test_override')
         @cross_origin()
@@ -88,7 +92,9 @@ class AppConfigAllowHeadersTestCase(AppConfigTest, AllowHeadersTestCase):
             Version 1.10.2 changed the name of the parameter from 'headers'
             to 'allow_headers'
         '''
-        self.app.config['CORS_HEADERS'] = ['X-Example-Header-B', 'X-Example-Header-A']
+        self.app.config['CORS_HEADERS'] = ['X-Example-Header-B',
+                                           'X-Example-Header-A']
+
         @self.app.route('/test_backwards_compatible')
         @cross_origin()
         def test_list():

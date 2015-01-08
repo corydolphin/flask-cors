@@ -107,7 +107,6 @@ class AppOptionsTestCase(AppConfigTest, OptionsTestCase):
             return 'Welcome!'
         super(AppOptionsTestCase, self).test_no_options_and_not_auto()
 
-
     def test_options_and_not_auto(self):
         self.app.config['CORS_AUTOMATIC_OPTIONS'] = False
 

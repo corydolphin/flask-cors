@@ -41,11 +41,18 @@ class FlaskCorsTestCase(unittest.TestCase):
             yield getattr(c, verb)
 
     def iter_responses(self, path, verbs=['get', 'head', 'options'], **kwargs):
-        with self.app.test_client() as c:
-            for verb in verbs:
-                yield getattr(c, verb.lower())(path, **kwargs)
+        for verb in verbs:
+            yield self._request(verb.lower(), path, **kwargs)
+        # with self.app.test_client() as c:
+        #     for verb in verbs:
+        #         yield getattr(c, verb.lower())(path, **kwargs)
 
     def _request(self, verb, *args, **kwargs):
+        _origin = kwargs.pop('origin', None)
+        if _origin:
+            kwargs['headers'] = kwargs.get('headers', {})
+            kwargs['headers'].update(Origin=_origin)
+
         with self.app.test_client() as c:
             return getattr(c, verb)(*args, **kwargs)
 
@@ -90,3 +97,15 @@ class AppConfigTest(object):
 
     def tearDown(self):
         self.app = None
+
+    def add_route(self, path):
+
+        # Flask checks the name of the function to ensure that iew mappings
+        # do not collide. We work around it by generating a new function name
+        # for the path
+        def function_to_rename():
+            return 'STUBBED: %s' % path
+        function_to_rename.__name__ = 'func_%s' % path
+
+        self.app.route(path)(function_to_rename)
+

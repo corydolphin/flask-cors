@@ -40,15 +40,18 @@ CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_ALLOW_HEADERS',
 # included for backwards compatibility
 CONFIG_OPTIONS.append('CORS_HEADERS')
 
-
 FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 
+# Strange, but this gets the type of a compiled regex, which is otherwise not
+# exposed in a public API.
+RegexObject = type(re.compile(''))
 _defaults_dict = dict(origins='*',
                       methods=ALL_METHODS,
                       always_send=True,
                       automatic_options=True,
                       send_wildcard=True,
                       vary_header=True)
+
 
 def cross_origin(*args, **kwargs):
     '''
@@ -79,8 +82,8 @@ def cross_origin(*args, **kwargs):
         Default : None
     :type expose_headers: list or string
 
-    :param allow_headers: The header or list of header field names which can be used
-        when this resource is accessed by allowed origins
+    :param allow_headers: The header or list of header field names which can be
+        used when this resource is accessed by allowed origins
 
         Default : None
     :type allow_headers: list or string
@@ -158,7 +161,7 @@ def cross_origin(*args, **kwargs):
 
             return resp
 
-        # If True, intercept OPTIONS requests by modifying the view function
+        # If True, intercept OPTIONS requests by modifying the view function,
         # replicating Flask's default behavior, and wrapping the response with
         # CORS headers.
         #
@@ -216,6 +219,7 @@ class CORS(object):
     '''
 
     def __init__(self, app=None, **kwargs):
+        self._options = kwargs
         if app is not None:
             self.init_app(app, **kwargs)
 
@@ -223,28 +227,11 @@ class CORS(object):
         options = {}
         options.update(_defaults_dict)
         options.update(_get_app_kwarg_dict(app))
+        options.update(self._options)
         options.update(kwargs)
 
-        _resources = options.get('resources', [r'/*'])
         _intercept_exceptions = options.get('intercept_exceptions', True)
-
-        if isinstance(_resources, dict):  # sort the regexps by length
-            # To make the API more consistent with the decorator, allow a
-            # resource of '*', which is not actually a valid regexp.
-            _resources = [(_re_fix(k), v) for k, v in _resources.items()]
-
-            # Sort by regex length to provide consistency of matching and
-            # to provide a proxy for specificity of match. E.G. longer
-            # regular expressions are tried first.
-            resources = sorted(_resources, key=lambda r: len(r[0]),
-                               reverse=True)
-
-        elif isinstance(_resources, string_types):
-            resources = [(_re_fix(_resources), {})]
-        elif isinstance(_resources, collections.Iterable):
-            resources = [(_re_fix(r), {}) for r in _resources]
-        else:
-            raise ValueError("Unexpected value for resources argument.")
+        resources = _parse_resources(options.get('resources', [r'/*']))
 
         def cors_after_request(resp):
             '''
@@ -278,6 +265,38 @@ class CORS(object):
                 app.handle_exception)
             app.handle_user_exception = _after_request_decorator(
                 app.handle_user_exception)
+
+
+def _parse_resources(resources):
+    if isinstance(resources, dict):  # sort the regexps by length
+        # To make the API more consistent with the decorator, allow a
+        # resource of '*', which is not actually a valid regexp.
+        resources = [(_re_fix(k), v) for k, v in resources.items()]
+
+        # Sort by regex length to provide consistency of matching and
+        # to provide a proxy for specificity of match. E.G. longer
+        # regular expressions are tried first.
+        def _reg_length(maybe_regex):
+            if isinstance(maybe_regex, RegexObject):
+                return len(maybe_regex.pattern)
+            else:
+                return len(maybe_regex)
+
+        return sorted(resources,
+                      key=lambda pair: _reg_length(pair[0]),
+                      reverse=True)
+
+    elif isinstance(resources, string_types):
+        return [(_re_fix(resources), {})]
+
+    elif isinstance(resources, collections.Iterable):
+        return [(_re_fix(r), {}) for r in resources]
+
+    elif isinstance(resources, RegexObject):  # compiled regex
+        return [(_re_fix(resources), {})]
+
+    else:
+        raise ValueError("Unexpected value for resources argument.")
 
 
 def _get_cors_origin(options, request_origin):
@@ -317,7 +336,8 @@ def _get_cors_origin(options, request_origin):
         return None
 
 
-def _get_cors_headers(options, request_headers, request_method, response_headers=None):
+def _get_cors_headers(options, request_headers, request_method,
+                      response_headers=None):
     headers = dict(response_headers or {})  # copy dict
     origin_to_set = _get_cors_origin(options, request_headers.get('Origin'))
 
@@ -328,12 +348,13 @@ def _get_cors_headers(options, request_headers, request_method, response_headers
     headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
 
     if options.get('supports_credentials'):
-        headers[ACL_CREDENTIALS] = 'true' # case sensative
+        headers[ACL_CREDENTIALS] = 'true'  # case sensative
 
     # This is a preflight request
     # http://www.w3.org/TR/cors/#resource-preflight-requests
     if request_method == 'OPTIONS':
         acl_request_method = request_headers.get(ACL_REQUEST_METHOD, '').upper()
+
         # If there is no Access-Control-Request-Method header or if parsing
         # failed, do not set any additional headers
         if acl_request_method and acl_request_method in options.get('methods'):
@@ -391,8 +412,12 @@ def _re_fix(reg):
         enable the CORS app extension to have a more consistent api with the
         decorator.
     '''
-    return r'/.*' if reg == r'*' else reg
+    pattern = r'.*' if reg == r'*' else reg
 
+    try:
+        return re.compile(pattern)
+    except: # invalid regex, return original string
+        return pattern
 
 def _try_match(pattern, request_origin):
     '''
@@ -432,11 +457,16 @@ def _serialize_option(d, key, target_key=None, upper=False):
 def _is_regexp(pattern):
     '''
         Returns True if the `pattern` is likely to be a regexp,
+        based on whether or not it contains characters which would make
+        it in invalid domain name.
     '''
-    if isinstance(pattern, re._pattern_type) \
-            or (pattern != '*' and any(c in pattern for c in '?*')):
+    if isinstance(pattern, RegexObject):
         return True
-    return False
+
+    # ?*[] are invalid in RFC 1034 and RFC 1035 domain name
+    # if they are in the pattern, it is probably a regex!
+    return pattern != '*' and any(c in pattern for c in '?*[]')
+
 
 
 def _filter_false(predicate, iterable):

@@ -146,8 +146,7 @@ class OriginsTestCase(FlaskCorsTestCase):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
         self.assertEquals("http://example.com",
-                          self.get('/test_regex_mixed_list').headers.get(ACL_ORIGIN)
-                          )
+            self.get('/test_regex_mixed_list').headers.get(ACL_ORIGIN))
 
 
 class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
