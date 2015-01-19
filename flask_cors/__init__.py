@@ -9,6 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from logging import getLogger
 import collections
 from datetime import timedelta
 import re
@@ -17,6 +18,8 @@ from flask import make_response, request, current_app
 from six import string_types
 
 from ._version import __version__
+
+logger = getLogger(__name__)
 
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
@@ -150,6 +153,7 @@ def cross_origin(*args, **kwargs):
             options.update(_get_app_kwarg_dict())
             options.update(_options)
             _serialize_options(options)
+            logger.debug('Final CORS options: {}'.format(str(options)))
 
             if options.get('automatic_options') and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
@@ -157,6 +161,7 @@ def cross_origin(*args, **kwargs):
                 resp = make_response(f(*args, **kwargs))
 
             _set_cors_headers(resp, options)
+            logger.debug('Response headers: {}'.format(str(resp.headers)))
             setattr(resp, FLASK_CORS_EVALUATED, True)
 
             return resp
@@ -229,6 +234,7 @@ class CORS(object):
         options.update(_get_app_kwarg_dict(app))
         options.update(self._options)
         options.update(kwargs)
+        logger.debug('setting CORS for app {}'.format(app.name))
 
         _intercept_exceptions = options.get('intercept_exceptions', True)
         resources = _parse_resources(options.get('resources', [r'/*']))
@@ -238,17 +244,25 @@ class CORS(object):
                 The actual after-request handler, retains references to the
                 the options, and definitions of resources through a closure.
             '''
+            logger.debug('Checking CORS for request')
             # If CORS headers are set in a view decorator, pass
             if resp.headers.get(ACL_ORIGIN):
+                logger.debug('Header {} have been set already, skipping'.format(ACL_ORIGIN))
                 return resp
 
+            logger.debug('Checking available CORS rules')
             for res_regex, res_options in resources:
                 if _try_match(res_regex, request.path):
+                    logger.debug('Rule {} matches'.format(str(res_regex)))
                     _options = options.copy()
                     _options.update(res_options)
                     _serialize_options(_options)
+                    logger.debug('Final CORS options: {}'.format(str(_options)))
                     _set_cors_headers(resp, _options)
                     break
+            else:
+                logger.debug('No CORS rule matches')
+            logger.debug('Response headers: {}'.format(str(resp.headers)))
             return resp
 
         app.after_request(cors_after_request)
@@ -298,6 +312,19 @@ def _parse_resources(resources):
     else:
         raise ValueError("Unexpected value for resources argument.")
 
+def _stringify_regexp(regexp):
+    '''
+        Helper that returns regexp pattern from given value.
+
+        :param regexp: regular expression to stringify
+        :type regexp: _sre.SRE_Pattern or str
+        :returns: string representation of given regexp pattern
+        :rtype: str
+    '''
+    try:
+        return regexp.pattern
+    except AttributeError:
+        return str(regexp)
 
 def _get_cors_origin(options, request_origin):
     origins = options.get('origins')
@@ -305,9 +332,11 @@ def _get_cors_origin(options, request_origin):
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
     if request_origin:
+        logger.debug("'Origin' header was send with value '{}'".format(str(request_origin)))
 
         # If the allowed origins is an asterisk or 'wildcard', always match
         if wildcard:
+            logger.debug("Allowed origins are set to '*', assuming valid request")
             if options.get('send_wildcard'):
                 return '*'
             else:
@@ -316,11 +345,14 @@ def _get_cors_origin(options, request_origin):
         # If the value of the Origin header is a case-sensitive match
         # for any of the values in list of origins
         elif any(_try_match(pattern, request_origin) for pattern in origins):
+            logger.debug("Given origin matches set of allowed origins")
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             # -- W3Spec
             return request_origin
         else:
+            logger.debug("Given origin does not match any of allowed origins: {}".format(\
+                str(map(_stringify_regexp, origins))))
             return None
 
     # Unless always_send is set, then ignore W3 spec as long as there is a
@@ -330,9 +362,12 @@ def _get_cors_origin(options, request_origin):
     # This will only be exceuted it there is no Origin in the request, in which
     # case, why bother with CORS?
     elif options.get('always_send') and options.get('origins_str'):
+        logger.debug("Althought 'Origin' header was not send, we are going " + \
+                "to send CORS response because 'always_send' option was set")
         return options.get('origins_str')
     # Terminate these steps, return the original request untouched.
     else:
+        logger.debug("'Origin' header was not send, which means CORS was not requested, skipping")
         return None
 
 
@@ -342,7 +377,9 @@ def _get_cors_headers(options, request_headers, request_method,
     origin_to_set = _get_cors_origin(options, request_headers.get('Origin'))
 
     if origin_to_set is None:  # CORS is not enabled for this route
+        logger.debug("Could not obtain value of origin header for response, skipping")
         return headers
+    logger.debug("'{}' header will be set to {}".format(ACL_ORIGIN, origin_to_set))
 
     headers[ACL_ORIGIN] = origin_to_set
     headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
@@ -381,12 +418,14 @@ def _set_cors_headers(resp, options):
 
     # If CORS has already been evaluated via the decorator, skip
     if hasattr(resp, FLASK_CORS_EVALUATED):
+        logger.debug('CORS have been already evaluated, skipping')
         return resp
 
     headers_to_set = _get_cors_headers(options,
                                        request.headers,
                                        request.method,
                                        resp.headers)
+    logger.debug('CORS headers to be set {}'.format(str(headers_to_set)))
 
     for k, v in headers_to_set.items():
         resp.headers[k] = v
