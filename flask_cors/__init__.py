@@ -26,7 +26,7 @@ from six import string_types
 from ._version import __version__
 
 logger = logging.getLogger(__name__)
-#logger.addHandler(logging.NullHandler())
+logger.addHandler(logging.NullHandler())
 
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
@@ -357,8 +357,8 @@ def _get_cors_origin(options, request_origin):
             # -- W3Spec
             return request_origin
         else:
-            logger.debug("Given origin does not match any of allowed origins: {}".format(\
-                str(map(_get_regexp_pattern, origins))))
+            logger.debug("Given origin does not match any of allowed origins: %s", \
+                                        str(map(_get_regexp_pattern, origins)))
             return None
 
     # Unless always_send is set, then ignore W3 spec as long as there is a
@@ -383,7 +383,7 @@ def _get_cors_headers(options, request_headers, request_method,
 
     if origin_to_set is None:  # CORS is not enabled for this route
         return headers
-    logger.debug("'{}' header will be set to {}".format(ACL_ORIGIN, origin_to_set))
+    logger.debug("'%s' header will be set to '%s'", ACL_ORIGIN, origin_to_set)
 
     headers[ACL_ORIGIN] = origin_to_set
     headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
