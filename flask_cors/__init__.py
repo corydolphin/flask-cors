@@ -9,7 +9,13 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from logging import getLogger
+import logging
+if not hasattr(logging, 'NullHandler'):
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
+    logging.NullHandler = NullHandler
+
 import collections
 from datetime import timedelta
 import re
@@ -19,7 +25,8 @@ from six import string_types
 
 from ._version import __version__
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
+#logger.addHandler(logging.NullHandler())
 
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
@@ -153,7 +160,8 @@ def cross_origin(*args, **kwargs):
             options.update(_get_app_kwarg_dict())
             options.update(_options)
             _serialize_options(options)
-            logger.debug('Final CORS options: {}'.format(str(options)))
+            logger.debug("Request to '%s' requires CORS support. Using options: %s",
+                request.path, options)
 
             if options.get('automatic_options') and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
@@ -161,7 +169,7 @@ def cross_origin(*args, **kwargs):
                 resp = make_response(f(*args, **kwargs))
 
             _set_cors_headers(resp, options)
-            logger.debug('Response headers: {}'.format(str(resp.headers)))
+            logger.debug('Response headers: %s', str(resp.headers))
             setattr(resp, FLASK_CORS_EVALUATED, True)
 
             return resp
@@ -234,35 +242,33 @@ class CORS(object):
         options.update(_get_app_kwarg_dict(app))
         options.update(self._options)
         options.update(kwargs)
-        logger.debug('setting CORS for app {}'.format(app.name))
 
         _intercept_exceptions = options.get('intercept_exceptions', True)
         resources = _parse_resources(options.get('resources', [r'/*']))
+        logger.debug("Configuring CORS for app:'%s' with resources:%s", \
+                     app.name, resources)
 
         def cors_after_request(resp):
             '''
                 The actual after-request handler, retains references to the
                 the options, and definitions of resources through a closure.
             '''
-            logger.debug('Checking CORS for request')
             # If CORS headers are set in a view decorator, pass
             if resp.headers.get(ACL_ORIGIN):
-                logger.debug('Header {} have been set already, skipping'.format(ACL_ORIGIN))
+                logger.debug('CORS have been already evaluated, skipping')
                 return resp
 
-            logger.debug('Checking available CORS rules')
             for res_regex, res_options in resources:
                 if _try_match(res_regex, request.path):
-                    logger.debug('Rule {} matches'.format(str(res_regex)))
                     _options = options.copy()
                     _options.update(res_options)
                     _serialize_options(_options)
-                    logger.debug('Final CORS options: {}'.format(str(_options)))
+                    logger.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
+                        request.path, _get_regexp_pattern(res_regex), _options)
                     _set_cors_headers(resp, _options)
                     break
             else:
                 logger.debug('No CORS rule matches')
-            logger.debug('Response headers: {}'.format(str(resp.headers)))
             return resp
 
         app.after_request(cors_after_request)
@@ -312,7 +318,7 @@ def _parse_resources(resources):
     else:
         raise ValueError("Unexpected value for resources argument.")
 
-def _stringify_regexp(regexp):
+def _get_regexp_pattern(regexp):
     '''
         Helper that returns regexp pattern from given value.
 
@@ -332,7 +338,7 @@ def _get_cors_origin(options, request_origin):
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
     if request_origin:
-        logger.debug("'Origin' header was send with value '{}'".format(str(request_origin)))
+        logger.debug("CORS request received with 'Origin' %s", request_origin)
 
         # If the allowed origins is an asterisk or 'wildcard', always match
         if wildcard:
@@ -352,7 +358,7 @@ def _get_cors_origin(options, request_origin):
             return request_origin
         else:
             logger.debug("Given origin does not match any of allowed origins: {}".format(\
-                str(map(_stringify_regexp, origins))))
+                str(map(_get_regexp_pattern, origins))))
             return None
 
     # Unless always_send is set, then ignore W3 spec as long as there is a
@@ -362,8 +368,7 @@ def _get_cors_origin(options, request_origin):
     # This will only be exceuted it there is no Origin in the request, in which
     # case, why bother with CORS?
     elif options.get('always_send') and options.get('origins_str'):
-        logger.debug("Althought 'Origin' header was not send, we are going " + \
-                "to send CORS response because 'always_send' option was set")
+        logger.debug("No 'Origin' header in request, skipping")
         return options.get('origins_str')
     # Terminate these steps, return the original request untouched.
     else:
@@ -377,7 +382,6 @@ def _get_cors_headers(options, request_headers, request_method,
     origin_to_set = _get_cors_origin(options, request_headers.get('Origin'))
 
     if origin_to_set is None:  # CORS is not enabled for this route
-        logger.debug("Could not obtain value of origin header for response, skipping")
         return headers
     logger.debug("'{}' header will be set to {}".format(ACL_ORIGIN, origin_to_set))
 
@@ -425,7 +429,7 @@ def _set_cors_headers(resp, options):
                                        request.headers,
                                        request.method,
                                        resp.headers)
-    logger.debug('CORS headers to be set {}'.format(str(headers_to_set)))
+    logger.debug('Settings CORS headers: %s', str(headers_to_set))
 
     for k, v in headers_to_set.items():
         resp.headers[k] = v
