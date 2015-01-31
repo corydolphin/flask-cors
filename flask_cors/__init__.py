@@ -10,22 +10,20 @@
 """
 
 import logging
-if not hasattr(logging, 'NullHandler'):
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
-    logging.NullHandler = NullHandler
-
 import collections
 from datetime import timedelta
 import re
 from functools import update_wrapper
 from flask import make_response, request, current_app
 from six import string_types
-
 from ._version import __version__
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('Flask-Cors')
+if not hasattr(logging, 'NullHandler'):
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
+    logging.NullHandler = NullHandler
 logger.addHandler(logging.NullHandler())
 
 # Common string constants
@@ -39,7 +37,6 @@ ACL_REQUEST_METHOD = 'Access-Control-Request-Method'
 ACL_REQUEST_HEADERS = 'Access-Control-Request-Headers'
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']
-
 CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_ALLOW_HEADERS',
                   'CORS_EXPOSE_HEADERS', 'CORS_SUPPORTS_CREDENTIALS',
                   'CORS_MAX_AGE', 'CORS_SEND_WILDCARD', 'CORS_ALWAYS_SEND',
@@ -50,6 +47,8 @@ CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_ALLOW_HEADERS',
 # included for backwards compatibility
 CONFIG_OPTIONS.append('CORS_HEADERS')
 
+# Attribute added to request object by decorator to indicate that CORS
+# was evaluated, in case the decorator and extension are both applied to a view.
 FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 
 # Strange, but this gets the type of a compiled regex, which is otherwise not
@@ -160,8 +159,8 @@ def cross_origin(*args, **kwargs):
             options.update(_get_app_kwarg_dict())
             options.update(_options)
             _serialize_options(options)
-            logger.debug("Request to '%s' requires CORS support. Using options: %s",
-                request.path, options)
+            logger.debug("Request to '%s' is enabled for CORS with options:%s",
+                         request.path, options)
 
             if options.get('automatic_options') and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
@@ -169,7 +168,6 @@ def cross_origin(*args, **kwargs):
                 resp = make_response(f(*args, **kwargs))
 
             _set_cors_headers(resp, options)
-            logger.debug('Response headers: %s', str(resp.headers))
             setattr(resp, FLASK_CORS_EVALUATED, True)
 
             return resp
@@ -245,7 +243,7 @@ class CORS(object):
 
         _intercept_exceptions = options.get('intercept_exceptions', True)
         resources = _parse_resources(options.get('resources', [r'/*']))
-        logger.debug("Configuring CORS for app:'%s' with resources:%s", \
+        logger.info("Configuring CORS for app:'%s' with resources:%s", \
                      app.name, resources)
 
         def cors_after_request(resp):
@@ -288,7 +286,7 @@ class CORS(object):
 
 
 def _parse_resources(resources):
-    if isinstance(resources, dict):  # sort the regexps by length
+    if isinstance(resources, dict):
         # To make the API more consistent with the decorator, allow a
         # resource of '*', which is not actually a valid regexp.
         resources = [(_re_fix(k), v) for k, v in resources.items()]
@@ -296,14 +294,12 @@ def _parse_resources(resources):
         # Sort by regex length to provide consistency of matching and
         # to provide a proxy for specificity of match. E.G. longer
         # regular expressions are tried first.
-        def _reg_length(maybe_regex):
-            if isinstance(maybe_regex, RegexObject):
-                return len(maybe_regex.pattern)
-            else:
-                return len(maybe_regex)
+        def pattern_length(pair):
+            maybe_regex, _ = pair
+            return len(_get_regexp_pattern(maybe_regex))
 
         return sorted(resources,
-                      key=lambda pair: _reg_length(pair[0]),
+                      key=pattern_length,
                       reverse=True)
 
     elif isinstance(resources, string_types):
@@ -312,7 +308,9 @@ def _parse_resources(resources):
     elif isinstance(resources, collections.Iterable):
         return [(_re_fix(r), {}) for r in resources]
 
-    elif isinstance(resources, RegexObject):  # compiled regex
+    # Type of compiled regex is not part of the public API. Test for this
+    # at runtime.
+    elif isinstance(resources,  RegexObject):
         return [(_re_fix(resources), {})]
 
     else:
@@ -357,8 +355,8 @@ def _get_cors_origin(options, request_origin):
             # -- W3Spec
             return request_origin
         else:
-            logger.debug("Given origin does not match any of allowed origins: %s", \
-                                        str(map(_get_regexp_pattern, origins)))
+            logger.debug("Given origin does not match any of allowed origins: %s",
+                         map(_get_regexp_pattern, origins))
             return None
 
     # Unless always_send is set, then ignore W3 spec as long as there is a
@@ -383,7 +381,8 @@ def _get_cors_headers(options, request_headers, request_method,
 
     if origin_to_set is None:  # CORS is not enabled for this route
         return headers
-    logger.debug("'%s' header will be set to '%s'", ACL_ORIGIN, origin_to_set)
+    logger.info("CORS request from Origin:%s, setting %s:%s",
+                request_headers.get('Origin'), ACL_ORIGIN, origin_to_set)
 
     headers[ACL_ORIGIN] = origin_to_set
     headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
@@ -459,8 +458,9 @@ def _re_fix(reg):
 
     try:
         return re.compile(pattern)
-    except: # invalid regex, return original string
+    except:  # invalid regex, return original string
         return pattern
+
 
 def _try_match(pattern, request_origin):
     '''
@@ -509,7 +509,6 @@ def _is_regexp(pattern):
     # ?*[] are invalid in RFC 1034 and RFC 1035 domain name
     # if they are in the pattern, it is probably a regex!
     return pattern != '*' and any(c in pattern for c in '?*[]')
-
 
 
 def _filter_false(predicate, iterable):
