@@ -1,6 +1,6 @@
 # Flask-CORS
 
-[![Build Status](https://api.travis-ci.org/wcdolphin/flask-cors.svg?branch=master)](https://travis-ci.org/wcdolphin/flask-cors) [![Latest Version](https://pypip.in/version/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![Downloads](https://pypip.in/download/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![Supported Python versions](https://pypip.in/py_versions/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![License](https://pypip.in/license/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/)
+[![Build Status](https://api.travis-ci.org/CoryDolphin/flask-cors.svg?branch=master)](https://travis-ci.org/CoryDolphin/flask-cors) [![Latest Version](https://pypip.in/version/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![Downloads](https://pypip.in/download/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![Supported Python versions](https://pypip.in/py_versions/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![License](https://pypip.in/license/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/)
 
 A Flask extension for handling Cross Origin Resource Sharing (CORS), making cross-origin AJAX possible.
 
@@ -55,6 +55,20 @@ This extension also exposes a simple decorator to decorate flask routes with. Si
 @cross_origin() # allow all origins all methods.
 def helloWorld():
   return "Hello, cross-origin-world!"
+```
+
+#### Logging
+
+Flask-Cors uses standard Python logging, using the module name 'Flask-Cors'. You can read more about logging from [Flask's documentation](http://flask.pocoo.org/docs/0.10/errorhandling/). To add logging for flask_cors to the standard StreamHandler:
+
+```python
+for logger in (app.logger, logging.getLogger('Flask-Cors')):
+    sh = logging.StreamHandler()
+    sh.setFormatter(
+        logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    )
+    logger.addHandler(sh)
+    logger.setLevel(logging.DEBUG)
 ```
 
 ### Options
