@@ -98,6 +98,23 @@ e.g.
 
     app.config['CORS_HEADERS'] = 'Content-Type'
 
+Logging
+^^^^^^^
+
+Flask-Cors uses standard Python logging, using the module name
+'Flask-Cors'. You can read more about logging from `Flask's
+documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__. To
+add logging for flask\_cors to the standard StreamHandler:
+
+.. code:: python
+
+    for logger in (app.logger, logging.getLogger('Flask-Cors')):
+        sh = logging.StreamHandler()
+        sh.setFormatter(
+            logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        )
+        logger.addHandler(sh)
+        logger.setLevel(logging.DEBUG)
 
 
 Full description of options
@@ -110,19 +127,10 @@ Full description of options
 More examples
 ~~~~~~~~~~~~~
 
-A simple, and suggested example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A simple example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is the suggested approach to enabling CORS. The default configuration
 will work well for most use cases.
-
-.. literalinclude:: ../examples/simple_example.py
-   :language: python
-
-A more complicated example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If you require advanced configuration and more specific configuration of CORS
-support for your application, this example provides a useful example of
-multiple regular expressions and options.
 
 .. literalinclude:: ../examples/app_based_example.py
    :language: python
@@ -136,8 +144,8 @@ a particular view.
    :language: python
 
 
-.. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.png?branch=master
-   :target: https://travis-ci.org/wcdolphin/flask-cors
+.. |Build Status| image:: https://api.travis-ci.org/CoryDolphin/flask-cors.png?branch=master
+   :target: https://travis-ci.org/CoryDolphin/flask-cors
 .. |Latest Version| image:: https://pypip.in/version/Flask-Cors/badge.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
 .. |Downloads| image:: https://pypip.in/download/Flask-Cors/badge.svg

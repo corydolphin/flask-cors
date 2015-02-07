@@ -78,6 +78,24 @@ CORS on a given route.
     def helloWorld():
       return "Hello, cross-origin-world!"
 
+Logging
+^^^^^^^
+
+Flask-Cors uses standard Python logging, using the module name
+'Flask-Cors'. You can read more about logging from `Flask's
+documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__. To
+add logging for flask\_cors to the standard StreamHandler:
+
+.. code:: python
+
+    for logger in (app.logger, logging.getLogger('Flask-Cors')):
+        sh = logging.StreamHandler()
+        sh.setFormatter(
+            logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        )
+        logger.addHandler(sh)
+        logger.setLevel(logging.DEBUG)
+
 Options
 ~~~~~~~
 
@@ -231,8 +249,8 @@ This Flask extension is based upon the `Decorator for the HTTP Access
 Control <http://flask.pocoo.org/snippets/56/>`__ written by Armin
 Ronacher.
 
-.. |Build Status| image:: https://api.travis-ci.org/wcdolphin/flask-cors.svg?branch=master
-   :target: https://travis-ci.org/wcdolphin/flask-cors
+.. |Build Status| image:: https://api.travis-ci.org/CoryDolphin/flask-cors.svg?branch=master
+   :target: https://travis-ci.org/CoryDolphin/flask-cors
 .. |Latest Version| image:: https://pypip.in/version/Flask-Cors/badge.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
 .. |Downloads| image:: https://pypip.in/download/Flask-Cors/badge.svg
