@@ -83,18 +83,13 @@ Logging
 
 Flask-Cors uses standard Python logging, using the module name
 'Flask-Cors'. You can read more about logging from `Flask's
-documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__. To
-add logging for flask\_cors to the standard StreamHandler:
+documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__.
 
 .. code:: python
 
-    for logger in (app.logger, logging.getLogger('Flask-Cors')):
-        sh = logging.StreamHandler()
-        sh.setFormatter(
-            logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        )
-        logger.addHandler(sh)
-        logger.setLevel(logging.DEBUG)
+    import logging
+    # make your awesome app
+    app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
 
 Options
 ~~~~~~~

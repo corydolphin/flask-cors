@@ -22,16 +22,7 @@ except ImportError:
 
 
 app = Flask(__name__)
-
-# Add logging for flask_cors to the StreamHandler logger
-for logger in (app.logger, logging.getLogger('Flask-Cors')):
-    sh = logging.StreamHandler()
-    sh.setFormatter(
-        logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    )
-    logger.addHandler(sh)
-    logger.setLevel(logging.INFO)
-
+app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
 
 
 @app.route("/", methods=['GET'])
