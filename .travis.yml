@@ -32,7 +32,7 @@ deploy:
   on:
     all_branches: true
     tags: true
-    repo: wcdolphin/flask-cors
+    repo: corydolphin/flask-cors
     condition: $TRAVIS_PYTHON_VERSION != *2.6* # Ensures we release a 2.7X wheel
 
 
