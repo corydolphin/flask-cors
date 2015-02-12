@@ -31,5 +31,5 @@ deploy:
   distributions: "sdist bdist_wheel"
   on:
     tags: true
-    repo: CoryDolphin/flask-cors
+    repo: corydolphin/flask-cors
     condition: $TRAVIS_PYTHON_VERSION != *2.6* # Ensures we release a 2.7X wheel
