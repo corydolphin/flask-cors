@@ -28,6 +28,7 @@ deploy:
   user: CoryDolphin
   password:
     secure: YaYiBkI4mgSvhZ9WV5DPtOglBZwdm69JKEo6ZwjNp7h3tTa8tu8rSmMB/5L7opUj3A8LxU3f/Shct1irqkRcu3dw4M83zVBVhp1PRxo4pEhHwpshUq2dat0CCqrh96QexevdAQzSFVkNlMP3ghOfLGr4fku7WC931BCBtxWCns8=
+  distributions: "sdist bdist_wheel"
   on:
     tags: true
     repo: CoryDolphin/flask-cors
