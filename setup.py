@@ -18,10 +18,10 @@ with open(join(dirname(__file__), 'flask_cors/_version.py'), 'r') as f:
 setup(
     name='Flask-Cors',
     version=__version__,
-    url='https://github.com/wcdolphin/flask-cors',
+    url='https://github.com/corydolphin/flask-cors',
     license='MIT',
     author='Cory Dolphin',
-    author_email='wcdolphin@gmail.com',
+    author_email='corydolphin@gmail.com',
     description="A Flask extension adding a decorator for CORS support",
     long_description=open('README.rst').read(),
     packages=['flask_cors'],

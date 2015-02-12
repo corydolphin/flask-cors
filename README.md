@@ -64,7 +64,7 @@ Flask-Cors uses standard Python logging, using the module name 'Flask-Cors'. You
 ```python
 import logging
 # make your awesome app
-app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
+logging.basicConfig(level=logging.DEBUG)
 ```
 
 ### Options
