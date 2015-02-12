@@ -1,38 +1,35 @@
 language: python
 python:
-  - '2.6'
-  - '2.7'
-  - '3.3'
-  - pypy
+- '2.6'
+- '2.7'
+- '3.3'
+- pypy
 env:
-  - FLASK=0.10.1
-  - FLASK=0.10
-  - FLASK=0.9
+- FLASK=0.10.1
+- FLASK=0.10
+- FLASK=0.9
 matrix:
   allow_failures:
-    - python: '3.3'
-      env: FLASK=0.9
+  - python: '3.3'
+    env: FLASK=0.9
 install:
-  - pip install pep8 coveralls six
-  - pip install -U "pip>=1.4" "setuptools>=0.9" "wheel>=0.21"
-  - pip install flask==$FLASK
+- pip install pep8 coveralls six
+- pip install -U "pip>=1.4" "setuptools>=0.9" "wheel>=0.21"
+- pip install flask==$FLASK
 script:
-  - coverage erase
-  - nosetests --with-coverage --cover-package=flask_cors
-  - python setup.py clean build install
+- coverage erase
+- nosetests --with-coverage --cover-package=flask_cors
+- python setup.py clean build install
 after_success:
-  - pep8 flask_cors.py
-  - coveralls
+- pep8 flask_cors.py
+- coveralls
 deploy:
   provider: pypi
-  user: wcdolphin
+  user: CoryDolphin
   password:
-    secure: PrKEfSZX/IBwy/1TtocCDVNE9inepYeCoChFQ7MXxC49ytbEjLL8xcv57MSnFgOtMuVxzikjkrplBlDe0+gNtTW8vQQWMg6n2I/rkgI8tIJ+RAwWMBvVDNjtdziBkVlkcfOFHYZ6NHZ1SH/FQ1GCicQF8LSsBnMLJZOJ+RVjs5Q=
+    secure: YaYiBkI4mgSvhZ9WV5DPtOglBZwdm69JKEo6ZwjNp7h3tTa8tu8rSmMB/5L7opUj3A8LxU3f/Shct1irqkRcu3dw4M83zVBVhp1PRxo4pEhHwpshUq2dat0CCqrh96QexevdAQzSFVkNlMP3ghOfLGr4fku7WC931BCBtxWCns8=
   distributions: "sdist bdist_wheel"
   on:
-    all_branches: true
     tags: true
-    repo: corydolphin/flask-cors
+    repo: CoryDolphin/flask-cors
     condition: $TRAVIS_PYTHON_VERSION != *2.6* # Ensures we release a 2.7X wheel
-
-

@@ -22,7 +22,7 @@ except ImportError:
 
 
 app = Flask(__name__)
-app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
+logging.basicConfig(level=logging.DEBUG)
 
 
 @app.route("/", methods=['GET'])
@@ -45,12 +45,12 @@ def helloWorld():
 
         <h1>Hello CORS!</h1> Read about my spec at the
         <a href="http://www.w3.org/TR/cors/">W3</a> Or, checkout my documentation
-        on <a href="https://github.com/wcdolphin/flask-cors">Github</a>
+        on <a href="https://github.com/corydolphin/flask-cors">Github</a>
 
     '''
     return '''<h1>Hello CORS!</h1> Read about my spec at the
 <a href="http://www.w3.org/TR/cors/">W3</a> Or, checkout my documentation
-on <a href="https://github.com/wcdolphin/flask-cors">Github</a>'''
+on <a href="https://github.com/corydolphin/flask-cors">Github</a>'''
 
 
 @app.route("/api/v1/user/create", methods=['GET', 'POST'])

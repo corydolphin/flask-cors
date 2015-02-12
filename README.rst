@@ -21,12 +21,12 @@ Usage
 
 This extension enables CORS support either via a decorator, or a Flask
 extension. There are three examples shown in the
-`examples <https://github.com/wcdolphin/flask-cors/tree/master/examples>`__
+`examples <https://github.com/corydolphin/flask-cors/tree/master/examples>`__
 directory, showing the major use cases. The suggested configuration is
 the
-`simple\_example.py <https://github.com/wcdolphin/flask-cors/tree/master/examples/simple_example.py>`__,
+`simple\_example.py <https://github.com/corydolphin/flask-cors/tree/master/examples/simple_example.py>`__,
 or the
-`app\_example.py <https://github.com/wcdolphin/flask-cors/tree/master/examples/app_based_example.py>`__.
+`app\_example.py <https://github.com/corydolphin/flask-cors/tree/master/examples/app_based_example.py>`__.
 
 Simple Usage
 ~~~~~~~~~~~~
@@ -89,7 +89,7 @@ documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__.
 
     import logging
     # make your awesome app
-    app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
+    logging.basicConfig(level=logging.DEBUG)
 
 Options
 ~~~~~~~
@@ -234,8 +234,8 @@ Contributing
 ------------
 
 Questions, comments or improvements? Please create an issue on
-`Github <https://github.com/wcdolphin/flask-cors>`__, tweet at
-`@wcdolphin <https://twitter.com/wcdolphin>`__ or send me an email.
+`Github <https://github.com/corydolphin/flask-cors>`__, tweet at
+`@corydolphin <https://twitter.com/corydolphin>`__ or send me an email.
 
 Credits
 -------
@@ -244,8 +244,8 @@ This Flask extension is based upon the `Decorator for the HTTP Access
 Control <http://flask.pocoo.org/snippets/56/>`__ written by Armin
 Ronacher.
 
-.. |Build Status| image:: https://api.travis-ci.org/CoryDolphin/flask-cors.svg?branch=master
-   :target: https://travis-ci.org/CoryDolphin/flask-cors
+.. |Build Status| image:: https://api.travis-ci.org/corydolphin/flask-cors.svg?branch=master
+   :target: https://travis-ci.org/corydolphin/flask-cors
 .. |Latest Version| image:: https://pypip.in/version/Flask-Cors/badge.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
 .. |Downloads| image:: https://pypip.in/download/Flask-Cors/badge.svg
