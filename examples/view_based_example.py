@@ -22,8 +22,7 @@ except ImportError:
 
 
 app = Flask(__name__)
-app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
-
+logging.basicConfig(level=logging.DEBUG)
 
 @app.route("/", methods=['GET'])
 @cross_origin()

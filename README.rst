@@ -89,7 +89,7 @@ documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__.
 
     import logging
     # make your awesome app
-    app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
+    logging.basicConfig(level=logging.DEBUG)
 
 Options
 ~~~~~~~
