@@ -1,6 +1,6 @@
 # Flask-CORS
 
-[![Build Status](https://api.travis-ci.org/CoryDolphin/flask-cors.svg?branch=master)](https://travis-ci.org/CoryDolphin/flask-cors) [![Latest Version](https://pypip.in/version/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![Downloads](https://pypip.in/download/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![Supported Python versions](https://pypip.in/py_versions/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![License](https://pypip.in/license/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/)
+[![Build Status](https://api.travis-ci.org/corydolphin/flask-cors.svg?branch=master)](https://travis-ci.org/corydolphin/flask-cors) [![Latest Version](https://pypip.in/version/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![Downloads](https://pypip.in/download/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![Supported Python versions](https://pypip.in/py_versions/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/) [![License](https://pypip.in/license/Flask-Cors/badge.svg)](https://pypi.python.org/pypi/Flask-Cors/)
 
 A Flask extension for handling Cross Origin Resource Sharing (CORS), making cross-origin AJAX possible.
 
@@ -14,7 +14,7 @@ $ pip install -U flask-cors
 
 ## Usage
 
-This extension enables CORS support either via a decorator, or a Flask extension. There are three examples shown in the [examples](https://github.com/wcdolphin/flask-cors/tree/master/examples) directory, showing the major use cases. The suggested configuration is the [simple_example.py](https://github.com/wcdolphin/flask-cors/tree/master/examples/simple_example.py), or the [app_example.py](https://github.com/wcdolphin/flask-cors/tree/master/examples/app_based_example.py).
+This extension enables CORS support either via a decorator, or a Flask extension. There are three examples shown in the [examples](https://github.com/corydolphin/flask-cors/tree/master/examples) directory, showing the major use cases. The suggested configuration is the [simple_example.py](https://github.com/corydolphin/flask-cors/tree/master/examples/simple_example.py), or the [app_example.py](https://github.com/corydolphin/flask-cors/tree/master/examples/app_based_example.py).
 
 
 ### Simple Usage
@@ -64,7 +64,7 @@ Flask-Cors uses standard Python logging, using the module name 'Flask-Cors'. You
 ```python
 import logging
 # make your awesome app
-app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
+logging.basicConfig(level=logging.DEBUG)
 ```
 
 ### Options
@@ -156,7 +156,7 @@ A simple set of tests is included in `test/`. To run, install nose, and simply i
 
 ## Contributing
 
-Questions, comments or improvements? Please create an issue on [Github](https://github.com/wcdolphin/flask-cors), tweet at [@wcdolphin](https://twitter.com/wcdolphin) or send me an email.
+Questions, comments or improvements? Please create an issue on [Github](https://github.com/corydolphin/flask-cors), tweet at [@corydolphin](https://twitter.com/corydolphin) or send me an email.
 
 ## Credits
 

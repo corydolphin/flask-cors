@@ -21,8 +21,7 @@ except ImportError:
 
 
 app = Flask(__name__)
-app.logger.addHandler(logging.basicConfig(level=logging.DEBUG))
-
+logging.basicConfig(level=logging.DEBUG)
 
 # One of the simplest configurations. Exposes all resources matching /api/* to
 # CORS and allows the Content-Type header, which is necessary to POST JSON
@@ -38,7 +37,7 @@ def helloWorld():
     '''
     return '''<h1>Hello CORS!</h1> Read about my spec at the
 <a href="http://www.w3.org/TR/cors/">W3</a> Or, checkout my documentation
-on <a href="https://github.com/wcdolphin/flask-cors">Github</a>'''
+on <a href="https://github.com/corydolphin/flask-cors">Github</a>'''
 
 
 @app.route("/api/v1/users/")
