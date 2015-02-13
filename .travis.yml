@@ -27,9 +27,7 @@ deploy:
   provider: pypi
   user: CoryDolphin
   password:
-    secure: YaYiBkI4mgSvhZ9WV5DPtOglBZwdm69JKEo6ZwjNp7h3tTa8tu8rSmMB/5L7opUj3A8LxU3f/Shct1irqkRcu3dw4M83zVBVhp1PRxo4pEhHwpshUq2dat0CCqrh96QexevdAQzSFVkNlMP3ghOfLGr4fku7WC931BCBtxWCns8=
-  distributions: "sdist bdist_wheel"
+    secure: KKc5C87ER7cCrOLLkPqiawmoYNngJfOLv9Plpj32u6R8fMIBYV11HUj2GmSOX3jho8nuNDX+9QitVpcKFdh7GkDaMYWTz4sWdGfUuz+uLTK5TETnm+FeuXGreNTla1QR+8JmEjY92H0OJPIkHAKOlJyNhxJ80OQfhOkgZdVfT9c=
   on:
     tags: true
     repo: corydolphin/flask-cors
-    condition: $TRAVIS_PYTHON_VERSION != *2.6* # Ensures we release a 2.7X wheel
