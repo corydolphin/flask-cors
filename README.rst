@@ -91,6 +91,12 @@ documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__.
     # make your awesome app
     logging.basicConfig(level=logging.DEBUG)
 
+Documentation
+-------------
+
+For a full list of options, please see the full
+`documentation <http://flask-cors.readthedocs.org/en/latest/>`__
+
 Options
 ~~~~~~~
 
@@ -216,12 +222,6 @@ value on your application, e.g:
 .. code:: python
 
     app.config['CORS_HEADERS'] = 'Content-Type'
-
-Documentation
--------------
-
-For a full list of options, please see the full
-`documentation <http://flask-cors.readthedocs.org/en/latest/>`__
 
 Tests
 -----
