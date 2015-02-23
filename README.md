@@ -67,6 +67,10 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 ```
 
+## Documentation
+
+For a full list of options, please see the full [documentation](http://flask-cors.readthedocs.org/en/latest/)
+
 ### Options
 
 #### origins
@@ -143,12 +147,6 @@ When using JSON cross origin, browsers will issue a pre-flight OPTIONS request f
 ```python
 app.config['CORS_HEADERS'] = 'Content-Type'
 ```
-
-
-## Documentation
-
-For a full list of options, please see the full [documentation](http://flask-cors.readthedocs.org/en/latest/)
-
 
 ## Tests
 
