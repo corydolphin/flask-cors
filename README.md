@@ -59,12 +59,12 @@ def helloWorld():
 
 #### Logging
 
-Flask-Cors uses standard Python logging, using the module name 'Flask-Cors'. You can read more about logging from [Flask's documentation](http://flask.pocoo.org/docs/0.10/errorhandling/).
+Flask-Cors uses standard Python logging, using the logger name '`app.logger_name`.cors'. The app's logger name attribute is usually the same as the name of the app. You can read more about logging from [Flask's documentation](http://flask.pocoo.org/docs/0.10/errorhandling/).
 
 ```python
 import logging
 # make your awesome app
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 ```
 
 ## Documentation
@@ -133,7 +133,7 @@ The application-wide configuration options are identical to the keyword argument
 
 * CORS_ORIGINS
 * CORS_METHODS
-* CORS_HEADERS
+* CORS_ALLOW_HEADERS
 * CORS_EXPOSE_HEADERS
 * CORS_ALWAYS_SEND
 * CORS_MAX_AGE

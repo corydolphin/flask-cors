@@ -21,9 +21,8 @@ except ImportError:
     from flask.ext.cors import cross_origin
 
 
-app = Flask(__name__)
-logging.basicConfig(level=logging.DEBUG)
-
+app = Flask('FlaskCorsViewBasedExample')
+logging.basicConfig(level=logging.INFO)
 
 @app.route("/", methods=['GET'])
 @cross_origin()

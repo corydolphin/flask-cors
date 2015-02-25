@@ -20,8 +20,8 @@ except ImportError:
     from flask.ext.cors import CORS
 
 
-app = Flask(__name__)
-logging.basicConfig(level=logging.DEBUG)
+app = Flask('FlaskCorsAppBasedExample')
+logging.basicConfig(level=logging.INFO)
 
 # One of the simplest configurations. Exposes all resources matching /api/* to
 # CORS and allows the Content-Type header, which is necessary to POST JSON

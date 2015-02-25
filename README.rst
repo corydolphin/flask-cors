@@ -81,15 +81,17 @@ CORS on a given route.
 Logging
 ^^^^^^^
 
-Flask-Cors uses standard Python logging, using the module name
-'Flask-Cors'. You can read more about logging from `Flask's
+Flask-Cors uses standard Python logging, using the logger name
+'``app.logger_name``.cors'. The app's logger name attribute is usually
+the same as the name of the app. You can read more about logging from
+`Flask's
 documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__.
 
 .. code:: python
 
     import logging
     # make your awesome app
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
 Documentation
 -------------
