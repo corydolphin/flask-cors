@@ -8,7 +8,6 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
-
 import logging
 import collections
 from datetime import timedelta
@@ -18,13 +17,14 @@ from flask import make_response, request, current_app
 from six import string_types
 from ._version import __version__
 
-logger = logging.getLogger('Flask-Cors')
+
 if not hasattr(logging, 'NullHandler'):
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
     logging.NullHandler = NullHandler
-logger.addHandler(logging.NullHandler())
+logger = None
+
 
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
@@ -235,6 +235,10 @@ class CORS(object):
             self.init_app(app, **kwargs)
 
     def init_app(self, app, **kwargs):
+        global logger
+        logger = logging.getLogger(app.logger_name + '.cors')
+        logger.addHandler(logging.NullHandler())
+
         options = {}
         options.update(_defaults_dict)
         options.update(_get_app_kwarg_dict(app))
