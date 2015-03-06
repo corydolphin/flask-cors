@@ -8,23 +8,27 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
-
+import re
 import logging
 import collections
 from datetime import timedelta
-import re
 from functools import update_wrapper
-from flask import make_response, request, current_app
 from six import string_types
+from flask import make_response, request, current_app
+try:
+    from flask import _app_ctx_stack as stack
+except ImportError:
+    from flask import _request_ctx_stack as stack
+
 from ._version import __version__
 
-logger = logging.getLogger('Flask-Cors')
+
+# Compatibility with old Pythons!
 if not hasattr(logging, 'NullHandler'):
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
     logging.NullHandler = NullHandler
-logger.addHandler(logging.NullHandler())
 
 # Common string constants
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
@@ -159,8 +163,8 @@ def cross_origin(*args, **kwargs):
             options.update(_get_app_kwarg_dict())
             options.update(_options)
             _serialize_options(options)
-            logger.debug("Request to '%s' is enabled for CORS with options:%s",
-                         request.path, options)
+
+            getLogger().debug("Using computed options %s", options)
 
             if options.get('automatic_options') and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
@@ -243,8 +247,15 @@ class CORS(object):
 
         _intercept_exceptions = options.get('intercept_exceptions', True)
         resources = _parse_resources(options.get('resources', [r'/*']))
-        logger.info("Configuring CORS for app:'%s' with resources:%s", \
-                     app.name, resources)
+        resources_human = dict(
+            map(
+                lambda r: (_get_regexp_pattern(r[0]), r[1]),
+                resources
+            )
+        )
+
+        getLogger(app).info("Configuring CORS with resources and options%s", resources_human)
+
 
         def cors_after_request(resp):
             '''
@@ -253,7 +264,7 @@ class CORS(object):
             '''
             # If CORS headers are set in a view decorator, pass
             if resp.headers.get(ACL_ORIGIN):
-                logger.debug('CORS have been already evaluated, skipping')
+                getLogger().debug('CORS have been already evaluated, skipping')
                 return resp
 
             for res_regex, res_options in resources:
@@ -261,12 +272,12 @@ class CORS(object):
                     _options = options.copy()
                     _options.update(res_options)
                     _serialize_options(_options)
-                    logger.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
+                    getLogger().debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
                         request.path, _get_regexp_pattern(res_regex), _options)
                     _set_cors_headers(resp, _options)
                     break
             else:
-                logger.debug('No CORS rule matches')
+                getLogger().debug('No CORS rule matches')
             return resp
 
         app.after_request(cors_after_request)
@@ -336,11 +347,11 @@ def _get_cors_origin(options, request_origin):
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
     if request_origin:
-        logger.debug("CORS request received with 'Origin' %s", request_origin)
+        getLogger().debug("CORS request received with 'Origin' %s", request_origin)
 
         # If the allowed origins is an asterisk or 'wildcard', always match
         if wildcard:
-            logger.debug("Allowed origins are set to '*', assuming valid request")
+            getLogger().debug("Allowed origins are set to '*', assuming valid request")
             if options.get('send_wildcard'):
                 return '*'
             else:
@@ -349,13 +360,13 @@ def _get_cors_origin(options, request_origin):
         # If the value of the Origin header is a case-sensitive match
         # for any of the values in list of origins
         elif any(_try_match(pattern, request_origin) for pattern in origins):
-            logger.debug("Given origin matches set of allowed origins")
+            getLogger().debug("Given origin matches set of allowed origins")
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             # -- W3Spec
             return request_origin
         else:
-            logger.debug("Given origin does not match any of allowed origins: %s",
+            getLogger().debug("Given origin does not match any of allowed origins: %s",
                          map(_get_regexp_pattern, origins))
             return None
 
@@ -366,22 +377,28 @@ def _get_cors_origin(options, request_origin):
     # This will only be exceuted it there is no Origin in the request, in which
     # case, why bother with CORS?
     elif options.get('always_send') and options.get('origins_str'):
-        logger.debug("No 'Origin' header in request, skipping")
+        getLogger().debug("No 'Origin' header in request, skipping")
         return options.get('origins_str')
     # Terminate these steps, return the original request untouched.
     else:
-        logger.debug("'Origin' header was not send, which means CORS was not requested, skipping")
+        getLogger().debug("'Origin' header was not send, which means CORS was not requested, skipping")
         return None
 
 
 def _get_cors_headers(options, request_headers, request_method,
                       response_headers=None):
-    headers = dict(response_headers or {})  # copy dict
     origin_to_set = _get_cors_origin(options, request_headers.get('Origin'))
+
+    if 'Vary' in response_headers:
+        headers = {'Vary': response_headers.get('Vary')}
+    else:
+        headers = {}
+
+
 
     if origin_to_set is None:  # CORS is not enabled for this route
         return headers
-    logger.info("CORS request from Origin:%s, setting %s:%s",
+    getLogger().info("CORS request from Origin:%s, setting %s:%s",
                 request_headers.get('Origin'), ACL_ORIGIN, origin_to_set)
 
     headers[ACL_ORIGIN] = origin_to_set
@@ -404,7 +421,7 @@ def _get_cors_headers(options, request_headers, request_method,
 
     # http://www.w3.org/TR/cors/#resource-implementation
     if headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
-        vary = ['Origin', headers.get('Vary', None)]
+        vary = ['Origin', headers.get('Vary')]
         headers['Vary'] = ', '. join(v for v in vary if v is not None)
 
     return dict((k, v) for k, v in headers.items() if v is not None)
@@ -421,14 +438,14 @@ def _set_cors_headers(resp, options):
 
     # If CORS has already been evaluated via the decorator, skip
     if hasattr(resp, FLASK_CORS_EVALUATED):
-        logger.debug('CORS have been already evaluated, skipping')
+        getLogger().debug('CORS have been already evaluated, skipping')
         return resp
 
     headers_to_set = _get_cors_headers(options,
                                        request.headers,
                                        request.method,
                                        resp.headers)
-    logger.debug('Settings CORS headers: %s', str(headers_to_set))
+    getLogger().debug('Settings CORS headers: %s', str(headers_to_set))
 
     for k, v in headers_to_set.items():
         resp.headers[k] = v
@@ -544,3 +561,12 @@ def _serialize_options(options):
 
     if isinstance(options.get('max_age'), timedelta):
         options['max_age'] = str(int(options['max_age'].total_seconds()))
+
+
+def getLogger(app=None):
+    if stack.top is not None: # we are in the context of a request
+        return logging.getLogger("%s.cors" % current_app.logger_name)
+    elif app is not None: # For use init method, when an app is known, but there is no context
+        return logging.getLogger("%s.cors" % app.logger_name)
+    else:
+        return logging.getLogger("flask.ext.cors")
