@@ -46,7 +46,7 @@ def list_users():
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set. The expected result is as follows:
 
-        $ curl --include -X GET http://127.0.0.1:5000/api/v1/users \
+        $ curl --include -X GET http://127.0.0.1:5000/api/v1/users/ \
             --header Origin:www.examplesite.com
         HTTP/1.0 200 OK
         Access-Control-Allow-Headers: Content-Type

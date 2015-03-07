@@ -6,15 +6,11 @@
     Flask-Cors tests module
 """
 
-from tests.base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
-try:
-    # this is how you would normally import
-    from flask.ext.cors import *
-except:
-    # support local usage without installed package
-    from flask_cors import *
+from flask_cors import *
+from flask_cors.core import *
 
 
 class ExposeHeadersTestCase(FlaskCorsTestCase):
@@ -32,7 +28,7 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
     def test_default(self):
-        for resp in self.iter_responses('/test_default'):
+        for resp in self.iter_responses('/test_default', origin='www.example.com'):
             self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
                             "No Access-Control-Expose-Headers by default")
 
@@ -40,7 +36,7 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
         ''' The specified headers should be returned in the ACL_EXPOSE_HEADERS
             and correctly serialized if it is a list.
         '''
-        for resp in self.iter_responses('/test_override'):
+        for resp in self.iter_responses('/test_override', origin='www.example.com'):
             self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
                              'X-Another-Custom-Header, X-My-Custom-Header')
 

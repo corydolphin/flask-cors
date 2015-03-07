@@ -9,15 +9,11 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
-try:
-    # this is how you would normally import
-    from flask.ext.cors import *
-except:
-    # support local usage without installed package
-    from flask_cors import *
+from flask_cors import *
+from flask_cors.core import *
 
 
 class SupportsCredentialsCase(FlaskCorsTestCase):
@@ -38,16 +34,20 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
         ''' The specified route should return the
             Access-Control-Allow-Credentials header.
         '''
+        resp = self.get('/test_credentials', origin='www.example.com')
+        self.assertEquals(resp.headers.get(ACL_CREDENTIALS), 'true')
+
         resp = self.get('/test_credentials')
-        header = resp.headers.get(ACL_CREDENTIALS)
-        self.assertEquals(header, 'true')
+        self.assertEquals(resp.headers.get(ACL_CREDENTIALS), None )
 
     def test_open_request(self):
         ''' The default behavior should be to disallow credentials.
         '''
-        resp = self.get('/test_open')
+        resp = self.get('/test_open', origin='www.example.com')
         self.assertTrue(ACL_CREDENTIALS not in resp.headers)
 
+        resp = self.get('/test_open')
+        self.assertTrue(ACL_CREDENTIALS not in resp.headers)
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, SupportsCredentialsCase):
     def __init__(self, *args, **kwargs):
