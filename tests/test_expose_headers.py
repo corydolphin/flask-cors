@@ -32,7 +32,7 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
     def test_default(self):
-        for resp in self.iter_responses('/test_default'):
+        for resp in self.iter_responses('/test_default', origin='www.example.com'):
             self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
                             "No Access-Control-Expose-Headers by default")
 
@@ -40,7 +40,7 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
         ''' The specified headers should be returned in the ACL_EXPOSE_HEADERS
             and correctly serialized if it is a list.
         '''
-        for resp in self.iter_responses('/test_override'):
+        for resp in self.iter_responses('/test_override', origin='www.example.com'):
             self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
                              'X-Another-Custom-Header, X-My-Custom-Header')
 

@@ -30,20 +30,22 @@ if not hasattr(logging, 'NullHandler'):
             pass
     logging.NullHandler = NullHandler
 
-# Common string constants
+# Response Headers
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
 ACL_METHODS = 'Access-Control-Allow-Methods'
 ACL_ALLOW_HEADERS = 'Access-Control-Allow-Headers'
 ACL_EXPOSE_HEADERS = 'Access-Control-Expose-Headers'
 ACL_CREDENTIALS = 'Access-Control-Allow-Credentials'
 ACL_MAX_AGE = 'Access-Control-Max-Age'
+
+# Request Header
 ACL_REQUEST_METHOD = 'Access-Control-Request-Method'
 ACL_REQUEST_HEADERS = 'Access-Control-Request-Headers'
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']
 CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_ALLOW_HEADERS',
                   'CORS_EXPOSE_HEADERS', 'CORS_SUPPORTS_CREDENTIALS',
-                  'CORS_MAX_AGE', 'CORS_SEND_WILDCARD', 'CORS_ALWAYS_SEND',
+                  'CORS_MAX_AGE', 'CORS_SEND_WILDCARD',
                   'CORS_AUTOMATIC_OPTIONS', 'CORS_VARY_HEADER',
                   'CORS_RESOURCES', 'CORS_INTERCEPT_EXCEPTIONS']
 
@@ -60,10 +62,11 @@ FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 RegexObject = type(re.compile(''))
 _defaults_dict = dict(origins='*',
                       methods=ALL_METHODS,
-                      always_send=True,
+                      allow_headers='*',
                       automatic_options=True,
-                      send_wildcard=True,
-                      vary_header=True)
+                      send_wildcard=False,
+                      vary_header=True,
+                      supports_credentials=False)
 
 
 def cross_origin(*args, **kwargs):
@@ -77,11 +80,11 @@ def cross_origin(*args, **kwargs):
 
 
     :param origins: The origin, or list of origins to allow requests from.
-        The origin(s) may be regular expressions, exact origins, or else an
-        asterisk.
+        The origin(s) may be regular expressions, case-sensitive strings,
+        or else an asterisk
 
         Default : '*'
-    :type origins: list or string
+    :type origins: list, string or regex
 
     :param methods: The method or list of methods which the allowed origins
         are allowed to access for non-simple requests.
@@ -90,20 +93,21 @@ def cross_origin(*args, **kwargs):
     :type methods: list or string
 
     :param expose_headers: The header or list which are safe to expose to the
-        API of a CORS API specification
+        API of a CORS API specification.
 
         Default : None
     :type expose_headers: list or string
 
     :param allow_headers: The header or list of header field names which can be
-        used when this resource is accessed by allowed origins
+        used when this resource is accessed by allowed origins. The header(s)
+        may be regular expressions, case-sensitive strings, or else an asterisk.
 
-        Default : None
-    :type allow_headers: list or string
+        Default : '*', allow all headers
+    :type allow_headers: list, string or regex
 
     :param supports_credentials: Allows users to make authenticated requests.
         If true, injects the `Access-Control-Allow-Credentials` header in
-        responses.
+        responses. This allows cookies to be submitted across domains.
 
         :note: This option cannot be used in conjuction with a '*' origin
 
@@ -120,38 +124,31 @@ def cross_origin(*args, **kwargs):
         wildcard `Access-Control-Allow-Origin` header is sent, rather than
         the request's `Origin` header.
 
-        Default : True
+        Default : False
     :type send_wildcard: bool
 
-    :param always_send: If True, CORS headers are sent even if there is no
-        `Origin` in the request's headers.
-
-        Default : True
-    :type always_send: bool
-
-    :param automatic_options: If True, CORS headers will be returned for
-        OPTIONS requests. For use with cross domain POST requests which
-        preflight OPTIONS requests, you will need to specifically allow
-        the Content-Type header.
-
-        Default : True
-    :type automatic_options: bool
-
     :param vary_header: If True, the header Vary: Origin will be returned
-        as per suggestion by the W3 implementation guidelines.
+        as per the W3 implementation guidelines.
 
         Setting this header when the `Access-Control-Allow-Origin` is
         dynamically generated (e.g. when there is more than one allowed
         origin, and an Origin than '*' is returned) informs CDNs and other
-        caches that the CORS headers are dynamic, and cannot be re-used.
+        caches that the CORS headers are dynamic, and cannot be cached.
 
         If False, the Vary header will never be injected or altered.
 
         Default : True
     :type vary_header: bool
 
-    '''
+    :param automatic_options: Only applies to the `cross_origin` decorator.
+        If True, Flask-CORS will override Flask's default OPTIONS handling to
+        return CORS headers for OPTIONS requests.
 
+        Default : True
+    :type automatic_options: bool
+
+
+    '''
     _options = kwargs
 
     def decorator(f):
@@ -173,7 +170,6 @@ def cross_origin(*args, **kwargs):
 
             _set_cors_headers(resp, options)
             setattr(resp, FLASK_CORS_EVALUATED, True)
-
             return resp
 
         # If True, intercept OPTIONS requests by modifying the view function,
@@ -268,7 +264,7 @@ class CORS(object):
                 return resp
 
             for res_regex, res_options in resources:
-                if _try_match(res_regex, request.path):
+                if _try_match(request.path, res_regex):
                     _options = options.copy()
                     _options.update(res_options)
                     _serialize_options(_options)
@@ -343,23 +339,20 @@ def _get_regexp_pattern(regexp):
 
 def _get_cors_origin(options, request_origin):
     origins = options.get('origins')
-    wildcard = '*' in origins
+    wildcard = r'.*' in origins
+
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
     if request_origin:
         getLogger().debug("CORS request received with 'Origin' %s", request_origin)
 
         # If the allowed origins is an asterisk or 'wildcard', always match
-        if wildcard:
+        if wildcard and options.get('send_wildcard'):
             getLogger().debug("Allowed origins are set to '*', assuming valid request")
-            if options.get('send_wildcard'):
-                return '*'
-            else:
-                return request_origin
-
+            return '*'
         # If the value of the Origin header is a case-sensitive match
         # for any of the values in list of origins
-        elif any(_try_match(pattern, request_origin) for pattern in origins):
+        elif _try_match_any(request_origin, origins):
             getLogger().debug("Given origin matches set of allowed origins")
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
@@ -369,37 +362,31 @@ def _get_cors_origin(options, request_origin):
             getLogger().debug("Given origin does not match any of allowed origins: %s",
                          map(_get_regexp_pattern, origins))
             return None
-
-    # Unless always_send is set, then ignore W3 spec as long as there is a
-    # valid list of origins, e.g. one that is not merely comrpised of regular
-    # expressions.
-    # TODO: remove this. It breaks the spec, and practically shouldn't be used
-    # This will only be exceuted it there is no Origin in the request, in which
-    # case, why bother with CORS?
-    elif options.get('always_send') and options.get('origins_str'):
-        getLogger().debug("No 'Origin' header in request, skipping")
-        return options.get('origins_str')
     # Terminate these steps, return the original request untouched.
     else:
-        getLogger().debug("'Origin' header was not send, which means CORS was not requested, skipping")
+        getLogger().debug("'Origin' header was not set, which means CORS was not requested, skipping")
         return None
 
+def _get_allow_headers(options, acl_request_headers):
+    if acl_request_headers:
+        acl_request_headers = [h.strip() for h in acl_request_headers.split(',')] # remove falsey values
+        matching_headers = filter(
+            lambda h: _try_match_any(h, options.get('allow_headers')), # any header that matches in the allow_headers
+            acl_request_headers
+        )
+        return ', '.join(sorted(matching_headers))
 
-def _get_cors_headers(options, request_headers, request_method,
-                      response_headers=None):
+    return None
+
+
+def _get_cors_headers(options, request_headers, request_method, response_headers):
     origin_to_set = _get_cors_origin(options, request_headers.get('Origin'))
-
-    if 'Vary' in response_headers:
-        headers = {'Vary': response_headers.get('Vary')}
-    else:
-        headers = {}
-
-
+    headers = {}
 
     if origin_to_set is None:  # CORS is not enabled for this route
         return headers
-    getLogger().info("CORS request from Origin:%s, setting %s:%s",
-                request_headers.get('Origin'), ACL_ORIGIN, origin_to_set)
+    getLogger().info("Request from Origin:%s, setting %s:%s",
+                     request_headers.get('Origin'), ACL_ORIGIN, origin_to_set)
 
     headers[ACL_ORIGIN] = origin_to_set
     headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
@@ -415,16 +402,26 @@ def _get_cors_headers(options, request_headers, request_method,
         # If there is no Access-Control-Request-Method header or if parsing
         # failed, do not set any additional headers
         if acl_request_method and acl_request_method in options.get('methods'):
+
+            # If method is not a case-sensitive match for any of the values in
+            # list of methods do not set any additional headers and terminate this set of steps.
+            headers[ACL_ALLOW_HEADERS] = _get_allow_headers(options, request_headers.get(ACL_REQUEST_HEADERS))
             headers[ACL_MAX_AGE] = options.get('max_age')
             headers[ACL_METHODS] = options.get('methods')
-            headers[ACL_ALLOW_HEADERS] = options.get('allow_headers')
+        else:
+            getLogger().info("Access-Control-Request-Method:%s does not match allowed methods %s",
+                             acl_request_method, options.get('methods'))
 
     # http://www.w3.org/TR/cors/#resource-implementation
-    if headers[ACL_ORIGIN] != '*' and options.get('vary_header'):
-        vary = ['Origin', headers.get('Vary')]
-        headers['Vary'] = ', '. join(v for v in vary if v is not None)
+    if options.get('vary_header'):
+        # Only set header if the origin returned will vary dynamically,
+        # i.e. if we are not returning an asterisk, and there are multiple
+        # origins that can be matched.
+        if headers[ACL_ORIGIN] != '*' and len(options.get('origins')) > 1:
+            vary = ['Origin', response_headers.get('Vary')]
+            headers['Vary'] = ', '. join(v for v in vary if v is not None)
 
-    return dict((k, v) for k, v in headers.items() if v is not None)
+    return dict((k, v) for k, v in headers.items() if v)
 
 
 def _set_cors_headers(resp, options):
@@ -468,22 +465,17 @@ def _get_app_kwarg_dict(appInstance=None):
 def _re_fix(reg):
     '''
         Replace the invalid regex r'*' with the valid, wildcard regex r'/.*' to
-        enable the CORS app extension to have a more consistent api with the
-        decorator.
+        enable the CORS app extension to have a more user friendly api.
     '''
-    pattern = r'.*' if reg == r'*' else reg
+    return r'.*' if reg == r'*' else reg
 
-    try:
-        return re.compile(pattern)
-    except:  # invalid regex, return original string
-        return pattern
+def _try_match_any(inst, patterns):
+    return any(_try_match(inst, pattern) for pattern in patterns)
 
 
-def _try_match(pattern, request_origin):
+def _try_match(request_origin, pattern):
     '''
         Safely attempts to match a pattern or string to a request origin.
-
-        If a pattern is an illegal regular expression
     '''
     try:
         return re.match(pattern, request_origin)
@@ -506,34 +498,26 @@ def _flexible_str(obj):
         return str(obj)
 
 
-def _serialize_option(d, key, target_key=None, upper=False):
-    if key in d:
-        v = _flexible_str(d[key])
-        if upper and v:
-            v.upper()
-        d[target_key or key] = v
+def _serialize_option(options_dict, key, upper=False):
+    if key in options_dict:
+        value = _flexible_str(options_dict[key])
+        options_dict[key] = value.upper() if upper else value
 
-
-def _is_regexp(pattern):
+def _ensure_iterable(inst):
     '''
-        Returns True if the `pattern` is likely to be a regexp,
-        based on whether or not it contains characters which would make
-        it in invalid domain name.
-    '''
-    if isinstance(pattern, RegexObject):
-        return True
+        Wraps scalars or string types as a list, or returns the iterable instance.
 
-    # ?*[] are invalid in RFC 1034 and RFC 1035 domain name
-    # if they are in the pattern, it is probably a regex!
-    return pattern != '*' and any(c in pattern for c in '?*[]')
+    '''
+    if isinstance(inst, string_types):
+        return [inst]
+    elif not isinstance(inst, collections.Iterable):
+        return [inst]
+    else:
+        return inst
 
 
-def _filter_false(predicate, iterable):
-    '''
-        Returns all objects in iterable for which predicate is false.
-        Equivalent to the Python 3 version of itertools.filterfalse
-    '''
-    return filter(lambda x: not predicate(x), iterable)
+def _sanitize_regex_param(param):
+    return [_re_fix(x) for x in _ensure_iterable(param)]
 
 
 def _serialize_options(options):
@@ -541,23 +525,19 @@ def _serialize_options(options):
         A helper method to serialize and processes the options dictionary
         where applicable.
     '''
-    # ensure origins is a list of allowed origins with at least one entry.
-    if isinstance(options.get('origins'), string_types):
-        options['origins'] = [options.get('origins')]
 
-    # remove regular expressions from the list of serialized origins to be
-    # returned in the case of a request with no Origin header, while
-    # always_send is set to True
-    options['origins_str'] = _filter_false(_is_regexp, options.get('origins'))
+    # Ensure origins is a list of allowed origins with at least one entry.
+    options['origins'] = _sanitize_regex_param(options.get('origins'))
+    options['allow_headers'] = _sanitize_regex_param(options.get('allow_headers'))
 
-    if 'headers' in options:
-        options['allow_headers'] = options.pop('headers')
+    # This is expressly forbidden by the spec. Raise a value error so people don't
+    # get burned in production.
+    if r'.*' in options['origins'] and options['supports_credentials'] and options['send_wildcard']:
+        raise ValueError("Cannot use supports_credentials in conjunction with"
+            "an origin string of '*'. See: http://www.w3.org/TR/cors/#resource-requests")
 
-    _serialize_option(options, 'origins_str')
-    _serialize_option(options, 'methods', upper=True)
-    _serialize_option(options, 'allow_headers')
     _serialize_option(options, 'expose_headers')
-    _serialize_option(options, 'supports_credentials')
+    _serialize_option(options, 'methods', upper=True)
 
     if isinstance(options.get('max_age'), timedelta):
         options['max_age'] = str(int(options['max_age'].total_seconds()))

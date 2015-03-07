@@ -42,11 +42,10 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
 
     def test_consistent_origin(self):
         '''
-            If the Access-Control-Allow-Origin header will not be changed
-            dynamically, there is no need to Vary:Origin header should not
-            be set.
+            If the Access-Control-Allow-Origin header will change dynamically,
+            the Vary:Origin header should be set.
         '''
-        for resp in self.iter_responses('/'):
+        for resp in self.iter_responses('/', origin="http://foo.com"):
             self.assertFalse('Vary' in resp.headers)
 
     def test_varying_origin(self):
@@ -61,8 +60,8 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             re-used across-origins.
         '''
         example_origin = 'http://foo.com'
-        for resp in self.iter_responses('/test_vary',
-                                        headers={'Origin': example_origin}):
+        for resp in self.iter_responses('/test_vary', origin=example_origin):
+            self.assertHasACLOrigin(resp)
             self.assertEqual(resp.headers.get('Vary'), 'Origin')
 
     def test_consistent_origin_concat(self):
@@ -71,7 +70,7 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             header set, the headers should be combined and comma-separated.
         '''
 
-        resp = self.get('/test_existing_vary_headers')
+        resp = self.get('/test_existing_vary_headers', origin="http://foo.com")
         self.assertEqual(
             resp.headers.get('Vary'),
             'Origin, Accept-Encoding'

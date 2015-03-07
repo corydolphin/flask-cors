@@ -40,11 +40,18 @@ class AppExtensionRegexp(AppConfigTest, OriginsTestCase):
             },
             r'/test_regex_mixed_list': {
                 'origins': ["http://example.com", r".*.otherexample.com"]
+            },
+            r'/test_send_wildcard_with_origin' : {
+                'send_wildcard':True
             }
         })
 
         @self.app.route('/')
         def wildcard():
+            return 'Welcome!'
+
+        @self.app.route('/test_send_wildcard_with_origin')
+        def send_wildcard_with_origin():
             return 'Welcome!'
 
         @self.app.route('/test_list')
@@ -64,7 +71,7 @@ class AppExtensionList(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
         CORS(self.app, resources=[r'/test_exposed', r'/test_other_exposed'],
-             origins=['http://foo.com, http://bar.com'])
+             origins=['http://foo.com', 'http://bar.com'])
 
         @self.app.route('/test_unexposed')
         def unexposed():
@@ -79,19 +86,17 @@ class AppExtensionList(FlaskCorsTestCase):
             return 'Welcome!'
 
     def test_exposed(self):
-        for resp in self.iter_responses('/test_exposed'):
+        for resp in self.iter_responses('/test_exposed', origin='http://foo.com'):
             self.assertEqual(resp.status_code, 200)
-            self.assertEqual(resp.headers.get(ACL_ORIGIN),
-                             'http://foo.com, http://bar.com')
+            self.assertEqual(resp.headers.get(ACL_ORIGIN),'http://foo.com')
 
     def test_other_exposed(self):
-        for resp in self.iter_responses('/test_other_exposed'):
+        for resp in self.iter_responses('/test_other_exposed', origin='http://bar.com'):
             self.assertEqual(resp.status_code, 200)
-            self.assertEqual(resp.headers.get(ACL_ORIGIN),
-                             'http://foo.com, http://bar.com')
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://bar.com')
 
     def test_unexposed(self):
-        for resp in self.iter_responses('/test_unexposed'):
+        for resp in self.iter_responses('/test_unexposed', origin='http://foo.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
@@ -101,7 +106,8 @@ class AppExtensionString(FlaskCorsTestCase):
         self.app = Flask(__name__)
         CORS(self.app, resources=r'/api/*',
              headers='Content-Type',
-             expose_headers='X-Total-Count')
+             expose_headers='X-Total-Count',
+             origins='http://bar.com')
 
         @self.app.route('/api/v1/foo')
         def exposed1():
@@ -122,23 +128,32 @@ class AppExtensionString(FlaskCorsTestCase):
 
     def test_exposed(self):
         for path in '/api/v1/foo', '/api/v1/bar':
-            for resp in self.iter_responses(path):
+            for resp in self.iter_responses(path, origin='http://bar.com'):
                 self.assertEqual(resp.status_code, 200)
-                self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
+                self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://bar.com')
                 self.assertEqual(resp.headers.get(ACL_EXPOSE_HEADERS),
                                  'X-Total-Count')
+            for resp in self.iter_responses(path, origin='http://foo.com'):
+                self.assertEqual(resp.status_code, 200)
+                self.assertFalse(ACL_ORIGIN in resp.headers)
+                self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
     def test_unexposed(self):
-        for resp in self.iter_responses('/'):
+        for resp in self.iter_responses('/', origin='http://bar.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
             self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
     def test_override(self):
-        for resp in self.iter_responses('/api/v1/special'):
+        for resp in self.iter_responses('/api/v1/special', origin='http://foo.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
 
+            self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
+
+        for resp in self.iter_responses('/api/v1/special', origin='http://bar.com'):
+            self.assertEqual(resp.status_code, 200)
+            self.assertFalse(ACL_ORIGIN in resp.headers)
             self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
 
@@ -165,7 +180,7 @@ class AppExtensionDefault(FlaskCorsTestCase):
         def index():
             return 'Welcome'
 
-        for resp in self.iter_responses('/'):
+        for resp in self.iter_responses('/', origin='http://foo.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertTrue(ACL_ORIGIN in resp.headers)
 
@@ -193,7 +208,7 @@ class AppExtensionExampleApp(FlaskCorsTestCase):
         '''
             If regex does not match, do not set CORS
         '''
-        for resp in self.iter_responses('/'):
+        for resp in self.iter_responses('/', origin='http://foo.bar'):
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
     def test_wildcard(self):
@@ -238,7 +253,7 @@ class AppExtensionCompiledRegexp(FlaskCorsTestCase):
         for resp in self.iter_responses('/'):
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
-        for resp in self.iter_responses('/api/v1'):
+        for resp in self.iter_responses('/api/v1', origin='http://foo.com'):
             self.assertTrue(ACL_ORIGIN in resp.headers)
 
 

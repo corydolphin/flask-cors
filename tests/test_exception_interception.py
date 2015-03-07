@@ -53,7 +53,7 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
             path matches. This path matches.
 
         '''
-        resp = self.get('/test_acl_abort_404')
+        resp = self.get('/test_acl_abort_404', origin='www.example.com')
         self.assertEqual(resp.status_code, 404)
         self.assertTrue(ACL_ORIGIN in resp.headers)
 
@@ -63,7 +63,7 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
             to normal responses, and should be wrapped by CORS headers if thep
             path matches. This path does not match.
         '''
-        resp = self.get('/test_no_acl_abort_404')
+        resp = self.get('/test_no_acl_abort_404', origin='www.example.com')
         self.assertEqual(resp.status_code, 404)
         self.assertFalse(ACL_ORIGIN in resp.headers)
 
@@ -73,7 +73,7 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
             to normal responses, and should be wrapped by CORS headers if thep
             path matches. This path matches
         '''
-        resp = self.get('/test_acl_abort_500')
+        resp = self.get('/test_acl_abort_500', origin='www.example.com')
         self.assertEqual(resp.status_code, 500)
         self.assertTrue(ACL_ORIGIN in resp.headers)
 
@@ -83,7 +83,7 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
             to normal responses, and should be wrapped by CORS headers if thep
             path matches. This path matches
         '''
-        resp = self.get('/test_no_acl_abort_500')
+        resp = self.get('/test_no_acl_abort_500', origin='www.example.com')
         self.assertEqual(resp.status_code, 500)
         self.assertFalse(ACL_ORIGIN in resp.headers)
 
@@ -96,7 +96,7 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
             This url matches.
         '''
 
-        resp = self.get('/test_acl_uncaught_exception_500')
+        resp = self.get('/test_acl_uncaught_exception_500', origin='www.example.com')
         self.assertEqual(resp.status_code, 500)
         self.assertTrue(ACL_ORIGIN in resp.headers)
 
@@ -109,7 +109,7 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
             This url does not match.
         '''
 
-        resp = self.get('/test_no_acl_uncaught_exception_500')
+        resp = self.get('/test_no_acl_uncaught_exception_500', origin='www.example.com')
         self.assertEqual(resp.status_code, 500)
         self.assertFalse(ACL_ORIGIN in resp.headers)
 
@@ -141,11 +141,14 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
             'test_no_acl_uncaught_exception_500'
         ]
 
-        for resp in map(self.get, acl_paths):
+        def get_with_origins(path):
+            return self.get(path, origin='www.example.com')
+
+        for resp in map(get_with_origins, acl_paths):
             self.assertEqual(resp.status_code, 200)
             self.assertTrue(ACL_ORIGIN in resp.headers)
 
-        for resp in map(self.get, no_acl_paths):
+        for resp in map(get_with_origins, no_acl_paths):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
@@ -188,12 +191,14 @@ class NoExceptionInterceptionTestCase(ExceptionInterceptionDefaultTestCase):
             'test_no_acl_uncaught_exception_500'
             'test_acl_uncaught_exception_500'
         ]
+        def get_with_origins(path):
+            return self.get(path, origin='www.example.com')
 
-        for resp in map(self.get, acl_paths):
+        for resp in map(get_with_origins, acl_paths):
             self.assertEqual(resp.status_code, 200)
             self.assertTrue(ACL_ORIGIN in resp.headers)
 
-        for resp in map(self.get, no_acl_paths):
+        for resp in map(get_with_origins, no_acl_paths):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
@@ -203,7 +208,7 @@ class NoExceptionInterceptionTestCase(ExceptionInterceptionDefaultTestCase):
             handler, and should have ACL headers only if intercept_exceptions
             is set to True. In this case it is not.
         '''
-        resp = self.get('/test_acl_uncaught_exception_500')
+        resp = self.get('/test_acl_uncaught_exception_500', origin='www.example.com')
         self.assertEqual(resp.status_code, 500)
         self.assertFalse(ACL_ORIGIN in resp.headers)
 

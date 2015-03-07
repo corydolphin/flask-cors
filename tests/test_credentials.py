@@ -38,16 +38,20 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
         ''' The specified route should return the
             Access-Control-Allow-Credentials header.
         '''
+        resp = self.get('/test_credentials', origin='www.example.com')
+        self.assertEquals(resp.headers.get(ACL_CREDENTIALS), 'true')
+
         resp = self.get('/test_credentials')
-        header = resp.headers.get(ACL_CREDENTIALS)
-        self.assertEquals(header, 'true')
+        self.assertEquals(resp.headers.get(ACL_CREDENTIALS), None )
 
     def test_open_request(self):
         ''' The default behavior should be to disallow credentials.
         '''
-        resp = self.get('/test_open')
+        resp = self.get('/test_open', origin='www.example.com')
         self.assertTrue(ACL_CREDENTIALS not in resp.headers)
 
+        resp = self.get('/test_open')
+        self.assertTrue(ACL_CREDENTIALS not in resp.headers)
 
 class AppConfigExposeHeadersTestCase(AppConfigTest, SupportsCredentialsCase):
     def __init__(self, *args, **kwargs):

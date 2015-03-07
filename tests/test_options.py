@@ -45,16 +45,13 @@ class OptionsTestCase(FlaskCorsTestCase):
             The default behavior should automatically provide OPTIONS
             and return CORS headers.
         '''
-        resp = self.options('/test_default')
+        resp = self.options('/test_default', origin='http://foo.bar.com')
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(ACL_ORIGIN in resp.headers)
 
-        headers = {'Origin': 'http://foo.bar.com/'}
-        resp = self.options('/test_default', headers=headers)
-
+        resp = self.options('/test_default', origin='http://foo.bar.com')
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(ACL_ORIGIN in resp.headers)
-        self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
     def test_no_options_and_not_auto(self):
         '''
@@ -66,8 +63,7 @@ class OptionsTestCase(FlaskCorsTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(ACL_ORIGIN in resp.headers)
 
-        headers = {'Origin': 'http://foo.bar.com/'}
-        resp = self.options('/test_no_options_and_not_auto', headers=headers)
+        resp = self.options('/test_no_options_and_not_auto', origin='http://foo.bar.com')
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(ACL_ORIGIN in resp.headers)
 
@@ -76,15 +72,14 @@ class OptionsTestCase(FlaskCorsTestCase):
             If OPTIONS is in methods, and automatic_options is False,
             the view function must return a response.
         '''
-        resp = self.options('/test_options_and_not_auto')
+        resp = self.options('/test_options_and_not_auto', origin='http://foo.bar.com')
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(ACL_ORIGIN in resp.headers)
         self.assertEqual(resp.data.decode("utf-8"), u"Welcome!")
 
-        headers = {'Origin': 'http://foo.bar.com/'}
-        resp = self.options('/test_options_and_not_auto', headers=headers)
+        resp = self.options('/test_options_and_not_auto', origin='http://foo.bar.com')
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
+        self.assertTrue(ACL_ORIGIN in resp.headers)
         self.assertEqual(resp.data.decode("utf-8"), u"Welcome!")
 
 
