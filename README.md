@@ -145,7 +145,7 @@ The application-wide configuration options are identical to the keyword argument
 When using JSON cross origin, browsers will issue a pre-flight OPTIONS request for POST requests. In order for browsers to allow POST requests with a JSON content type, you must allow the Content-Type header. The simplest way to do this is to simply set the CORS_HEADERS configuration value on your application, e.g:
 
 ```python
-app.config['CORS_HEADERS'] = 'Content-Type'
+app.config['CORS_ALLOW_HEADERS'] = 'Content-Type'
 ```
 
 ## Tests
