@@ -16,6 +16,8 @@ matrix:
     env: FLASK=0.9
   - python: 'pypy3'
     env: FLASK=0.9
+  - python: '3.4'
+    env: FLASK=0.9
 install:
 - pip install pep8 coveralls six
 - pip install -U "pip>=1.4" "setuptools>=0.9" "wheel>=0.21"
