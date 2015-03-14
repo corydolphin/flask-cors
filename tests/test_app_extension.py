@@ -14,12 +14,8 @@ from tests.test_origins import OriginsTestCase
 from tests.test_options import OptionsTestCase
 from flask import Flask, jsonify
 
-try:
-    # this is how you would normally import
-    from flask.ext.cors import *
-except:
-    # support local usage without installed package
-    from flask_cors import *
+from flask_cors import *
+from flask_cors.core import *
 
 
 class AppExtensionRegexp(AppConfigTest, OriginsTestCase):
@@ -309,9 +305,9 @@ class AppExtensionOptionsTestCase(OptionsTestCase):
 class AppExtensionSortedResourcesTestCase(FlaskCorsTestCase):
     def setUp(self):
 
-        from flask_cors import _parse_resources
+        from flask_cors.core import parse_resources
 
-        self.resources = _parse_resources({
+        self.resources = parse_resources({
             '/foo': {'origins': 'http://foo.com'},
             re.compile(r'/.*'): {
                 'origins': 'http://some-domain.com'

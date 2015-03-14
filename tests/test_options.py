@@ -9,16 +9,11 @@
     :license: MIT, see LICENSE for more details.
 """
 
-
 from tests.base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
-try:
-    # this is how you would normally import
-    from flask.ext.cors import *
-except:
-    # support local usage without installed package
-    from flask_cors import *
+from flask_cors import *
+from flask_cors.core import *
 
 
 class OptionsTestCase(FlaskCorsTestCase):

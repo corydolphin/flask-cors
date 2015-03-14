@@ -10,38 +10,34 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
-from flask import Flask
+
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
 
-try:
-    # this is how you would normally import
-    from flask.ext.cors import _try_match, _flexible_str, _serialize_options
-except:
-    # support local usage without installed package
-    from flask_cors import _try_match, _flexible_str, _serialize_options
+from flask_cors.core import *
+
 
 class InternalsTestCase(unittest.TestCase):
-    def test_try_match(self):
-        self.assertTrue(_try_match('www.com/foo+', 'www.com/foo+'))
+    def testtry_match(self):
+        self.assertTrue(try_match('www.com/foo+', 'www.com/foo+'))
 
-    def test_flexible_str_str(self):
-        self.assertEquals(_flexible_str('Bar, Foo, Qux'), 'Bar, Foo, Qux')
+    def testflexible_str_str(self):
+        self.assertEquals(flexible_str('Bar, Foo, Qux'), 'Bar, Foo, Qux')
 
-    def test_flexible_str_set(self):
-        self.assertEquals(_flexible_str(set(['Foo', 'Bar', 'Qux'])),
-            'Bar, Foo, Qux')
+    def testflexible_str_set(self):
+        self.assertEquals(flexible_str(set(['Foo', 'Bar', 'Qux'])),
+                          'Bar, Foo, Qux')
 
-    def test_serialize_options(self):
+    def testserialize_options(self):
         try:
-            _serialize_options({
+            serialize_options({
                 'origins': r'*',
                 'allow_headers': True,
                 'supports_credentials': True,
                 'send_wildcard': True
             })
             self.assertFalse(True, "A Value Error should have been raised.")
-        except ValueError as e:
+        except ValueError:
             pass

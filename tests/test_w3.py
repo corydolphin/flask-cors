@@ -15,9 +15,11 @@ from flask import Flask
 try:
     # this is how you would normally import
     from flask.ext.cors import *
+    from flask.ext.cors.core import *
 except:
     # support local usage without installed package
     from flask_cors import *
+    from flask_cors.core import *
 
 
 class OriginsW3TestCase(FlaskCorsTestCase):
