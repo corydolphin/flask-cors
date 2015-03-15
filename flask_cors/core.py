@@ -60,7 +60,9 @@ DEFAULT_OPTIONS = dict(origins='*',
                        automatic_options=True,
                        send_wildcard=False,
                        vary_header=True,
-                       supports_credentials=False)
+                       supports_credentials=False,
+                       resources=r'/*',
+                       intercept_exceptions=True)
 
 
 def parse_resources(resources):
@@ -117,27 +119,27 @@ def get_cors_origin(options, request_origin):
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
     if request_origin:
-        debug("CORS request received with 'Origin' %s", request_origin)
+        debugLog("CORS request received with 'Origin' %s", request_origin)
 
         # If the allowed origins is an asterisk or 'wildcard', always match
         if wildcard and options.get('send_wildcard'):
-            debug("Allowed origins are set to '*', assuming valid request")
+            debugLog("Allowed origins are set to '*', assuming valid request")
             return '*'
         # If the value of the Origin header is a case-sensitive match
         # for any of the values in list of origins
         elif try_match_any(request_origin, origins):
-            debug("Given origin matches set of allowed origins")
+            debugLog("Given origin matches set of allowed origins")
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             # -- W3Spec
             return request_origin
         else:
-            debug("Given origin does not match any of allowed origins: %s",
+            debugLog("Given origin does not match any of allowed origins: %s",
                   map(get_regexp_pattern, origins))
             return None
     # Terminate these steps, return the original request untouched.
     else:
-        debug("'Origin' header was not set, which means CORS was not requested, skipping")
+        debugLog("'Origin' header was not set, which means CORS was not requested, skipping")
         return None
 
 
@@ -162,7 +164,7 @@ def get_cors_headers(options, request_headers, request_method, response_headers)
 
     if origin_to_set is None:  # CORS is not enabled for this route
         return headers
-    getLogger().info("Request from Origin:%s, setting %s:%s",
+    infoLog("Request from Origin:%s, setting %s:%s",
                      request_headers.get('Origin'), ACL_ORIGIN, origin_to_set)
 
     headers[ACL_ORIGIN] = origin_to_set
@@ -187,7 +189,7 @@ def get_cors_headers(options, request_headers, request_method, response_headers)
             headers[ACL_MAX_AGE] = options.get('max_age')
             headers[ACL_METHODS] = options.get('methods')
         else:
-            getLogger().info("Access-Control-Request-Method:%s does not match allowed methods %s",
+            infoLog("Access-Control-Request-Method:%s does not match allowed methods %s",
                              acl_request_method, options.get('methods'))
 
     # http://www.w3.org/TR/cors/#resource-implementation
@@ -213,31 +215,19 @@ def set_cors_headers(resp, options):
 
     # If CORS has already been evaluated via the decorator, skip
     if hasattr(resp, FLASK_CORS_EVALUATED):
-        debug('CORS have been already evaluated, skipping')
+        debugLog('CORS have been already evaluated, skipping')
         return resp
 
     headers_to_set = get_cors_headers(options,
                                        request.headers,
                                        request.method,
                                        resp.headers)
-    debug('Settings CORS headers: %s', str(headers_to_set))
+    debugLog('Settings CORS headers: %s', str(headers_to_set))
 
     for k, v in headers_to_set.items():
         resp.headers[k] = v
 
     return resp
-
-
-def get_app_kwarg_dict(appInstance=None):
-    '''
-        Returns the dictionary of CORS specific app configurations.
-    '''
-    app = (appInstance or current_app)
-    return dict(
-        (k.lower().replace('cors_', ''), app.config.get(k))
-        for k in CONFIG_OPTIONS
-        if app.config.get(k) is not None
-    )
 
 
 def re_fix(reg):
@@ -265,6 +255,33 @@ def try_match(request_origin, pattern):
         return request_origin == pattern
 
 
+def get_cors_options(appInstance, *dicts):
+    '''
+        Compute CORS options for an application by combining
+        the DEFAULT_OPTIONS, the app's configuration-specified options
+        and any dictionaries passed. The last specified option wins.
+    '''
+    options = DEFAULT_OPTIONS.copy()
+    options.update(get_app_kwarg_dict(appInstance))
+    if dicts:
+        for d in dicts:
+            options.update(d)
+
+    return serialize_options(options)
+
+
+def get_app_kwarg_dict(appInstance=None):
+    '''
+        Returns the dictionary of CORS specific app configurations.
+    '''
+    app = (appInstance or current_app)
+    return dict(
+        (k.lower().replace('cors_', ''), app.config.get(k))
+        for k in CONFIG_OPTIONS
+        if app.config.get(k) is not None
+    )
+
+
 def flexible_str(obj):
     '''
         A more flexible str function which intelligently handles
@@ -285,6 +302,7 @@ def serialize_option(options_dict, key, upper=False):
         value = flexible_str(options_dict[key])
         options_dict[key] = value.upper() if upper else value
 
+
 def ensure_iterable(inst):
     '''
         Wraps scalars or string types as a list, or returns the iterable instance.
@@ -295,7 +313,6 @@ def ensure_iterable(inst):
         return [inst]
     else:
         return inst
-
 
 def sanitize_regex_param(param):
     return [re_fix(x) for x in ensure_iterable(param)]
@@ -329,7 +346,10 @@ def serialize_options(opts):
 
 
 def getLogger(app=None):
-
+    '''
+        Helper to get Flask-Cor's logger, attached to the current_app's logger
+        if it exists.
+    '''
     # we are in the context of a request
     if stack.top is not None:
         return logging.getLogger("%s.cors" % current_app.logger_name)
@@ -340,5 +360,15 @@ def getLogger(app=None):
         return logging.getLogger("flask.ext.cors")
 
 
-def debug(*args, **kwargs):
+def debugLog(*args, **kwargs):
+    '''
+        Helper to log a message at the DEBUG level.
+    '''
     getLogger().debug(*args, **kwargs)
+
+
+def infoLog(*args, **kwargs):
+    '''
+        Helper to log a message at the INFO level.
+    '''
+    getLogger().info(*args, **kwargs)

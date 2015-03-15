@@ -6,39 +6,11 @@
     Flask-Cors tests module
 """
 
-from tests.base_test import FlaskCorsTestCase
+from ..base_test import FlaskCorsTestCase
 from flask import Flask
 
 from flask_cors import *
 from flask_cors.core import *
-
-
-class AllowHeadersTestCase(FlaskCorsTestCase):
-    def test_get_allow_headers_empty(self):
-        options = serialize_options({'allow_headers': r'*'})
-
-        self.assertEquals(get_allow_headers(options, ''), None)
-        self.assertEquals(get_allow_headers(options, None), None)
-
-    def test_get_allow_headers_matching(self):
-        options = serialize_options({'allow_headers': r'*'})
-
-        self.assertEquals(get_allow_headers(options, 'X-FOO'), 'X-FOO')
-        self.assertEquals(
-            get_allow_headers(options, 'X-Foo, X-Bar'),
-            'X-Bar, X-Foo'
-        )
-
-    def test_get_allow_headers_matching_none(self):
-        options = serialize_options({'allow_headers': r'X-FLASK-.*'})
-
-        self.assertEquals(get_allow_headers(options, 'X-FLASK-CORS'),
-                          'X-FLASK-CORS')
-        self.assertEquals(
-            get_allow_headers(options, 'X-NOT-FLASK-CORS'),
-            ''
-        )
-
 
 class AllowHeadersTestCaseIntegration(FlaskCorsTestCase):
     def setUp(self):

@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase
+from ..base_test import FlaskCorsTestCase
 from flask import Flask
 
 try:

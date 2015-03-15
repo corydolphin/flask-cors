@@ -9,10 +9,6 @@
     :license: MIT, see LICENSE for more details.
 """
 from flask import request
-try:
-    from flask import _app_ctx_stack as stack
-except ImportError:
-    from flask import _request_ctx_stack as stack
 from .core import *
 
 
@@ -63,23 +59,26 @@ class CORS(object):
             self.init_app(app, **kwargs)
 
     def init_app(self, app, **kwargs):
-        options = {}
-        options.update(DEFAULT_OPTIONS)
-        options.update(get_app_kwarg_dict(app))
-        options.update(self._options)
-        options.update(kwargs)
+        # The resources and options may be specified in the App Config, the CORS constructor
+        # or the kwargs to the call to init_app.
+        options = get_cors_options(app, self._options, kwargs)
 
-        _intercept_exceptions = options.get('intercept_exceptions', True)
-        resources = parse_resources(options.get('resources', [r'/*']))
-        resources_human = dict(
-            map(
-                lambda r: (get_regexp_pattern(r[0]), r[1]),
-                resources
-            )
-        )
+        # Flatten our resources into a list of the form
+        # (pattern_or_regexp, dictionary_of_options)
+        resources = parse_resources(options.get('resources'))
 
-        getLogger(app).info("Configuring CORS with resources and options%s",
-                            resources_human)
+        # Compute the options for each resource by combining the options from
+        # the app's configuration, the constructor, the kwargs to init_app, and
+        # finally the options specified in the resources dictionary.
+        resources = [
+                     (pattern, get_cors_options(app, options, opts))
+                     for (pattern, opts) in resources
+                    ]
+
+        # Create a human readable form of these resources by converting the compiled
+        # regular expressions into strings.
+        resources_human = dict([(get_regexp_pattern(pattern), opts) for (pattern,opts) in resources])
+        getLogger(app).info("Configuring CORS with resources: %s", resources_human)
 
         def cors_after_request(resp):
             '''
@@ -88,27 +87,24 @@ class CORS(object):
             '''
             # If CORS headers are set in a view decorator, pass
             if resp.headers.get(ACL_ORIGIN):
-                debug('CORS have been already evaluated, skipping')
+                debugLog('CORS have been already evaluated, skipping')
                 return resp
 
             for res_regex, res_options in resources:
                 if try_match(request.path, res_regex):
-                    resource_options = options.copy()
-                    resource_options.update(res_options)
-                    resource_options = serialize_options(resource_options)
-                    debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
-                          request.path, get_regexp_pattern(res_regex), resource_options)
-                    set_cors_headers(resp, resource_options)
+                    debugLog("Request to '%s' matches CORS resource '%s'. Using options: %s",
+                          request.path, get_regexp_pattern(res_regex), res_options)
+                    set_cors_headers(resp, res_options)
                     break
             else:
-                debug('No CORS rule matches')
+                debugLog('No CORS rule matches')
             return resp
 
         app.after_request(cors_after_request)
 
         # Wrap exception handlers with cross_origin
         # These error handlers will still respect the behavior of the route
-        if _intercept_exceptions:
+        if options.get('intercept_exceptions', True):
             def _after_request_decorator(f):
                 def wrapped_function(*args, **kwargs):
                     return cors_after_request(app.make_response(f(*args, **kwargs)))

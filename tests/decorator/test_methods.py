@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 from flask_cors import *
@@ -45,10 +45,8 @@ class MethodsCase(FlaskCorsTestCase):
         ''' If the methods parameter is defined, it should override the default
             methods defined by the user.
         '''
-        self.assertFalse(
-            ACL_METHODS in self.get('/test_methods_defined').headers)
-        self.assertFalse(
-            ACL_METHODS in self.head('/test_methods_defined').headers)
+        self.assertFalse(ACL_METHODS in self.get('/test_methods_defined').headers)
+        self.assertFalse(ACL_METHODS in self.head('/test_methods_defined').headers)
 
         res = self.preflight('/test_methods_defined', 'POST', origin='www.example.com')
         self.assertTrue('POST' in res.headers.get(ACL_METHODS))

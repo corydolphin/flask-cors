@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 import re
 from flask_cors import *

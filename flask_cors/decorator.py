@@ -96,6 +96,8 @@ def cross_origin(*args, **kwargs):
     _options = kwargs
 
     def decorator(f):
+        debugLog("Enabling %s for cross_origin using options:%s", f, _options)
+
         # If True, intercept OPTIONS requests by modifying the view function,
         # replicating Flask's default behavior, and wrapping the response with
         # CORS headers.
@@ -110,13 +112,7 @@ def cross_origin(*args, **kwargs):
 
         def wrapped_function(*args, **kwargs):
             # Handle setting of Flask-Cors parameters
-            options = {}
-            options.update(DEFAULT_OPTIONS)
-            options.update(get_app_kwarg_dict())
-            options.update(_options)
-            options = serialize_options(options)
-
-            debug("Using computed options %s", options)
+            options = get_cors_options(current_app, _options)
 
             if options.get('automatic_options') and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()

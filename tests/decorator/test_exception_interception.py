@@ -8,7 +8,7 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
-from tests.base_test import FlaskCorsTestCase
+from ..base_test import FlaskCorsTestCase
 from flask import Flask, abort
 from flask_cors import *
 from flask_cors.core import *

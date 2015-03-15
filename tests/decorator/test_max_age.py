@@ -10,7 +10,7 @@
 """
 from datetime import timedelta
 import sys
-from tests.base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
 from flask_cors import *
