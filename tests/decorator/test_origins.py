@@ -9,14 +9,11 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
-try:
-    # this is how you would normally import
-    from flask.ext.cors import *
-except:
-    # support local usage without installed package
-    from flask_cors import *
+import re
+from flask_cors import *
+from flask_cors.core import *
 
 letters = 'abcdefghijklmnopqrstuvwxyz'  # string.letters is not PY3 compatible
 
@@ -28,6 +25,11 @@ class OriginsTestCase(FlaskCorsTestCase):
         @self.app.route('/')
         @cross_origin()
         def wildcard():
+            return 'Welcome!'
+
+        @self.app.route('/test_send_wildcard_with_origin')
+        @cross_origin(send_wildcard=True)
+        def send_wildcard():
             return 'Welcome!'
 
         @self.app.route('/test_list')
@@ -50,6 +52,11 @@ class OriginsTestCase(FlaskCorsTestCase):
         def _test_subdomain_regex():
             return ''
 
+        @self.app.route('/test_compiled_subdomain_regex')
+        @cross_origin(origins=re.compile(r"http?://\w*\.?example\.com:?\d*/?.*"))
+        def _test_compiled_subdomain_regex():
+            return ''
+
         @self.app.route('/test_regex_list')
         @cross_origin(origins=[r".*.example.com", r".*.otherexample.com"])
         def _test_regex_list():
@@ -60,22 +67,27 @@ class OriginsTestCase(FlaskCorsTestCase):
         def _test_regex_mixed_list():
             return ''
 
-    def test_wildcard_defaults_no_origin(self):
+    def test_defaults_no_origin(self):
         ''' If there is no Origin header in the request, the
             Access-Control-Allow-Origin header should not be included,
             according to the w3 spec.
         '''
         for resp in self.iter_responses('/'):
-            self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), None)
 
-    def test_wildcard_defaults_origin(self):
-        ''' If there is no Origin header in the request, the
-            Access-Control-Allow-Origin header should be included, if and only
-            if the always_send parameter is `True`, which is the default value.
+    def test_defaults_with_origin(self):
+        ''' If there is an Origin header in the request, the
+            Access-Control-Allow-Origin header should be included.
         '''
-        example_origin = 'http://example.com'
-        headers = {'Origin': example_origin}
-        for resp in self.iter_responses('/', headers=headers):
+        for resp in self.iter_responses('/', origin='http://example.com'):
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://example.com')
+
+    def test_send_wildcard_with_origin(self):
+        ''' If there is an Origin header in the request, the
+            Access-Control-Allow-Origin header should be included.
+        '''
+        for resp in self.iter_responses('/test_send_wildcard_with_origin', origin='http://example.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
@@ -83,36 +95,41 @@ class OriginsTestCase(FlaskCorsTestCase):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed.
         '''
-        resp = self.get('/test_list')
-        self.assertEqual(resp.headers.get(ACL_ORIGIN),
-                         'http://bar.com, http://foo.com')
+        resp = self.get('/test_list', origin='http://bar.com')
+        self.assertEqual(resp.headers.get(ACL_ORIGIN),'http://bar.com')
 
     def test_string_serialized(self):
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
-        resp = self.get('/test_string')
+        resp = self.get('/test_string', origin='http://foo.com')
         self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
 
     def test_set_serialized(self):
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
-        resp = self.get('/test_set')
+        resp = self.get('/test_set', origin='http://bar.com')
 
         allowed = resp.headers.get(ACL_ORIGIN)
         # Order is not garaunteed
-        self.assertEqual(allowed, 'http://bar.com, http://foo.com')
+        self.assertEqual(allowed, 'http://bar.com')
 
     def test_not_matching_origins(self):
-        for resp in self.iter_responses('/test_list',
-                                        headers={'origin': "http://bazz.com"}):
+        for resp in self.iter_responses('/test_list',origin="http://bazz.com"):
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
     def test_subdomain_regex(self):
         for sub in letters:
             domain = "http://%s.example.com" % sub
             for resp in self.iter_responses('/test_subdomain_regex',
+                                            headers={'origin': domain}):
+                self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
+
+    def test_compiled_subdomain_regex(self):
+        for sub in letters:
+            domain = "http://%s.example.com" % sub
+            for resp in self.iter_responses('/test_compiled_subdomain_regex',
                                             headers={'origin': domain}):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
@@ -142,31 +159,38 @@ class OriginsTestCase(FlaskCorsTestCase):
         for sub in letters:
             domain = "http://%s.otherexample.com" % sub
             for resp in self.iter_responses('/test_regex_mixed_list',
-                                            headers={'origin': domain}):
+                                            origin=domain):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
         self.assertEquals("http://example.com",
-            self.get('/test_regex_mixed_list').headers.get(ACL_ORIGIN))
+            self.get('/test_regex_mixed_list', origin='http://example.com').headers.get(ACL_ORIGIN))
 
 
 class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
     def __init__(self, *args, **kwargs):
         super(AppConfigOriginsTestCase, self).__init__(*args, **kwargs)
 
-    def test_wildcard_defaults_no_origin(self):
+    def test_defaults_no_origin(self):
         @self.app.route('/')
         @cross_origin()
         def wildcard():
             return 'Welcome!'
 
-        super(AppConfigOriginsTestCase, self).test_wildcard_defaults_no_origin()
+        super(AppConfigOriginsTestCase, self).test_defaults_no_origin()
 
-    def test_wildcard_defaults_origin(self):
+    def test_defaults_with_origin(self):
         @self.app.route('/')
         @cross_origin()
         def wildcard():
             return 'Welcome!'
-        super(AppConfigOriginsTestCase, self).test_wildcard_defaults_origin()
+        super(AppConfigOriginsTestCase, self).test_defaults_with_origin()
+
+    def test_send_wildcard_with_origin(self):
+        @self.app.route('/test_send_wildcard_with_origin')
+        @cross_origin(send_wildcard=True)
+        def send_wildcard():
+            return 'Welcome!'
+        super(AppConfigOriginsTestCase, self).test_send_wildcard_with_origin()
 
     def test_list_serialized(self):
         self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
@@ -229,6 +253,16 @@ class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
 
         super(AppConfigOriginsTestCase, self).test_subdomain_regex()
 
+    def test_compiled_subdomain_regex(self):
+        self.app.config['CORS_ORIGINS'] = r"http?://\w*\.?example\.com:?\d*/?.*"
+
+        @self.app.route('/test_compiled_subdomain_regex')
+        @cross_origin()
+        def _test_compiled_subdomain_regex():
+            return ''
+
+        super(AppConfigOriginsTestCase, self).test_compiled_subdomain_regex()
+
     def test_regex_mixed_list(self):
         self.app.config['CORS_ORIGINS'] = ["http://example.com",
                                            r".*.otherexample.com"]
@@ -239,6 +273,8 @@ class AppConfigOriginsTestCase(AppConfigTest, OriginsTestCase):
             return ''
 
         super(AppConfigOriginsTestCase, self).test_regex_mixed_list()
+
+
 
 if __name__ == "__main__":
     unittest.main()

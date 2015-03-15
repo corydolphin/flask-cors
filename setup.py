@@ -12,7 +12,7 @@
 from setuptools import setup
 
 from os.path import join, dirname
-with open(join(dirname(__file__), 'flask_cors/_version.py'), 'r') as f:
+with open(join(dirname(__file__), 'flask_cors/version.py'), 'r') as f:
     exec(f.read())
 
 setup(

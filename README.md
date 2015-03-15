@@ -14,12 +14,14 @@ $ pip install -U flask-cors
 
 ## Usage
 
-This extension enables CORS support either via a decorator, or a Flask extension. There are three examples shown in the [examples](https://github.com/corydolphin/flask-cors/tree/master/examples) directory, showing the major use cases. The suggested configuration is the [simple_example.py](https://github.com/corydolphin/flask-cors/tree/master/examples/simple_example.py), or the [app_example.py](https://github.com/corydolphin/flask-cors/tree/master/examples/app_based_example.py).
+This extension enables CORS support either via a decorator, or a Flask extension. There are three examples shown in the [examples](https://github.com/corydolphin/flask-cors/tree/master/examples) directory, showing the major use cases. The suggested configuration is the [simple_example.py](https://github.com/corydolphin/flask-cors/tree/master/examples/simple_example.py), or the [app_example.py](https://github.com/corydolphin/flask-cors/tree/master/examples/app_based_example.py). A full list of options can be found in the [documentation](http://flask-cors.readthedocs.org/en/latest/).
+
+This package has a simple philosophy, when you want to enable CORS, you wish to enable it for all use cases on a domain. This means no mucking around with different allowed headers, methods, etc. By default, submission of cookies across domains is disabled due to the security implications, please see the documentation for how to enable credential'ed requests, and please make sure you add some sort of [CRSF](http://en.wikipedia.org/wiki/Cross-site_request_forgery) protection before doing so!
 
 
 ### Simple Usage
 
-In the simplest case, initialize the Flask-Cors extension with default arguments in order to allow CORS on all routes.
+In the simplest case, initialize the Flask-Cors extension with default arguments in order to allow CORS for all domains on all routes.
 
 ```python
 
@@ -33,9 +35,7 @@ def helloWorld():
 
 #### Resource specific CORS
 
-Alternatively, a list of resources and associated settings for CORS can be supplied, selectively enables CORS support on a set of paths on your app.
-
-Note: this resources parameter can also be set in your application's config.
+Alternatively, you can specify CORS options on a resource and origin level of granularity by passing a dictionary as the 'resources' option, mapping paths to a set of options.
 
 ```python
 app = Flask(__name__)
@@ -48,11 +48,11 @@ def list_users():
 
 #### Route specific CORS via decorator
 
-This extension also exposes a simple decorator to decorate flask routes with. Simply add `@cross_origin()` below a call to Flask's `@app.route(..)` incanation to accept the default options and allow CORS on a given route.
+This extension also exposes a simple decorator to decorate flask routes with. Simply add `@cross_origin()` below a call to Flask's `@app.route(..)` to allow CORS on a given route.
 
 ```python
 @app.route("/")
-@cross_origin() # allow all origins all methods.
+@cross_origin()
 def helloWorld():
   return "Hello, cross-origin-world!"
 ```
@@ -71,90 +71,13 @@ logging.basicConfig(level=logging.INFO)
 
 For a full list of options, please see the full [documentation](http://flask-cors.readthedocs.org/en/latest/)
 
-### Options
-
-#### origins
-> Default : '*'
-
-The origin, or list of origins to allow requests from. The origin(s) may be regular expressions, exact origins, or else an asterisk.
-
-#### methods
-> Default : [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE]
-
-The method or list of methods which the allowed origins are allowed to access for non-simple requests.
-
-#### expose_headers
-> Default : None
-
-The header or list of headers which are safe to expose to the API of a CORS API specification
-
-#### allow_headers
-> Default : None
-
-The header or list of header field names which can be used when this resource is accessed by allowed origins.
-
-#### supports_credentials
-> Default : False
-
-Allows users to make authenticated requests. If true, injects the `Access-Control-Allow-Credentials` header in responses.
-
-#### max_age
-> Default : None
-
-The maximum time for which this CORS request maybe cached. This value is set as the `Access-Control-Max-Age` header.
-
-#### send_wildcard
-> Default : True
-
-If True, and the origins parameter is `*`, a wildcard `Access-Control-Allow-Origin` header is sent, rather than the request's `Origin` header.
-
-#### always_send
-> Default : True
-
-If True, CORS headers are sent even if there is no `Origin` in the request's headers.
-
-#### automatic_options
-> Default : True
-
-If True, CORS headers will be returned for OPTIONS requests. For use with cross domain POST requests which preflight OPTIONS requests, you will need to specifically allow the Content-Type header. ** Only applicable for use in the decorator**
-
-#### vary_header
-> Default : True
-
-If True, the header Vary: Origin will be returned as per suggestion by the W3 implementation guidelines. Setting this header when the `Access-Control-Allow-Origin` is dynamically generated (e.g. when there is more than one allowed origin, and an Origin than '*' is returned) informs CDNs and other caches that the CORS headers are dynamic, and cannot be re-used. If False, the Vary header will never be injected or altered.
-
-### Application-wide options
-
-Alternatively, you can set all parameters **except automatic_options** in an app's config object. Setting these at the application level effectively changes the default value for your application, while still allowing you to override it on a per-resource basis, either via the CORS Flask-Extension and regular expressions, or via the `@cross_origin()` decorator.
-
-
-The application-wide configuration options are identical to the keyword arguments to `cross_origin`, creatively prefixed with `CORS_`
-
-
-* CORS_ORIGINS
-* CORS_METHODS
-* CORS_ALLOW_HEADERS
-* CORS_EXPOSE_HEADERS
-* CORS_ALWAYS_SEND
-* CORS_MAX_AGE
-* CORS_SEND_WILDCARD
-* CORS_ALWAYS_SEND
-
-### Using JSON with CORS
-
-When using JSON cross origin, browsers will issue a pre-flight OPTIONS request for POST requests. In order for browsers to allow POST requests with a JSON content type, you must allow the Content-Type header. The simplest way to do this is to simply set the CORS_HEADERS configuration value on your application, e.g:
-
-```python
-app.config['CORS_ALLOW_HEADERS'] = 'Content-Type'
-```
-
 ## Tests
 
 A simple set of tests is included in `test/`. To run, install nose, and simply invoke `nosetests` or `python setup.py test` to exercise the tests.
 
 ## Contributing
 
-Questions, comments or improvements? Please create an issue on [Github](https://github.com/corydolphin/flask-cors), tweet at [@corydolphin](https://twitter.com/corydolphin) or send me an email.
+Questions, comments or improvements? Please create an issue on [Github](https://github.com/corydolphin/flask-cors), tweet at [@corydolphin](https://twitter.com/corydolphin) or send me an email. I do my best to include every contribution proposed in any way that I can. 
 
 ## Credits
 

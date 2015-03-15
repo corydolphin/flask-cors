@@ -94,40 +94,27 @@ documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__.
     logging.basicConfig(level=logging.INFO)
 
 
-Using JSON with CORS
-~~~~~~~~~~~~~~~~~~~~
 
-When using JSON cross origin, browsers will issue a pre-flight OPTIONS
-request for POST requests. In order for browsers to allow POST requests
-with a JSON content type, you must allow the Content-Type header. The
-simplest way to do this is to simply set the CORS\_HEADERS configuration
-value on your application, e.g:
-
-.. code:: python
-
-    app.config['CORS_HEADERS'] = 'Content-Type'
-
-
-Full description of options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CORS the Extension
+~~~~~~~~~~~~~~~~~~
 .. autoclass:: flask_cors.CORS
 
-.. autofunction:: flask_cors.cross_origin
-
-
-More examples
-~~~~~~~~~~~~~
-
 A simple example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 This is the suggested approach to enabling CORS. The default configuration
 will work well for most use cases.
 
 .. literalinclude:: ../examples/app_based_example.py
    :language: python
 
+
+CORS the Decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: flask_cors.cross_origin
+
+
 A view-based example
-~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^
 Alternatively, using the decorator on a per view basis enables CORS for only
 a particular view.
 
