@@ -27,6 +27,8 @@ the
 `simple\_example.py <https://github.com/corydolphin/flask-cors/tree/master/examples/simple_example.py>`__,
 or the
 `app\_example.py <https://github.com/corydolphin/flask-cors/tree/master/examples/app_based_example.py>`__.
+A full list of options can be found in the
+`documentation <http://flask-cors.readthedocs.org/en/latest/>`__
 
 Simple Usage
 ~~~~~~~~~~~~
@@ -98,132 +100,6 @@ Documentation
 
 For a full list of options, please see the full
 `documentation <http://flask-cors.readthedocs.org/en/latest/>`__
-
-Options
-~~~~~~~
-
-origins
-^^^^^^^
-
-    Default : '\*'
-
-The origin, or list of origins to allow requests from. The origin(s) may
-be regular expressions, exact origins, or else an asterisk.
-
-methods
-^^^^^^^
-
-    Default : [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE]
-
-The method or list of methods which the allowed origins are allowed to
-access for non-simple requests.
-
-expose\_headers
-^^^^^^^^^^^^^^^
-
-    Default : None
-
-The header or list of headers which are safe to expose to the API of a
-CORS API specification
-
-allow\_headers
-^^^^^^^^^^^^^^
-
-    Default : None
-
-The header or list of header field names which can be used when this
-resource is accessed by allowed origins.
-
-supports\_credentials
-^^^^^^^^^^^^^^^^^^^^^
-
-    Default : False
-
-Allows users to make authenticated requests. If true, injects the
-``Access-Control-Allow-Credentials`` header in responses.
-
-max\_age
-^^^^^^^^
-
-    Default : None
-
-The maximum time for which this CORS request maybe cached. This value is
-set as the ``Access-Control-Max-Age`` header.
-
-send\_wildcard
-^^^^^^^^^^^^^^
-
-    Default : True
-
-If True, and the origins parameter is ``*``, a wildcard
-``Access-Control-Allow-Origin`` header is sent, rather than the
-request's ``Origin`` header.
-
-always\_send
-^^^^^^^^^^^^
-
-    Default : True
-
-If True, CORS headers are sent even if there is no ``Origin`` in the
-request's headers.
-
-automatic\_options
-^^^^^^^^^^^^^^^^^^
-
-    Default : True
-
-If True, CORS headers will be returned for OPTIONS requests. For use
-with cross domain POST requests which preflight OPTIONS requests, you
-will need to specifically allow the Content-Type header. \*\* Only
-applicable for use in the decorator\*\*
-
-vary\_header
-^^^^^^^^^^^^
-
-    Default : True
-
-If True, the header Vary: Origin will be returned as per suggestion by
-the W3 implementation guidelines. Setting this header when the
-``Access-Control-Allow-Origin`` is dynamically generated (e.g. when
-there is more than one allowed origin, and an Origin than '\*' is
-returned) informs CDNs and other caches that the CORS headers are
-dynamic, and cannot be re-used. If False, the Vary header will never be
-injected or altered.
-
-Application-wide options
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Alternatively, you can set all parameters **except automatic\_options**
-in an app's config object. Setting these at the application level
-effectively changes the default value for your application, while still
-allowing you to override it on a per-resource basis, either via the CORS
-Flask-Extension and regular expressions, or via the ``@cross_origin()``
-decorator.
-
-The application-wide configuration options are identical to the keyword
-arguments to ``cross_origin``, creatively prefixed with ``CORS_``
-
--  CORS\_ORIGINS
--  CORS\_METHODS
--  CORS\_HEADERS
--  CORS\_EXPOSE\_HEADERS
--  CORS\_ALWAYS\_SEND
--  CORS\_MAX\_AGE
--  CORS\_SEND\_WILDCARD
--  CORS\_ALWAYS\_SEND
-
-Using JSON with CORS
-~~~~~~~~~~~~~~~~~~~~
-
-When using JSON cross origin, browsers will issue a pre-flight OPTIONS
-request for POST requests. In order for browsers to allow POST requests
-with a JSON content type, you must allow the Content-Type header. The
-simplest way to do this is to simply set the CORS\_HEADERS configuration
-value on your application, e.g:
-
-.. code:: python
-
-    app.config['CORS_HEADERS'] = 'Content-Type'
 
 Tests
 -----

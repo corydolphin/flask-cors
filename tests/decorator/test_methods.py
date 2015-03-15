@@ -9,15 +9,11 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from tests.base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
-try:
-    # this is how you would normally import
-    from flask.ext.cors import *
-except:
-    # support local usage without installed package
-    from flask_cors import *
+from flask_cors import *
+from flask_cors.core import *
 
 
 class MethodsCase(FlaskCorsTestCase):
@@ -39,9 +35,9 @@ class MethodsCase(FlaskCorsTestCase):
             if the client makes an OPTIONS request.
         '''
 
-        self.assertFalse(ACL_METHODS in self.get('/defaults').headers)
-        self.assertFalse(ACL_METHODS in self.head('/defaults').headers)
-        res = self.preflight('/defaults', 'POST')
+        self.assertFalse(ACL_METHODS in self.get('/defaults', origin='www.example.com').headers)
+        self.assertFalse(ACL_METHODS in self.head('/defaults', origin='www.example.com').headers)
+        res = self.preflight('/defaults', 'POST', origin='www.example.com')
         for method in ALL_METHODS:
             self.assertTrue(method in res.headers.get(ACL_METHODS))
 
@@ -49,18 +45,16 @@ class MethodsCase(FlaskCorsTestCase):
         ''' If the methods parameter is defined, it should override the default
             methods defined by the user.
         '''
-        self.assertFalse(
-            ACL_METHODS in self.get('/test_methods_defined').headers)
-        self.assertFalse(
-            ACL_METHODS in self.head('/test_methods_defined').headers)
+        self.assertFalse(ACL_METHODS in self.get('/test_methods_defined').headers)
+        self.assertFalse(ACL_METHODS in self.head('/test_methods_defined').headers)
 
-        res = self.preflight('/test_methods_defined', 'POST')
+        res = self.preflight('/test_methods_defined', 'POST', origin='www.example.com')
         self.assertTrue('POST' in res.headers.get(ACL_METHODS))
 
-        res = self.preflight('/test_methods_defined', 'PUT')
+        res = self.preflight('/test_methods_defined', 'PUT', origin='www.example.com')
         self.assertFalse(ACL_METHODS in res.headers)
 
-        res = self.get('/test_methods_defined')
+        res = self.get('/test_methods_defined', origin='www.example.com')
         self.assertFalse(ACL_METHODS in res.headers)
 
 

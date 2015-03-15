@@ -10,15 +10,11 @@
 """
 from datetime import timedelta
 import sys
-from tests.base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase, AppConfigTest
 from flask import Flask
 
-try:
-    # this is how you would normally import
-    from flask.ext.cors import *
-except:
-    # support local usage without installed package
-    from flask_cors import *
+from flask_cors import *
+from flask_cors.core import *
 
 
 class MaxAgeTestCase(FlaskCorsTestCase):
@@ -43,14 +39,14 @@ class MaxAgeTestCase(FlaskCorsTestCase):
     def test_defaults(self):
         ''' By default, no max-age headers should be returned
         '''
-        for resp in self.iter_responses('/defaults'):
+        for resp in self.iter_responses('/defaults', origin='www.example.com'):
             self.assertFalse(ACL_MAX_AGE in resp.headers)
 
     def test_string(self):
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
-        resp = self.preflight('/test_string')
+        resp = self.preflight('/test_string', origin='www.example.com')
         self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
     def test_time_delta(self):
@@ -61,7 +57,7 @@ class MaxAgeTestCase(FlaskCorsTestCase):
         if sys.version_info < (2, 7):
             return
 
-        resp = self.preflight('/test_time_delta')
+        resp = self.preflight('/test_time_delta', origin='www.example.com')
         self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
 
@@ -109,7 +105,7 @@ class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
         def test_override():
             return 'Welcome!'
 
-        resp = self.preflight('/test_override')
+        resp = self.preflight('/test_override', origin='www.example.com')
         self.assertEqual(resp.headers.get(ACL_MAX_AGE), '900')
 
 
