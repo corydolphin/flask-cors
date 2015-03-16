@@ -28,13 +28,22 @@ the
 or the
 `app\_example.py <https://github.com/corydolphin/flask-cors/tree/master/examples/app_based_example.py>`__.
 A full list of options can be found in the
-`documentation <http://flask-cors.readthedocs.org/en/latest/>`__
+`documentation <http://flask-cors.readthedocs.org/en/latest/>`__.
+
+This package has a simple philosophy, when you want to enable CORS, you
+wish to enable it for all use cases on a domain. This means no mucking
+around with different allowed headers, methods, etc. By default,
+submission of cookies across domains is disabled due to the security
+implications, please see the documentation for how to enable
+credential'ed requests, and please make sure you add some sort of
+`CRSF <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`__
+protection before doing so!
 
 Simple Usage
 ~~~~~~~~~~~~
 
 In the simplest case, initialize the Flask-Cors extension with default
-arguments in order to allow CORS on all routes.
+arguments in order to allow CORS for all domains on all routes.
 
 .. code:: python
 
@@ -49,12 +58,9 @@ arguments in order to allow CORS on all routes.
 Resource specific CORS
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Alternatively, a list of resources and associated settings for CORS can
-be supplied, selectively enables CORS support on a set of paths on your
-app.
-
-Note: this resources parameter can also be set in your application's
-config.
+Alternatively, you can specify CORS options on a resource and origin
+level of granularity by passing a dictionary as the 'resources' option,
+mapping paths to a set of options.
 
 .. code:: python
 
@@ -70,13 +76,12 @@ Route specific CORS via decorator
 
 This extension also exposes a simple decorator to decorate flask routes
 with. Simply add ``@cross_origin()`` below a call to Flask's
-``@app.route(..)`` incanation to accept the default options and allow
-CORS on a given route.
+``@app.route(..)`` to allow CORS on a given route.
 
 .. code:: python
 
     @app.route("/")
-    @cross_origin() # allow all origins all methods.
+    @cross_origin()
     def helloWorld():
       return "Hello, cross-origin-world!"
 
@@ -114,6 +119,8 @@ Contributing
 Questions, comments or improvements? Please create an issue on
 `Github <https://github.com/corydolphin/flask-cors>`__, tweet at
 `@corydolphin <https://twitter.com/corydolphin>`__ or send me an email.
+I do my best to include every contribution proposed in any way that I
+can.
 
 Credits
 -------
