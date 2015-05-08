@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.0.1
+Fixes Issue #124 where only the first of multiple headers with the same name would be passed through.
+
 ## 2.0.0
 **New Defaults**
 
