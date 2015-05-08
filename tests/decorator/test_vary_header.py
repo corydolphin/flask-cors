@@ -67,10 +67,8 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
         '''
 
         resp = self.get('/test_existing_vary_headers', origin="http://foo.com")
-        self.assertEqual(
-            resp.headers.get('Vary'),
-            'Origin, Accept-Encoding'
-        )
+        self.assertEqual(set(resp.headers.getlist('Vary')),
+                         set(['Origin', 'Accept-Encoding']))
 
 
 class AppConfigVaryHeaderTestCase(AppConfigTest,

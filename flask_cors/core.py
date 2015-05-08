@@ -18,7 +18,7 @@ try:
     from flask import _app_ctx_stack as stack
 except ImportError:
     from flask import _request_ctx_stack as stack
-
+from werkzeug.datastructures import MultiDict
 
 # Compatibility with old Pythons!
 if not hasattr(logging, 'NullHandler'):
@@ -160,7 +160,7 @@ def get_allow_headers(options, acl_request_headers):
 
 def get_cors_headers(options, request_headers, request_method, response_headers):
     origin_to_set = get_cors_origin(options, request_headers.get('Origin'))
-    headers = {}
+    headers = MultiDict()
 
     if origin_to_set is None:  # CORS is not enabled for this route
         return headers
@@ -198,10 +198,9 @@ def get_cors_headers(options, request_headers, request_method, response_headers)
         # i.e. if we are not returning an asterisk, and there are multiple
         # origins that can be matched.
         if headers[ACL_ORIGIN] != '*' and len(options.get('origins')) > 1:
-            vary = ['Origin', response_headers.get('Vary')]
-            headers['Vary'] = ', '. join(v for v in vary if v is not None)
+            headers.add('Vary', 'Origin')
 
-    return dict((k, v) for k, v in headers.items() if v)
+    return MultiDict((k, v) for k, v in headers.items() if v)
 
 
 def set_cors_headers(resp, options):
@@ -218,14 +217,13 @@ def set_cors_headers(resp, options):
         debugLog('CORS have been already evaluated, skipping')
         return resp
 
-    headers_to_set = get_cors_headers(options,
-                                       request.headers,
-                                       request.method,
-                                       resp.headers)
+    headers_to_set = get_cors_headers(options, request.headers, request.method,
+                                      resp.headers)
+
     debugLog('Settings CORS headers: %s', str(headers_to_set))
 
     for k, v in headers_to_set.items():
-        resp.headers[k] = v
+        resp.headers.add(k, v)
 
     return resp
 
