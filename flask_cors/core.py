@@ -123,23 +123,22 @@ def get_cors_origin(options, request_origin):
 
         # If the allowed origins is an asterisk or 'wildcard', always match
         if wildcard and options.get('send_wildcard'):
-            debugLog("Allowed origins are set to '*', assuming valid request")
+            debugLog("Allowed origins are set to '*'. Sending wildcard CORS header.")
             return '*'
         # If the value of the Origin header is a case-sensitive match
         # for any of the values in list of origins
         elif try_match_any(request_origin, origins):
-            debugLog("Given origin matches set of allowed origins")
+            debugLog("The request's Origin header matches. Sending CORS headers.", )
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             # -- W3Spec
             return request_origin
         else:
-            debugLog("Given origin does not match any of allowed origins: %s",
-                  map(get_regexp_pattern, origins))
+            debugLog("The request's Origin header does not match any of allowed origins.")
             return None
     # Terminate these steps, return the original request untouched.
     else:
-        debugLog("'Origin' header was not set, which means CORS was not requested, skipping")
+        debugLog("The request did not contain an 'Origin' header. This means the browser or client did not request CORS, ensure the Origin Header is set.")
         return None
 
 
@@ -164,8 +163,6 @@ def get_cors_headers(options, request_headers, request_method, response_headers)
 
     if origin_to_set is None:  # CORS is not enabled for this route
         return headers
-    infoLog("Request from Origin:%s, setting %s:%s",
-                     request_headers.get('Origin'), ACL_ORIGIN, origin_to_set)
 
     headers[ACL_ORIGIN] = origin_to_set
     headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
@@ -189,8 +186,7 @@ def get_cors_headers(options, request_headers, request_method, response_headers)
             headers[ACL_MAX_AGE] = options.get('max_age')
             headers[ACL_METHODS] = options.get('methods')
         else:
-            infoLog("Access-Control-Request-Method:%s does not match allowed methods %s",
-                             acl_request_method, options.get('methods'))
+            infoLog("The request's Access-Control-Request-Method header does not match allowed methods. CORS headers will not be applied.")
 
     # http://www.w3.org/TR/cors/#resource-implementation
     if options.get('vary_header'):
