@@ -24,9 +24,9 @@ extension. There are three examples shown in the
 `examples <https://github.com/corydolphin/flask-cors/tree/master/examples>`__
 directory, showing the major use cases. The suggested configuration is
 the
-`simple\_example.py <https://github.com/corydolphin/flask-cors/tree/master/examples/simple_example.py>`__,
+`app\_based\_example.py <https://github.com/corydolphin/flask-cors/blob/master/examples/app_based_example.py>`__,
 or the
-`app\_example.py <https://github.com/corydolphin/flask-cors/tree/master/examples/app_based_example.py>`__.
+`view\_based\_example.py <https://github.com/corydolphin/flask-cors/blob/master/examples/view_based_example.py>`__.
 A full list of options can be found in the
 `documentation <http://flask-cors.readthedocs.org/en/latest/>`__.
 
