@@ -269,10 +269,14 @@ def get_app_kwarg_dict(appInstance=None):
         Returns the dictionary of CORS specific app configurations.
     '''
     app = (appInstance or current_app)
+
+    # In order to support blueprints which do not have a config attribute
+    app_config = getattr(app, 'config', {})
+
     return dict(
-        (k.lower().replace('cors_', ''), app.config.get(k))
+        (k.lower().replace('cors_', ''), app_config.get(k))
         for k in CONFIG_OPTIONS
-        if app.config.get(k) is not None
+        if app_config.get(k) is not None
     )
 
 
@@ -345,13 +349,15 @@ def getLogger(app=None):
         if it exists.
     '''
     # we are in the context of a request
-    if stack.top is not None:
+    if stack.top is not None and hasattr(current_app, 'logger_name'):
         return logging.getLogger("%s.cors" % current_app.logger_name)
+
     # For use init method, when an app is known, but there is no context
-    elif app is not None:
+    if app is not None and hasattr(app, 'logger_name'):
         return logging.getLogger("%s.cors" % app.logger_name)
-    else:
-        return logging.getLogger("flask.ext.cors")
+    
+
+    return logging.getLogger("flask.ext.cors")
 
 
 def debugLog(*args, **kwargs):

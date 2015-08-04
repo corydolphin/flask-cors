@@ -110,7 +110,8 @@ class CORS(object):
                     return cors_after_request(app.make_response(f(*args, **kwargs)))
                 return wrapped_function
 
-            app.handle_exception = _after_request_decorator(
-                app.handle_exception)
-            app.handle_user_exception = _after_request_decorator(
-                app.handle_user_exception)
+            if hasattr(app, 'handle_exception'):
+                app.handle_exception = _after_request_decorator(
+                    app.handle_exception)
+                app.handle_user_exception = _after_request_decorator(
+                    app.handle_user_exception)
