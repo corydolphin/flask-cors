@@ -48,12 +48,33 @@ arguments in order to allow CORS for all domains on all routes.
 .. code:: python
 
 
+    from flask import Flask
+    from flask.ext.cors import CORS
+
     app = Flask(__name__)
-    cors = CORS(app)
+    CORS(app)
 
     @app.route("/")
     def helloWorld():
       return "Hello, cross-origin-world!"
+
+Initializing the extension with a blueprint is also feasible:
+
+.. code:: python
+
+
+    from flask import Flask, Blueprint
+    from flask.ext.cors import CORS
+
+    blueprint = Blueprint('myblueprint', __name__)
+    CORS(blueprint)
+
+    @app.route("/")
+    def helloBlueprints():
+        return "Hello, cross-origin-world! Sincerely, a Flask Blueprint"
+
+    app = Flask(__name__)
+    app.register_blueprint(blueprint)
 
 Resource specific CORS
 ^^^^^^^^^^^^^^^^^^^^^^
