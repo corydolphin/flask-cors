@@ -15,6 +15,9 @@ from os.path import join, dirname
 with open(join(dirname(__file__), 'flask_cors/version.py'), 'r') as f:
     exec(f.read())
 
+with open (join(dirname(__file__), 'requirements.txt'), 'r') as f:
+    install_requires = f.read().split("\n")
+
 setup(
     name='Flask-Cors',
     version=__version__,
@@ -28,10 +31,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     platforms='any',
-    install_requires=[
-        'Flask >= 0.9',
-        'Six'
-    ],
+    install_requires=install_requires,
     tests_require=[
         'nose'
     ],
