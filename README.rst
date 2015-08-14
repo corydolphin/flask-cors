@@ -69,7 +69,7 @@ Initializing the extension with a blueprint is also feasible:
     blueprint = Blueprint('myblueprint', __name__)
     CORS(blueprint)
 
-    @app.route("/")
+    @blueprint.route("/")
     def helloBlueprints():
         return "Hello, cross-origin-world! Sincerely, a Flask Blueprint"
 
