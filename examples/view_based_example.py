@@ -52,7 +52,7 @@ def helloWorld():
 on <a href="https://github.com/corydolphin/flask-cors">Github</a>'''
 
 
-@app.route("/api/v1/user/create", methods=['GET', 'POST'])
+@app.route("/api/v1/users/create", methods=['GET', 'POST'])
 @cross_origin(allow_headers=['Content-Type'])
 def cross_origin_json_post():
     '''
