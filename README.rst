@@ -7,6 +7,15 @@ Flask-CORS
 A Flask extension for handling Cross Origin Resource Sharing (CORS),
 making cross-origin AJAX possible.
 
+This package has a simple philosophy, when you want to enable CORS, you
+wish to enable it for all use cases on a domain. This means no mucking
+around with different allowed headers, methods, etc. By default,
+submission of cookies across domains is disabled due to the security
+implications, please see the documentation for how to enable
+credential'ed requests, and please make sure you add some sort of
+`CRSF <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`__
+protection before doing so!
+
 Installation
 ------------
 
@@ -19,31 +28,14 @@ Install the extension with using pip, or easy\_install.
 Usage
 -----
 
-This extension enables CORS support either via a decorator, or a Flask
-extension. There are three examples shown in the
-`examples <https://github.com/corydolphin/flask-cors/tree/master/examples>`__
-directory, showing the major use cases. The suggested configuration is
-the
-`app\_based\_example.py <https://github.com/corydolphin/flask-cors/blob/master/examples/app_based_example.py>`__,
-or the
-`view\_based\_example.py <https://github.com/corydolphin/flask-cors/blob/master/examples/view_based_example.py>`__.
-A full list of options can be found in the
-`documentation <http://flask-cors.readthedocs.org/en/latest/>`__.
-
-This package has a simple philosophy, when you want to enable CORS, you
-wish to enable it for all use cases on a domain. This means no mucking
-around with different allowed headers, methods, etc. By default,
-submission of cookies across domains is disabled due to the security
-implications, please see the documentation for how to enable
-credential'ed requests, and please make sure you add some sort of
-`CRSF <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`__
-protection before doing so!
+This package exposes a Flask extension which by default enables CORS support on all routes, for all origins and methods. It allows parameterization of all CORS headers on a per-resource level. The package also contains a decorator, for those who prefer this approach. 
 
 Simple Usage
 ~~~~~~~~~~~~
-
+  
 In the simplest case, initialize the Flask-Cors extension with default
-arguments in order to allow CORS for all domains on all routes.
+arguments in order to allow CORS for all domains on all routes. See the
+full list of options in the `documentation <http://flask-cors.corydolphin.com/en/latest/api.html#extension>`__.
 
 .. code:: python
 
@@ -58,30 +50,13 @@ arguments in order to allow CORS for all domains on all routes.
     def helloWorld():
       return "Hello, cross-origin-world!"
 
-Initializing the extension with a blueprint is also feasible:
-
-.. code:: python
-
-
-    from flask import Flask, Blueprint
-    from flask.ext.cors import CORS
-
-    blueprint = Blueprint('myblueprint', __name__)
-    CORS(blueprint)
-
-    @blueprint.route("/")
-    def helloBlueprints():
-        return "Hello, cross-origin-world! Sincerely, a Flask Blueprint"
-
-    app = Flask(__name__)
-    app.register_blueprint(blueprint)
-
 Resource specific CORS
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Alternatively, you can specify CORS options on a resource and origin
-level of granularity by passing a dictionary as the 'resources' option,
-mapping paths to a set of options.
+level of granularity by passing a dictionary as the `resources` option,
+mapping paths to a set of options. See the
+full list of options in the `documentation <http://flask-cors.corydolphin.com/en/latest/api.html#extension>`__.
 
 .. code:: python
 
@@ -97,7 +72,8 @@ Route specific CORS via decorator
 
 This extension also exposes a simple decorator to decorate flask routes
 with. Simply add ``@cross_origin()`` below a call to Flask's
-``@app.route(..)`` to allow CORS on a given route.
+``@app.route(..)`` to allow CORS on a given route. See the
+full list of options in the `decorator documentation <http://flask-cors.corydolphin.com/en/latest/api.html#decorator>`__.
 
 .. code:: python
 
@@ -106,26 +82,11 @@ with. Simply add ``@cross_origin()`` below a call to Flask's
     def helloWorld():
       return "Hello, cross-origin-world!"
 
-Logging
-^^^^^^^
-
-Flask-Cors uses standard Python logging, using the logger name
-'``app.logger_name``.cors'. The app's logger name attribute is usually
-the same as the name of the app. You can read more about logging from
-`Flask's
-documentation <http://flask.pocoo.org/docs/0.10/errorhandling/>`__.
-
-.. code:: python
-
-    import logging
-    # make your awesome app
-    logging.basicConfig(level=logging.INFO)
-
 Documentation
 -------------
 
 For a full list of options, please see the full
-`documentation <http://flask-cors.readthedocs.org/en/latest/>`__
+`documentation <http://flask-cors.corydolphin.com/en/latest/>`__
 
 Tests
 -----
@@ -152,11 +113,11 @@ Ronacher.
 
 .. |Build Status| image:: https://api.travis-ci.org/corydolphin/flask-cors.svg?branch=master
    :target: https://travis-ci.org/corydolphin/flask-cors
-.. |Latest Version| image:: https://pypip.in/version/Flask-Cors/badge.svg
+.. |Latest Version| image:: https://img.shields.io/pypi/v/Flask-Cors.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
-.. |Downloads| image:: https://pypip.in/download/Flask-Cors/badge.svg
+.. |Downloads| image:: https://img.shields.io/pypi/dm/Flask-Cors.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
-.. |Supported Python versions| image:: https://pypip.in/py_versions/Flask-Cors/badge.svg
-   :target: https://pypi.python.org/pypi/Flask-Cors/
-.. |License| image:: https://pypip.in/license/Flask-Cors/badge.svg
+.. |Supported Python versions| image:: https://img.shields.io/pypi/pyversions/Flask-Cors.svg
+   :target: https://img.shields.io/pypi/pyversions/Flask-Cors.svg
+.. |License| image:: http://img.shields.io/:license-mit-blue.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
