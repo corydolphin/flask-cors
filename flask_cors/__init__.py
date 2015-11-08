@@ -23,4 +23,10 @@ except ImportError:
         def emit(self, record):
             pass
 
-logging.getLogger(__name__).addHandler(NullHandler())
+# Set initial level to WARN. Users must manually enable logging for
+# flask_cors to see our logging.
+rootlogger = logging.getLogger(__name__)
+rootlogger.addHandler(NullHandler())
+
+if rootlogger.level == logging.NOTSET:
+    rootlogger.setLevel(logging.WARN)
