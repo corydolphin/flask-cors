@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.1.2
+Fixes package installation. Requirements.txt was not included in Manifest. 
+
+
 ## 2.1.1
 Stop dynamically referecing logger.
 
