@@ -88,6 +88,17 @@ Documentation
 For a full list of options, please see the full
 `documentation <http://flask-cors.corydolphin.com/en/latest/>`__
 
+Troubleshooting
+-----
+
+If things aren't working as you expect, enable logging to help understand
+what is going on under the hood, and why.
+
+.. code:: python
+
+    logging.getLogger('flask_cors').level = logging.DEBUG
+
+
 Tests
 -----
 

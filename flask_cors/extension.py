@@ -11,6 +11,7 @@
 from flask import request
 from .core import *
 
+LOG = logging.getLogger(__name__)
 
 class CORS(object):
     """
@@ -155,7 +156,7 @@ class CORS(object):
         # Create a human readable form of these resources by converting the compiled
         # regular expressions into strings.
         resources_human = dict([(get_regexp_pattern(pattern), opts) for (pattern,opts) in resources])
-        getLogger(app).info("Configuring CORS with resources: %s", resources_human)
+        LOG.debug("Configuring CORS with resources: %s", resources_human)
 
         def cors_after_request(resp):
             '''
@@ -164,17 +165,17 @@ class CORS(object):
             '''
             # If CORS headers are set in a view decorator, pass
             if resp.headers.get(ACL_ORIGIN):
-                debugLog('CORS have been already evaluated, skipping')
+                LOG.debug('CORS have been already evaluated, skipping')
                 return resp
 
             for res_regex, res_options in resources:
                 if try_match(request.path, res_regex):
-                    debugLog("Request to '%s' matches CORS resource '%s'. Using options: %s",
+                    LOG.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
                           request.path, get_regexp_pattern(res_regex), res_options)
                     set_cors_headers(resp, res_options)
                     break
             else:
-                debugLog('No CORS rule matches')
+                LOG.debug('No CORS rule matches')
             return resp
 
         app.after_request(cors_after_request)

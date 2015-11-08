@@ -20,12 +20,7 @@ except ImportError:
     from flask import _request_ctx_stack as stack
 from werkzeug.datastructures import MultiDict
 
-# Compatibility with old Pythons!
-if not hasattr(logging, 'NullHandler'):
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
-    logging.NullHandler = NullHandler
+LOG = logging.getLogger(__name__)
 
 # Response Headers
 ACL_ORIGIN = 'Access-Control-Allow-Origin'
@@ -119,26 +114,26 @@ def get_cors_origin(options, request_origin):
     # If the Origin header is not present terminate this set of steps.
     # The request is outside the scope of this specification.-- W3Spec
     if request_origin:
-        debugLog("CORS request received with 'Origin' %s", request_origin)
+        LOG.debug("CORS request received with 'Origin' %s", request_origin)
 
         # If the allowed origins is an asterisk or 'wildcard', always match
         if wildcard and options.get('send_wildcard'):
-            debugLog("Allowed origins are set to '*'. Sending wildcard CORS header.")
+            LOG.debug("Allowed origins are set to '*'. Sending wildcard CORS header.")
             return '*'
         # If the value of the Origin header is a case-sensitive match
         # for any of the values in list of origins
         elif try_match_any(request_origin, origins):
-            debugLog("The request's Origin header matches. Sending CORS headers.", )
+            LOG.debug("The request's Origin header matches. Sending CORS headers.", )
             # Add a single Access-Control-Allow-Origin header, with either
             # the value of the Origin header or the string "*" as value.
             # -- W3Spec
             return request_origin
         else:
-            debugLog("The request's Origin header does not match any of allowed origins.")
+            LOG.debug("The request's Origin header does not match any of allowed origins.")
             return None
     # Terminate these steps, return the original request untouched.
     else:
-        debugLog("The request did not contain an 'Origin' header. This means the browser or client did not request CORS, ensure the Origin Header is set.")
+        LOG.debug("The request did not contain an 'Origin' header. This means the browser or client did not request CORS, ensure the Origin Header is set.")
         return None
 
 
@@ -186,7 +181,7 @@ def get_cors_headers(options, request_headers, request_method, response_headers)
             headers[ACL_MAX_AGE] = options.get('max_age')
             headers[ACL_METHODS] = options.get('methods')
         else:
-            infoLog("The request's Access-Control-Request-Method header does not match allowed methods. CORS headers will not be applied.")
+            LOG.info("The request's Access-Control-Request-Method header does not match allowed methods. CORS headers will not be applied.")
 
     # http://www.w3.org/TR/cors/#resource-implementation
     if options.get('vary_header'):
@@ -210,13 +205,13 @@ def set_cors_headers(resp, options):
 
     # If CORS has already been evaluated via the decorator, skip
     if hasattr(resp, FLASK_CORS_EVALUATED):
-        debugLog('CORS have been already evaluated, skipping')
+        LOG.debug('CORS have been already evaluated, skipping')
         return resp
 
     headers_to_set = get_cors_headers(options, request.headers, request.method,
                                       resp.headers)
 
-    debugLog('Settings CORS headers: %s', str(headers_to_set))
+    LOG.debug('Settings CORS headers: %s', str(headers_to_set))
 
     for k, v in headers_to_set.items():
         resp.headers.add(k, v)
@@ -335,34 +330,3 @@ def serialize_options(opts):
         options['max_age'] = str(int(options['max_age'].total_seconds()))
 
     return options
-
-
-def getLogger(app=None):
-    '''
-        Helper to get Flask-Cor's logger, attached to the current_app's logger
-        if it exists.
-    '''
-    # we are in the context of a request
-    if stack.top is not None and hasattr(current_app, 'logger_name'):
-        return logging.getLogger("%s.cors" % current_app.logger_name)
-
-    # For use init method, when an app is known, but there is no context
-    if app is not None and hasattr(app, 'logger_name'):
-        return logging.getLogger("%s.cors" % app.logger_name)
-    
-
-    return logging.getLogger("flask.ext.cors")
-
-
-def debugLog(*args, **kwargs):
-    '''
-        Helper to log a message at the DEBUG level.
-    '''
-    getLogger().debug(*args, **kwargs)
-
-
-def infoLog(*args, **kwargs):
-    '''
-        Helper to log a message at the INFO level.
-    '''
-    getLogger().info(*args, **kwargs)

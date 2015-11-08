@@ -12,6 +12,7 @@ from functools import update_wrapper
 from flask import make_response, request, current_app
 from .core import *
 
+LOG = logging.getLogger(__name__)
 
 def cross_origin(*args, **kwargs):
     """
@@ -102,7 +103,7 @@ def cross_origin(*args, **kwargs):
     _options = kwargs
 
     def decorator(f):
-        debugLog("Enabling %s for cross_origin using options:%s", f, _options)
+        LOG.debug("Enabling %s for cross_origin using options:%s", f, _options)
 
         # If True, intercept OPTIONS requests by modifying the view function,
         # replicating Flask's default behavior, and wrapping the response with
