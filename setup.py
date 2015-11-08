@@ -10,8 +10,8 @@
 """
 
 from setuptools import setup
-
 from os.path import join, dirname
+
 with open(join(dirname(__file__), 'flask_cors/version.py'), 'r') as f:
     exec(f.read())
 
@@ -45,9 +45,6 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
