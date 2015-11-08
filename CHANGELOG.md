@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.1.1
+Stop dynamically referecing logger.
+
+Disable internal logging by default and reduce logging verbosity 
+
 ## 2.1.0
 Adds support for Flask Blueprints. 
 
