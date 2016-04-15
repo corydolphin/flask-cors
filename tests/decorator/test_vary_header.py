@@ -25,6 +25,11 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
         def wildcard():
             return 'Welcome!'
 
+        @self.app.route('/test_consistent_origin')
+        @cross_origin(origins='http://foo.com')
+        def test_consistent():
+            return 'Welcome!'
+
         @self.app.route('/test_vary')
         @cross_origin(origins=["http://foo.com", "http://bar.com"])
         def test_vary():
@@ -36,12 +41,20 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             return Response('', status=200,
                             headers={'Vary': 'Accept-Encoding'})
 
+    def test_default(self):
+        '''
+            By default, allow all domains, which means the Vary:Origin header
+            should be set.
+        '''
+        for resp in self.iter_responses('/', origin="http://foo.com"):
+            self.assertTrue('Vary' in resp.headers)
+
     def test_consistent_origin(self):
         '''
             If the Access-Control-Allow-Origin header will change dynamically,
             the Vary:Origin header should be set.
         '''
-        for resp in self.iter_responses('/', origin="http://foo.com"):
+        for resp in self.iter_responses('/test_consistent_origin', origin="http://foo.com"):
             self.assertFalse('Vary' in resp.headers)
 
     def test_varying_origin(self):
@@ -76,10 +89,20 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
     def __init__(self, *args, **kwargs):
         super(AppConfigVaryHeaderTestCase, self).__init__(*args, **kwargs)
 
-    def test_consistent_origin(self):
+
+    def test_default(self):
         @self.app.route('/')
         @cross_origin()
-        def wildcard():
+        def test_default():
+            return 'Welcome!'
+
+        super(AppConfigVaryHeaderTestCase, self).test_default()
+
+
+    def test_consistent_origin(self):
+        @self.app.route('/test_consistent_origin')
+        @cross_origin(origins='http://foo.com')
+        def test_consistent_origin():
             return 'Welcome!'
 
         super(AppConfigVaryHeaderTestCase, self).test_consistent_origin()
@@ -98,7 +121,7 @@ class AppConfigVaryHeaderTestCase(AppConfigTest,
         self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
 
         @self.app.route('/test_existing_vary_headers')
-        @cross_origin()
+        @cross_origin(origin='http://foo.com')
         def test_existing_vary_headers():
             return Response('', status=200,
                             headers={'Vary': 'Accept-Encoding'})

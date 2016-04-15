@@ -188,7 +188,9 @@ def get_cors_headers(options, request_headers, request_method, response_headers)
         # Only set header if the origin returned will vary dynamically,
         # i.e. if we are not returning an asterisk, and there are multiple
         # origins that can be matched.
-        if headers[ACL_ORIGIN] != '*' and len(options.get('origins')) > 1:
+        if headers[ACL_ORIGIN] == '*':
+            pass
+        elif len(options.get('origins')) > 1 or any(map(probably_regex, options.get('origins'))):
             headers.add('Vary', 'Origin')
 
     return MultiDict((k, v) for k, v in headers.items() if v)
@@ -218,6 +220,13 @@ def set_cors_headers(resp, options):
 
     return resp
 
+def probably_regex(maybe_regex):
+    if isinstance(maybe_regex, RegexObject):
+        return True
+    else:
+        # Use common characters used in regular expressions as a proxy
+        # for if this string is in fact a regex.
+        return any((c in maybe_regex for c in ['*','\\',']']))
 
 def re_fix(reg):
     """
@@ -311,6 +320,10 @@ def serialize_options(opts):
     A helper method to serialize and processes the options dictionary.
     """
     options = (opts or {}).copy()
+
+    for key in opts.keys():
+        if key not in DEFAULT_OPTIONS:
+             LOG.warn("Unknown option passed to Flask-CORS: %s", key)
 
     # Ensure origins is a list of allowed origins with at least one entry.
     options['origins'] = sanitize_regex_param(options.get('origins'))
