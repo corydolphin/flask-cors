@@ -21,6 +21,31 @@ to use.
 .. autofunction:: flask_cors.cross_origin
 
 
+Using `CORS` with cookies
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, Flask-CORS does not allow cookies to be submitted across sites,
+since it has potential security implications. If you wish to enable cross-site
+cookies, you may wish to add some sort of
+`CRSF <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`__
+protection to keep you and your users safe.
+
+To allow cookies or authenticated requests to be made
+cross origins, simply set the `supports_credentials` option to `True`. E.G.
+
+.. code:: python
+
+
+    from flask import Flask, session
+    from flask.ext.cors import CORS
+
+    app = Flask(__name__)
+    CORS(app, supports_credentials=True)
+
+    @app.route("/")
+    def helloWorld():
+      return "Hello, %s" % session['username']
+
 Using `CORS` with Blueprints
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,4 +73,3 @@ Using the `cross_origins` decorator
 .. literalinclude:: ../examples/view_based_example.py
    :language: python
    :lines: 27-
-
