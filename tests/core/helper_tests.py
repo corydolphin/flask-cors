@@ -82,3 +82,10 @@ class InternalsTestCase(unittest.TestCase):
             [r[0] for r in resources],
             [re.compile(r'/api/v1/.*'), '/foo', re.compile(r'/.*')]
         )
+
+    def test_probably_regex(self):
+        self.assertTrue(probably_regex("http://*.example.com"))
+        self.assertTrue(probably_regex("*"))
+        self.assertFalse(probably_regex("http://example.com"))
+        self.assertTrue(probably_regex("http://[\w].example.com"))
+        self.assertTrue(probably_regex("http://\w+.example.com"))
