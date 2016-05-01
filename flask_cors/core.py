@@ -40,7 +40,6 @@ CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_ALLOW_HEADERS',
                   'CORS_MAX_AGE', 'CORS_SEND_WILDCARD',
                   'CORS_AUTOMATIC_OPTIONS', 'CORS_VARY_HEADER',
                   'CORS_RESOURCES', 'CORS_INTERCEPT_EXCEPTIONS']
-
 # Attribute added to request object by decorator to indicate that CORS
 # was evaluated, in case the decorator and extension are both applied
 # to a view.
@@ -52,10 +51,12 @@ RegexObject = type(re.compile(''))
 DEFAULT_OPTIONS = dict(origins='*',
                        methods=ALL_METHODS,
                        allow_headers='*',
-                       automatic_options=True,
-                       send_wildcard=False,
-                       vary_header=True,
+                       expose_headers=None,
                        supports_credentials=False,
+                       max_age=None,
+                       send_wildcard=False,
+                       automatic_options=True,
+                       vary_header=True,
                        resources=r'/*',
                        intercept_exceptions=True)
 
@@ -287,7 +288,9 @@ def flexible_str(obj):
     to ensure generated responses are consistent when iterables such as Set
     are used.
     """
-    if(not isinstance(obj, string_types)
+    if obj is None:
+        return None
+    elif(not isinstance(obj, string_types)
             and isinstance(obj, collections.Iterable)):
         return ', '.join(str(item) for item in sorted(obj))
     else:

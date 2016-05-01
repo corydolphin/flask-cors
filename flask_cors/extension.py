@@ -121,14 +121,6 @@ class CORS(object):
 
         Default : True
     :type vary_header: bool
-
-    :param automatic_options:
-        Only applies to the `cross_origin` decorator. If True, Flask-CORS will
-        override Flask's default OPTIONS handling to return CORS headers for
-        OPTIONS requests.
-
-        Default : True
-    :type automatic_options: bool
     """
 
     def __init__(self, app=None, **kwargs):
