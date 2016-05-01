@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+import traceback
 from flask import request
 from .core import *
 
@@ -121,14 +122,6 @@ class CORS(object):
 
         Default : True
     :type vary_header: bool
-
-    :param automatic_options:
-        Only applies to the `cross_origin` decorator. If True, Flask-CORS will
-        override Flask's default OPTIONS handling to return CORS headers for
-        OPTIONS requests.
-
-        Default : True
-    :type automatic_options: bool
     """
 
     def __init__(self, app=None, **kwargs):
@@ -158,14 +151,18 @@ class CORS(object):
         resources_human = dict([(get_regexp_pattern(pattern), opts) for (pattern,opts) in resources])
         LOG.debug("Configuring CORS with resources: %s", resources_human)
 
-        def cors_after_request(resp):
-            '''
-                The actual after-request handler, retains references to the
-                the options, and definitions of resources through a closure.
-            '''
-            # If CORS headers are set in a view decorator, pass
-            if resp.headers.get(ACL_ORIGIN):
-                LOG.debug('CORS have been already evaluated, skipping')
+        # We want to run even in the case of an exception, so use teardown
+        # instead of after_request.
+        app.teardown_request(make_cors_teardown_request_func(options, resources))
+
+def make_cors_teardown_request_func(options, resources):
+    def cors_teardown_request(resp):
+        '''
+            The actual after-request handler, retains references to the
+            the options, and definitions of resources through a closure.
+        '''
+        try:
+            if resp is None or not hasattr(resp, 'headers'):
                 return resp
 
             for res_regex, res_options in resources:
@@ -176,20 +173,7 @@ class CORS(object):
                     break
             else:
                 LOG.debug('No CORS rule matches')
-            return resp
-
-        app.after_request(cors_after_request)
-
-        # Wrap exception handlers with cross_origin
-        # These error handlers will still respect the behavior of the route
-        if options.get('intercept_exceptions', True):
-            def _after_request_decorator(f):
-                def wrapped_function(*args, **kwargs):
-                    return cors_after_request(app.make_response(f(*args, **kwargs)))
-                return wrapped_function
-
-            if hasattr(app, 'handle_exception'):
-                app.handle_exception = _after_request_decorator(
-                    app.handle_exception)
-                app.handle_user_exception = _after_request_decorator(
-                    app.handle_user_exception)
+        except:
+            LOG.error(traceback.format_exc())
+        return resp
+    return cors_teardown_request

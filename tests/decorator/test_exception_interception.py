@@ -81,7 +81,7 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
         '''
         resp = self.get('/test_no_acl_abort_500', origin='www.example.com')
         self.assertEqual(resp.status_code, 500)
-        self.assertFalse(ACL_ORIGIN in resp.headers)
+        self.assertTrue(ACL_ORIGIN in resp.headers)
 
     def test_acl_uncaught_exception_500(self):
         '''
@@ -99,8 +99,8 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
     def test_no_acl_uncaught_exception_500(self):
         '''
             Uncaught exceptions will trigger Flask's internal exception
-            handler, and should have ACL headers only if intercept_exceptions
-            is set to True and if the request URL matches the resources pattern.
+            handler, and should have ACL headers if the request URL matches
+            the resources pattern.
 
             This url does not match.
         '''
