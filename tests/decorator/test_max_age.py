@@ -10,7 +10,7 @@
 """
 from datetime import timedelta
 import sys
-from ..base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase
 from flask import Flask
 
 from flask_cors import *
@@ -59,54 +59,6 @@ class MaxAgeTestCase(FlaskCorsTestCase):
 
         resp = self.preflight('/test_time_delta', origin='www.example.com')
         self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
-
-
-class AppConfigMaxAgeTestCase(AppConfigTest, MaxAgeTestCase):
-    def __init__(self, *args, **kwargs):
-        super(AppConfigMaxAgeTestCase, self).__init__(*args, **kwargs)
-
-    def test_defaults(self):
-        @self.app.route('/defaults')
-        @cross_origin()
-        def defaults():
-            return 'Should only return headers on OPTIONS'
-
-        super(AppConfigMaxAgeTestCase, self).test_defaults()
-
-    def test_string(self):
-        self.app.config['CORS_MAX_AGE'] = 600
-
-        @self.app.route('/test_string')
-        @cross_origin()
-        def test_string():
-            return 'Open!'
-
-        super(AppConfigMaxAgeTestCase, self).test_string()
-
-    def test_time_delta(self):
-        self.app.config['CORS_MAX_AGE'] = timedelta(minutes=10)
-
-        @self.app.route('/test_time_delta')
-        @cross_origin()
-        def test_time_delta():
-            return 'Open!'
-
-        super(AppConfigMaxAgeTestCase, self).test_time_delta()
-
-    def test_override(self):
-        ''' If the methods parameter is defined, always return the allowed
-            methods defined by the user.
-        '''
-        # timedelta.total_seconds is not available in older versions of Python
-        self.app.config['CORS_MAX_AGE'] = 600
-
-        @self.app.route('/test_override')
-        @cross_origin(max_age=900)
-        def test_override():
-            return 'Welcome!'
-
-        resp = self.preflight('/test_override', origin='www.example.com')
-        self.assertEqual(resp.headers.get(ACL_MAX_AGE), '900')
 
 
 if __name__ == "__main__":

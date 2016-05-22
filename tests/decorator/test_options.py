@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from ..base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase
 from flask import Flask
 
 from flask_cors import *
@@ -76,36 +76,6 @@ class OptionsTestCase(FlaskCorsTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(ACL_ORIGIN in resp.headers)
         self.assertEqual(resp.data.decode("utf-8"), u"Welcome!")
-
-
-class AppOptionsTestCase(AppConfigTest, OptionsTestCase):
-    def __init__(self, *args, **kwargs):
-        super(AppOptionsTestCase, self).__init__(*args, **kwargs)
-
-    def test_defaults(self):
-        @self.app.route('/test_default')
-        @cross_origin()
-        def test_default():
-            return 'Welcome!'
-
-        super(AppOptionsTestCase, self).test_defaults()
-
-    def test_no_options_and_not_auto(self):
-        @self.app.route('/test_no_options_and_not_auto')
-        @cross_origin(automatic_options=False)
-        def test_no_options_and_not_auto():
-            return 'Welcome!'
-        super(AppOptionsTestCase, self).test_no_options_and_not_auto()
-
-    def test_options_and_not_auto(self):
-        self.app.config['CORS_AUTOMATIC_OPTIONS'] = False
-
-        @self.app.route('/test_options_and_not_auto', methods=['OPTIONS'])
-        @cross_origin()
-        def test_options_and_not_auto():
-            return 'Welcome!'
-        super(AppOptionsTestCase, self).test_options_and_not_auto()
-
 
 if __name__ == "__main__":
     unittest.main()

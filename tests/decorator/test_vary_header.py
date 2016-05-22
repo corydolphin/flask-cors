@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from ..base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase
 from flask import Flask, Response
 
 from flask_cors import *
@@ -82,52 +82,6 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
         resp = self.get('/test_existing_vary_headers', origin="http://foo.com")
         self.assertEqual(set(resp.headers.getlist('Vary')),
                          set(['Origin', 'Accept-Encoding']))
-
-
-class AppConfigVaryHeaderTestCase(AppConfigTest,
-                                  VaryHeaderTestCase):
-    def __init__(self, *args, **kwargs):
-        super(AppConfigVaryHeaderTestCase, self).__init__(*args, **kwargs)
-
-
-    def test_default(self):
-        @self.app.route('/')
-        @cross_origin()
-        def test_default():
-            return 'Welcome!'
-
-        super(AppConfigVaryHeaderTestCase, self).test_default()
-
-
-    def test_consistent_origin(self):
-        @self.app.route('/test_consistent_origin')
-        @cross_origin(origins='http://foo.com')
-        def test_consistent_origin():
-            return 'Welcome!'
-
-        super(AppConfigVaryHeaderTestCase, self).test_consistent_origin()
-
-    def test_varying_origin(self):
-        self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
-
-        @self.app.route('/test_vary')
-        @cross_origin()
-        def test_vary():
-            return 'Welcome!'
-
-        super(AppConfigVaryHeaderTestCase, self).test_varying_origin()
-
-    def test_consistent_origin_concat(self):
-        self.app.config['CORS_ORIGINS'] = ["http://foo.com", "http://bar.com"]
-
-        @self.app.route('/test_existing_vary_headers')
-        @cross_origin(origin='http://foo.com')
-        def test_existing_vary_headers():
-            return Response('', status=200,
-                            headers={'Vary': 'Accept-Encoding'})
-
-        super(AppConfigVaryHeaderTestCase, self).test_consistent_origin_concat()
-
 
 if __name__ == "__main__":
     unittest.main()

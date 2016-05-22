@@ -9,14 +9,15 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from ..base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase
 from flask import Flask, jsonify
 
 from flask_cors import *
 from flask_cors.core import *
 
+letters = 'abcdefghijklmnopqrstuvwxyz'  # string.letters is not PY3 compatible
 
-class AppExtensionRegexp(AppConfigTest):
+class AppExtensionRegexp(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
         CORS(self.app, resources={
