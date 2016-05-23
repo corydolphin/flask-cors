@@ -38,10 +38,15 @@ def helloWorld():
         Since the path '/' does not match the regular expression r'/api/*',
         this route does not have CORS headers set.
     '''
-    return '''<h1>Hello CORS!</h1> Read about my spec at the
-<a href="http://www.w3.org/TR/cors/">W3</a> Or, checkout my documentation
-on <a href="https://github.com/corydolphin/flask-cors">Github</a>'''
+    return '''
+<html>
+    <h1>Hello CORS!</h1>
+    <h3> End to end editable example with jquery! </h3>
+    <a class="jsbin-embed" href="http://jsbin.com/zazitas/embed?js,console">JS Bin on jsbin.com</a>
+    <script src="//static.jsbin.com/js/embed.min.js?3.35.12"></script>
 
+</html>
+'''
 
 @app.route("/api/v1/users/")
 def list_users():
