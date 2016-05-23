@@ -42,9 +42,6 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
         resp = self.get('/test_credentials_supported', origin='www.example.com')
         self.assertEquals(resp.headers.get(ACL_CREDENTIALS), 'true')
 
-        resp = self.get('/test_credentials_supported')
-        self.assertEquals(resp.headers.get(ACL_CREDENTIALS), None )
-
     def test_default(self):
         ''' The default behavior should be to disallow credentials.
         '''
