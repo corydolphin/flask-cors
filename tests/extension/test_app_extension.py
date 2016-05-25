@@ -62,12 +62,11 @@ class AppExtensionRegexp(FlaskCorsTestCase):
             return 'Welcome!'
 
     def test_defaults_no_origin(self):
-        ''' If there is no Origin header in the request, the
-            Access-Control-Allow-Origin header should not be included,
-            according to the w3 spec.
+        ''' If there is no Origin header in the request,
+            by default the '*' should be sent
         '''
         for resp in self.iter_responses('/'):
-            self.assertEqual(resp.headers.get(ACL_ORIGIN), None)
+            self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
     def test_defaults_with_origin(self):
         ''' If there is an Origin header in the request, the
