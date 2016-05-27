@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from ..base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase
 from flask import Flask
 
 from flask_cors import *
@@ -59,28 +59,6 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
 
         resp = self.get('/test_credentials_unsupported')
         self.assertFalse(ACL_CREDENTIALS in resp.headers)
-
-
-class AppConfigExposeHeadersTestCase(AppConfigTest, SupportsCredentialsCase):
-    def __init__(self, *args, **kwargs):
-        super(AppConfigExposeHeadersTestCase, self).__init__(*args, **kwargs)
-
-    def test_credentials_supported(self):
-        self.app.config['CORS_SUPPORTS_CREDENTIALS'] = True
-
-        @self.app.route('/test_credentials_supported')
-        @cross_origin()
-        def test_credentials_supported():
-            return 'Credentials!'
-
-        super(AppConfigExposeHeadersTestCase, self).test_credentials_supported()
-
-    def test_open_request(self):
-        @self.app.route('/test_default')
-        @cross_origin()
-        def test_default():
-            return 'Open!'
-        super(AppConfigExposeHeadersTestCase, self).test_default()
 
 if __name__ == "__main__":
     unittest.main()

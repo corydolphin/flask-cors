@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from ..base_test import FlaskCorsTestCase, AppConfigTest
+from ..base_test import FlaskCorsTestCase
 from flask import Flask
 
 from flask_cors import *
@@ -56,29 +56,6 @@ class MethodsCase(FlaskCorsTestCase):
 
         res = self.get('/test_methods_defined', origin='www.example.com')
         self.assertFalse(ACL_METHODS in res.headers)
-
-
-class AppConfigMethodsTestCase(AppConfigTest, MethodsCase):
-    def __init__(self, *args, **kwargs):
-        super(AppConfigMethodsTestCase, self).__init__(*args, **kwargs)
-
-    def test_defaults(self):
-        @self.app.route('/defaults')
-        @cross_origin()
-        def defaults():
-            return ''
-
-        super(AppConfigMethodsTestCase, self).test_defaults()
-
-    def test_methods_defined(self):
-        self.app.config['CORS_METHODS'] = ['POST']
-
-        @self.app.route('/test_methods_defined')
-        @cross_origin()
-        def defaults():
-            return ''
-        super(AppConfigMethodsTestCase, self).test_methods_defined()
-
 
 if __name__ == "__main__":
     unittest.main()

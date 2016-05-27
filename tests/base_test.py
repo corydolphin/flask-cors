@@ -87,22 +87,3 @@ class FlaskCorsTestCase(unittest.TestCase):
             self.assertTrue(ACL_ORIGIN in resp.headers)
         else:
             self.assertTrue(resp.headers.get(ACL_ORIGIN) == origin)
-
-
-class AppConfigTest(object):
-    def setUp(self):
-        self.app = Flask(import_name=__name__)
-
-    def tearDown(self):
-        self.app = None
-
-    def add_route(self, path):
-
-        # Flask checks the name of the function to ensure that iew mappings
-        # do not collide. We work around it by generating a new function name
-        # for the path
-        def function_to_rename():
-            return 'STUBBED: %s' % path
-        function_to_rename.__name__ = 'func_%s' % path
-
-        self.app.route(path)(function_to_rename)
