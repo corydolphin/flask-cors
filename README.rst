@@ -41,7 +41,7 @@ full list of options in the `documentation <http://flask-cors.corydolphin.com/en
 
 
     from flask import Flask
-    from flask.ext.cors import CORS
+    from flask.ext.cors import CORS, cross_origin
 
     app = Flask(__name__)
     CORS(app)
