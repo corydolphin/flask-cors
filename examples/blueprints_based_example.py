@@ -10,14 +10,14 @@ to add cross origin support to your flask app!
 from flask import Flask, jsonify, Blueprint
 import logging
 try:
-    from flask.ext.cors import CORS  # The typical way to import flask-cors
+    from flask_cors import CORS  # The typical way to import flask-cors
 except ImportError:
     # Path hack allows examples to be run without installation.
     import os
     parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parentdir)
 
-    from flask.ext.cors import CORS
+    from flask_cors import CORS
 
 
 api_v1 = Blueprint('API_v1', __name__)
