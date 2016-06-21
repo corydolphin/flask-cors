@@ -28,11 +28,11 @@ Install the extension with using pip, or easy\_install.
 Usage
 -----
 
-This package exposes a Flask extension which by default enables CORS support on all routes, for all origins and methods. It allows parameterization of all CORS headers on a per-resource level. The package also contains a decorator, for those who prefer this approach. 
+This package exposes a Flask extension which by default enables CORS support on all routes, for all origins and methods. It allows parameterization of all CORS headers on a per-resource level. The package also contains a decorator, for those who prefer this approach.
 
 Simple Usage
 ~~~~~~~~~~~~
-  
+
 In the simplest case, initialize the Flask-Cors extension with default
 arguments in order to allow CORS for all domains on all routes. See the
 full list of options in the `documentation <http://flask-cors.corydolphin.com/en/latest/api.html#extension>`__.
@@ -41,7 +41,7 @@ full list of options in the `documentation <http://flask-cors.corydolphin.com/en
 
 
     from flask import Flask
-    from flask.ext.cors import CORS, cross_origin
+    from flask_cors import CORS, cross_origin
 
     app = Flask(__name__)
     CORS(app)
