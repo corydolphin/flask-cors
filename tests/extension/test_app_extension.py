@@ -15,7 +15,7 @@ from flask import Flask, jsonify
 
 from flask_cors import *
 from flask_cors.core import *
-
+import logging; logging.basicConfig(level=logging.DEBUG)
 letters = 'abcdefghijklmnopqrstuvwxyz'  # string.letters is not PY3 compatible
 
 class AppExtensionRegexp(FlaskCorsTestCase):

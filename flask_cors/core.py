@@ -159,7 +159,7 @@ def get_allow_headers(options, acl_request_headers):
 
         # any header that matches in the allow_headers
         matching_headers = filter(
-            lambda h: try_match_any(h, options.get('allow_headers'), True),
+            lambda h: try_match_any(h, options.get('allow_headers')),
             request_headers
         )
 
@@ -256,19 +256,18 @@ def re_fix(reg):
     return r'.*' if reg == r'*' else reg
 
 
-def try_match_any(inst, patterns, exact_match=False):
-    return any(try_match(inst, pattern, exact_match) for pattern in patterns)
+def try_match_any(inst, patterns):
+    return any(try_match(inst, pattern) for pattern in patterns)
 
 
-def try_match(request_origin, pattern, exact_match=False):
+def try_match(request_origin, maybe_regex):
     """Safely attempts to match a pattern or string to a request origin."""
-    try:
-        if isinstance(pattern, RegexObject):
-            return re.match(pattern, request_origin)
-        else:
-            return re.match("^" + pattern + "$" if exact_match else pattern, request_origin, flags=re.IGNORECASE)
-    except:
-        return request_origin == pattern
+    if isinstance(maybe_regex, RegexObject):
+        return re.match(maybe_regex, request_origin)
+    elif probably_regex(maybe_regex):
+        return re.match(maybe_regex, request_origin, flags=re.IGNORECASE)
+    else:
+        return request_origin == maybe_regex
 
 
 def get_cors_options(appInstance, *dicts):
