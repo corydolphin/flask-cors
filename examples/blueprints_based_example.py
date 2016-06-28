@@ -4,7 +4,7 @@ Flask-Cors example
 This is a tiny Flask Application demonstrating Flask-Cors, making it simple
 to add cross origin support to your flask app!
 
-:copyright: (C) 2013 by Cory Dolphin.
+:copyright: (c) 2016 by Cory Dolphin.
 :license:   MIT/X11, see LICENSE for more details.
 """
 from flask import Flask, jsonify, Blueprint
