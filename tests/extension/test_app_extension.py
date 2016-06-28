@@ -9,6 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+import re
 from ..base_test import FlaskCorsTestCase
 from flask import Flask, jsonify
 
@@ -21,7 +22,6 @@ class AppExtensionRegexp(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
         CORS(self.app, resources={
-            r'/': {},
             r'/test_list': {'origins': ["http://foo.com", "http://bar.com"]},
             r'/test_string': {'origins': 'http://foo.com'},
             r'/test_set': {
@@ -38,10 +38,14 @@ class AppExtensionRegexp(FlaskCorsTestCase):
             },
             r'/test_send_wildcard_with_origin' : {
                 'send_wildcard':True
-            }
+            },
+            re.compile('/test_compiled_subdomain_\w*'): {
+                'origins': re.compile("http://example\d+.com")
+            },
+            r'/test_defaults':{}
         })
 
-        @self.app.route('/')
+        @self.app.route('/test_defaults')
         def wildcard():
             return 'Welcome!'
 
@@ -65,14 +69,14 @@ class AppExtensionRegexp(FlaskCorsTestCase):
         ''' If there is no Origin header in the request,
             by default the '*' should be sent
         '''
-        for resp in self.iter_responses('/'):
+        for resp in self.iter_responses('/test_defaults'):
             self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
     def test_defaults_with_origin(self):
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be included.
         '''
-        for resp in self.iter_responses('/', origin='http://example.com'):
+        for resp in self.iter_responses('/test_defaults', origin='http://example.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://example.com')
 
@@ -120,11 +124,14 @@ class AppExtensionRegexp(FlaskCorsTestCase):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
     def test_compiled_subdomain_regex(self):
-        for sub in letters:
-            domain = "http://%s.example.com" % sub
+        for sub in [1, 100, 200]:
+            domain = "http://example%s.com" % sub
             for resp in self.iter_responses('/test_compiled_subdomain_regex',
                                             headers={'origin': domain}):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
+        for resp in self.iter_responses('/test_compiled_subdomain_regex',
+                                        headers={'origin': "http://examplea.com"}):
+            self.assertEqual(None, resp.headers.get(ACL_ORIGIN))
 
     def test_regex_list(self):
         for parent in 'example.com', 'otherexample.com':
