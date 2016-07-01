@@ -162,12 +162,12 @@ class CORS(object):
 
             for res_regex, res_options in resources:
                 if try_match(request.path, res_regex):
-                    print("Request to '%s' matches CORS resource '%s'. Using options: %s",
+                    LOG.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
                           request.path, get_regexp_pattern(res_regex), res_options)
                     set_cors_headers(resp, res_options)
                     break
             else:
-                print('No CORS rule matches')
+                LOG.debug('No CORS rule matches')
             return resp
 
         app.after_request(cors_after_request)
