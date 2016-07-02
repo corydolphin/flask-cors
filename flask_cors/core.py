@@ -260,15 +260,14 @@ def try_match_any(inst, patterns):
     return any(try_match(inst, pattern) for pattern in patterns)
 
 
-def try_match(request_origin, pattern):
+def try_match(request_origin, maybe_regex):
     """Safely attempts to match a pattern or string to a request origin."""
-    try:
-        if isinstance(pattern, RegexObject):
-            return re.match(pattern, request_origin)
-        else:
-            return re.match(pattern, request_origin, flags=re.IGNORECASE)
-    except:
-        return request_origin == pattern
+    if isinstance(maybe_regex, RegexObject):
+        return re.match(maybe_regex, request_origin)
+    elif probably_regex(maybe_regex):
+        return re.match(maybe_regex, request_origin, flags=re.IGNORECASE)
+    else:
+        return request_origin == maybe_regex
 
 
 def get_cors_options(appInstance, *dicts):

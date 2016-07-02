@@ -21,7 +21,8 @@ from flask_cors.core import *
 
 class InternalsTestCase(unittest.TestCase):
     def test_try_match(self):
-        self.assertTrue(try_match('www.com/foo+', 'www.com/foo'))
+        self.assertFalse(try_match('www.com/foo', 'www.com/fo'))
+        self.assertTrue(try_match('www.com/foo', 'www.com/fo*'))
 
     def test_flexible_str_str(self):
         self.assertEquals(flexible_str('Bar, Foo, Qux'), 'Bar, Foo, Qux')
