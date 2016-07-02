@@ -150,26 +150,7 @@ class CORS(object):
         resources_human = dict([(get_regexp_pattern(pattern), opts) for (pattern,opts) in resources])
         LOG.debug("Configuring CORS with resources: %s", resources_human)
 
-        def cors_after_request(resp):
-            '''
-                The actual after-request handler, retains references to the
-                the options, and definitions of resources through a closure.
-            '''
-            # If CORS headers are set in a view decorator, pass
-            if resp.headers.get(ACL_ORIGIN):
-                LOG.debug('CORS have been already evaluated, skipping')
-                return resp
-
-            for res_regex, res_options in resources:
-                if try_match(request.path, res_regex):
-                    LOG.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
-                          request.path, get_regexp_pattern(res_regex), res_options)
-                    set_cors_headers(resp, res_options)
-                    break
-            else:
-                LOG.debug('No CORS rule matches')
-            return resp
-
+        cors_after_request = make_after_request_function(resources)
         app.after_request(cors_after_request)
 
         # Wrap exception handlers with cross_origin
@@ -185,3 +166,21 @@ class CORS(object):
                     app.handle_exception)
                 app.handle_user_exception = _after_request_decorator(
                     app.handle_user_exception)
+
+def make_after_request_function(resources):
+    def cors_after_request(resp):
+        # If CORS headers are set in a view decorator, pass
+        if resp.headers.get(ACL_ORIGIN):
+            LOG.debug('CORS have been already evaluated, skipping')
+            return resp
+
+        for res_regex, res_options in resources:
+            if try_match(request.path, res_regex):
+                LOG.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
+                      request.path, get_regexp_pattern(res_regex), res_options)
+                set_cors_headers(resp, res_options)
+                break
+        else:
+            LOG.debug('No CORS rule matches')
+        return resp
+    return cors_after_request

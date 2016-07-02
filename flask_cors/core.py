@@ -13,10 +13,6 @@ import collections
 from datetime import timedelta
 from six import string_types
 from flask import request, current_app
-try:
-    from flask import _app_ctx_stack as stack
-except ImportError:
-    from flask import _request_ctx_stack as stack
 from werkzeug.datastructures import MultiDict
 
 LOG = logging.getLogger(__name__)
