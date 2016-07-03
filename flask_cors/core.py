@@ -168,7 +168,7 @@ def get_allow_headers(options, acl_request_headers):
     return None
 
 
-def get_cors_headers(options, request_headers, request_method, response_headers):
+def get_cors_headers(options, request_headers, request_method):
     origins_to_set = get_cors_origins(options, request_headers.get('Origin'))
     headers = MultiDict()
 
@@ -230,8 +230,7 @@ def set_cors_headers(resp, options):
         LOG.debug('CORS have been already evaluated, skipping')
         return resp
 
-    headers_to_set = get_cors_headers(options, request.headers, request.method,
-                                      resp.headers)
+    headers_to_set = get_cors_headers(options, request.headers, request.method)
 
     LOG.debug('Settings CORS headers: %s', str(headers_to_set))
 
