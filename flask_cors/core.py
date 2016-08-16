@@ -226,13 +226,9 @@ def set_cors_headers(resp, options):
         LOG.debug('CORS have been already evaluated, skipping')
         return resp
 
-    # If resp.headers is not a MultiDict, set resp.headers to a new
-    # MultiDict, copying the underlying dict.
-    if type(resp.headers) is MultiDict:
-        multidict = MultiDict()
-        for k, v in resp.headers.items():
-            multidict.add(k, v)
-        resp.headers = multidict
+    # OauthLib  sets resp.headers to a non MultiDict. Weird, but let's work around it.
+	if not isinstance(resp.headers, MultiDict):
+        resp.headers = MultiDict(resp.headers)
 
     headers_to_set = get_cors_headers(options, request.headers, request.method)
 
