@@ -226,6 +226,14 @@ def set_cors_headers(resp, options):
         LOG.debug('CORS have been already evaluated, skipping')
         return resp
 
+    # If resp.headers is not a MultiDict, set resp.headers to a new
+    # MultiDict, copying the underlying dict.
+    if type(resp.headers) is MultiDict:
+        multidict = MultiDict()
+        for k, v in resp.headers.items():
+            multidict.add(k, v)
+        resp.headers = multidict
+
     headers_to_set = get_cors_headers(options, request.headers, request.method)
 
     LOG.debug('Settings CORS headers: %s', str(headers_to_set))
