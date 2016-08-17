@@ -159,9 +159,9 @@ def get_allow_headers(options, acl_request_headers):
             request_headers
         )
 
-        return ', '.join(sorted(matching_headers))
+        return sorted(matching_headers)
 
-    return None
+    return []
 
 
 def get_cors_headers(options, request_headers, request_method):
@@ -171,8 +171,7 @@ def get_cors_headers(options, request_headers, request_method):
     if not origins_to_set:  # CORS is not enabled for this route
         return headers
 
-    for origin in origins_to_set:
-        headers.add(ACL_ORIGIN, origin)
+    headers.setlist(ACL_ORIGIN, origins_to_set)
 
     headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
 
@@ -191,7 +190,7 @@ def get_cors_headers(options, request_headers, request_method):
             # If method is not a case-sensitive match for any of the values in
             # list of methods do not set any additional headers and terminate
             # this set of steps.
-            headers[ACL_ALLOW_HEADERS] = get_allow_headers(options, request_headers.get(ACL_REQUEST_HEADERS))
+            headers.setlist(ACL_ALLOW_HEADERS, get_allow_headers(options, request_headers.get(ACL_REQUEST_HEADERS)))
             headers[ACL_MAX_AGE] = options.get('max_age')
             headers[ACL_METHODS] = options.get('methods')
         else:
@@ -209,7 +208,7 @@ def get_cors_headers(options, request_headers, request_method):
               any(map(probably_regex, options.get('origins')))):
             headers.add('Vary', 'Origin')
 
-    return MultiDict((k, v) for k, v in headers.items() if v)
+    return headers
 
 
 def set_cors_headers(resp, options):
