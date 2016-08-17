@@ -13,7 +13,7 @@ import collections
 from datetime import timedelta
 from six import string_types
 from flask import request, current_app
-from werkzeug.datastructures import MultiDict
+from werkzeug.datastructures import Headers, MultiDict
 
 LOG = logging.getLogger(__name__)
 
@@ -225,6 +225,13 @@ def set_cors_headers(resp, options):
     if hasattr(resp, FLASK_CORS_EVALUATED):
         LOG.debug('CORS have been already evaluated, skipping')
         return resp
+
+    # Some libraries, like OAuthlib, set resp.headers to non Multidict
+    # objects (Werkzeug Headers work as well). This is a problem because
+    # headers allow repeated values.
+    if (not isinstance(resp.headers, Headers)
+           and not isinstance(resp.headers, MultiDict)):
+        resp.headers = MultiDict(resp.headers)
 
     headers_to_set = get_cors_headers(options, request.headers, request.method)
 
