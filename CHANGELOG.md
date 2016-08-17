@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.1.3
+Fixes Vary:Origin header sending behavior when regex origins are used.
+
+
 ## 2.1.2
 Fixes package installation. Requirements.txt was not included in Manifest. 
 
