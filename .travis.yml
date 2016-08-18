@@ -16,7 +16,7 @@ env:
 install:
   - pip install --upgrade pip
   - pip install --upgrade setuptools # We want to use setup.py check
-  - pip install -U pep8 six docutils pygments flask==$FLASK
+  - pip install -U pep8 six coverage docutils pygments flask==$FLASK
 
 script:
   - coverage erase
