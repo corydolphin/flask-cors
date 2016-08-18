@@ -127,6 +127,7 @@ class CORS(object):
         self._options = kwargs
         if app is not None:
             self.init_app(app, **kwargs)
+        return app
 
     def init_app(self, app, **kwargs):
         # The resources and options may be specified in the App Config, the CORS constructor
