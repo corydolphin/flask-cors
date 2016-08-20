@@ -1,7 +1,7 @@
 Flask-CORS
 ==========
 
-|Build Status| |Latest Version| |Downloads| |Supported Python versions|
+|Build Status| |Latest Version| |Supported Python versions|
 |License|
 
 A Flask extension for handling Cross Origin Resource Sharing (CORS),
@@ -125,8 +125,6 @@ Ronacher.
 .. |Build Status| image:: https://api.travis-ci.org/corydolphin/flask-cors.svg?branch=master
    :target: https://travis-ci.org/corydolphin/flask-cors
 .. |Latest Version| image:: https://img.shields.io/pypi/v/Flask-Cors.svg
-   :target: https://pypi.python.org/pypi/Flask-Cors/
-.. |Downloads| image:: https://img.shields.io/pypi/dm/Flask-Cors.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
 .. |Supported Python versions| image:: https://img.shields.io/pypi/pyversions/Flask-Cors.svg
    :target: https://img.shields.io/pypi/pyversions/Flask-Cors.svg
