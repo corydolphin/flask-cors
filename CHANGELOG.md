@@ -1,20 +1,35 @@
 # Change Log
 
+## 3.0.0
+
+This release is largely a number of small bug fixes and improvements, along with a default change in behavior, which is technically a breaking change.
+
+**Breaking Change**
+We added an always_send option, enabled by default, which makes Flask-CORS inject headers even if the request did not have an 'Origin' header. Because this makes debugging far easier, and has very little downside, it has also been set as the default, making it technically a breaking change. If this actually broke something for you, please let me know, and I'll help you work around it. (#156) c7a1ecdad375a796155da6aca6a1f750337175f3
+
+
+Other improvements:
+* Adds building of universal wheels (#175) 4674c3d54260f8897bd18e5502509363dcd0d0da
+* Makes Flask-CORS compatible with OAuthLib's custom header class ... (#172) aaaf904845997a3b684bc6677bdfc91656a85a04
+* Fixes incorrect substring matches when strings are used as origins or headers (#165) 9cd3f295bd6b0ba87cc5f2afaca01b91ff43e72c
+* Fixes logging when unknown options are supplied (#152) bddb13ca6636c5d559ec67a95309c9607a3fcaba
+
+
 ## 2.1.3
 Fixes Vary:Origin header sending behavior when regex origins are used.
 
 
 ## 2.1.2
-Fixes package installation. Requirements.txt was not included in Manifest. 
+Fixes package installation. Requirements.txt was not included in Manifest.
 
 
 ## 2.1.1
 Stop dynamically referecing logger.
 
-Disable internal logging by default and reduce logging verbosity 
+Disable internal logging by default and reduce logging verbosity
 
 ## 2.1.0
-Adds support for Flask Blueprints. 
+Adds support for Flask Blueprints.
 
 ## 2.0.1
 Fixes Issue #124 where only the first of multiple headers with the same name would be passed through.
