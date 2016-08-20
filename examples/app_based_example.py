@@ -29,7 +29,7 @@ logging.getLogger('flask_cors').level = logging.DEBUG
 # One of the simplest configurations. Exposes all resources matching /api/* to
 # CORS and allows the Content-Type header, which is necessary to POST JSON
 # cross origin.
-CORS(app, resources=r'/api/*', allow_headers='Content-Type')
+CORS(app, resources=r'/api/*')
 
 
 @app.route("/")
@@ -114,6 +114,36 @@ def create_user():
 
     '''
     return jsonify(success=True)
+
+@app.route("/api/exception")
+def get_exception():
+    '''
+        Since the path matches the regular expression r'/api/*', this resource
+        automatically has CORS headers set.
+
+        Browsers will first make a preflight request to verify that the resource
+        allows cross-origin POSTs with a JSON Content-Type, which can be simulated
+        as:
+        $ curl --include -X OPTIONS http://127.0.0.1:5000/exception \
+            --header Access-Control-Request-Method:POST \
+            --header Access-Control-Request-Headers:Content-Type \
+            --header Origin:www.examplesite.com
+        >> HTTP/1.0 200 OK
+        Content-Type: text/html; charset=utf-8
+        Allow: POST, OPTIONS
+        Access-Control-Allow-Origin: *
+        Access-Control-Allow-Headers: Content-Type
+        Access-Control-Allow-Methods: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
+        Content-Length: 0
+        Server: Werkzeug/0.9.6 Python/2.7.9
+        Date: Sat, 31 Jan 2015 22:25:22 GMT
+    '''
+    raise Exception("example")
+
+@app.errorhandler(500)
+def server_error(e):
+    logging.exception('An error occurred during a request. %s', e)
+    return "An internal error occured", 500
 
 
 if __name__ == "__main__":
