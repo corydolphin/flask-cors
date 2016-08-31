@@ -90,3 +90,4 @@ class InternalsTestCase(unittest.TestCase):
         self.assertFalse(probably_regex("http://example.com"))
         self.assertTrue(probably_regex("http://[\w].example.com"))
         self.assertTrue(probably_regex("http://\w+.example.com"))
+        self.assertTrue(probably_regex("https?://example.com"))
