@@ -76,6 +76,11 @@ class OriginsTestCase(FlaskCorsTestCase):
         def test_regex_mixed_list():
             return ''
 
+        @self.app.route('/test_multiple_protocols')
+        @cross_origin(origins="https?://example.com")
+        def test_multiple_protocols():
+            return ''
+
     def test_defaults_no_origin(self):
         ''' If there is no Origin header in the request, the
             Access-Control-Allow-Origin header should be '*' by default.
@@ -187,6 +192,12 @@ class OriginsTestCase(FlaskCorsTestCase):
 
         self.assertEquals("http://example.com",
             self.get('/test_regex_mixed_list', origin='http://example.com').headers.get(ACL_ORIGIN))
+
+    def test_multiple_protocols(self):
+        import logging
+        logging.getLogger('flask_cors').level = logging.DEBUG
+        resp = self.get('test_multiple_protocols', origin='https://example.com')
+        self.assertEqual('https://example.com', resp.headers.get(ACL_ORIGIN))
 
 
 if __name__ == "__main__":
