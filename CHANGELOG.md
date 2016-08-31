@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.0.1
+Fixes Issue #183: regression whereby regular expressions for origins with an "?" are not properly matched.
+
 ## 3.0.0
 
 This release is largely a number of small bug fixes and improvements, along with a default change in behavior, which is technically a breaking change.
