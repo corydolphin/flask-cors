@@ -27,7 +27,7 @@ Using `CORS` with cookies
 By default, Flask-CORS does not allow cookies to be submitted across sites,
 since it has potential security implications. If you wish to enable cross-site
 cookies, you may wish to add some sort of
-`CRSF <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`__
+`CSRF <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`__
 protection to keep you and your users safe.
 
 To allow cookies or authenticated requests to be made
