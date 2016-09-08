@@ -7,16 +7,13 @@ python:
   - '3.4'
   - '3.5'
   - pypy
-  - pypy3
 
 env:
 - FLASK=0.10.1
 - FLASK=0.10
 
 install:
-  - pip install --upgrade pip
-  - pip install --upgrade setuptools # We want to use setup.py check
-  - pip install -U pep8 six coverage docutils pygments flask==$FLASK
+  - pip install -U setuptools pep8 six coverage docutils pygments flask==$FLASK
 
 script:
   - coverage erase
