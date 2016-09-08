@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.0.2
+Fixes Issue #187: regression whereby header (and domain) matching was incorrectly case sensitive. Now it is not, making the behavior identical to 2.X and 1.X.
+
 ## 3.0.1
 Fixes Issue #183: regression whereby regular expressions for origins with an "?" are not properly matched.
 
