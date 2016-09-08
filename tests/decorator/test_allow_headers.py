@@ -58,6 +58,18 @@ class AllowHeadersTestCaseIntegration(FlaskCorsTestCase):
         self.assertEqual(resp.headers.get(ACL_ALLOW_HEADERS),
                          'X-Example-Header-A')
 
+    def test_allow_headers_with_request_headers_case_insensitive(self):
+        '''
+            HTTP headers are case insensitive. We should respect that
+            and match regardless of case, returning the casing sent by
+            the client
+        '''
+        resp = self.preflight('/test_allow_headers',
+                              origin='www.example.com',
+                              cors_request_headers=['X-Example-header-a'])
+        self.assertEqual(resp.headers.get(ACL_ALLOW_HEADERS),
+                         'X-Example-header-a')
+
     def test_allow_headers_with_unmatched_request_headers(self):
         '''
             If every element in the Access-Control-Request-Headers is not an

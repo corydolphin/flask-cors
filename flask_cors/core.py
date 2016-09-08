@@ -270,7 +270,10 @@ def try_match(request_origin, maybe_regex):
     elif probably_regex(maybe_regex):
         return re.match(maybe_regex, request_origin, flags=re.IGNORECASE)
     else:
-        return request_origin == maybe_regex
+        try:
+            return request_origin.lower() == maybe_regex.lower()
+        except AttributeError:
+            return request_origin == maybe_regex
 
 
 def get_cors_options(appInstance, *dicts):
