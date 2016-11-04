@@ -13,7 +13,7 @@ around with different allowed headers, methods, etc. By default,
 submission of cookies across domains is disabled due to the security
 implications, please see the documentation for how to enable
 credential'ed requests, and please make sure you add some sort of
-`CRSF <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`__
+`CSRF <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`__
 protection before doing so!
 
 Installation
