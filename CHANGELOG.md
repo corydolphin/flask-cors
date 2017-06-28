@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.3
+Ensure that an Origin of '*' is never sent if supports_credentials is True (fixes Issue #202)
+* If `always_send=True`, and `'*'` is in the allowed origins, and a request is made without an Origin header, no `Access-Control-Allow-Origins` header will now be returned. This is breaking if you depended on it, but was a bug as it goes against the spec.
+
 ## 3.0.2
 Fixes Issue #187: regression whereby header (and domain) matching was incorrectly case sensitive. Now it is not, making the behavior identical to 2.X and 1.X.
 
