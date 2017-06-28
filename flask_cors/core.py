@@ -134,11 +134,15 @@ def get_cors_origins(options, request_origin):
     elif options.get('always_send'):
         if wildcard:
             # If wildcard is in the origins, even if 'send_wildcard' is False,
-            # simply send the wildcard. It is the most-likely to be correct
-            # thing to do (the only other option is to return nothing, which)
-            # pretty is probably not whawt you want if you specify origins as
-            # '*'
-            return ['*']
+            # simply send the wildcard. Unless supports_credentials is True,
+            # since that is forbidded by the spec..
+            # It is the most-likely to be correct thing to do (the only other
+            # option is to return nothing, which  almost certainly not what
+            # the developer wants if the '*' origin was specified.
+            if options.get('supports_credentials'):
+                return None
+            else:
+                return ['*']
         else:
             # Return all origins that are not regexes.
             return sorted([o for o in origins if not probably_regex(o)])
@@ -362,6 +366,8 @@ def serialize_options(opts):
         raise ValueError("Cannot use supports_credentials in conjunction with"
                          "an origin string of '*'. See: "
                          "http://www.w3.org/TR/cors/#resource-requests")
+
+
 
     serialize_option(options, 'expose_headers')
     serialize_option(options, 'methods', upper=True)
