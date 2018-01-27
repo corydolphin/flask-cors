@@ -86,7 +86,7 @@ Documentation
 -------------
 
 For a full list of options, please see the full
-`documentation <http://flask-cors.corydolphin.com/en/latest/>`__
+`documentation <http://flask-cors.corydolphin.com/en/latest/api.html>`__
 
 Troubleshooting
 ---------------
