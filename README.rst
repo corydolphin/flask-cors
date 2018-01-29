@@ -35,7 +35,7 @@ Simple Usage
 
 In the simplest case, initialize the Flask-Cors extension with default
 arguments in order to allow CORS for all domains on all routes. See the
-full list of options in the `documentation <http://flask-cors.corydolphin.com/en/latest/api.html#extension>`__.
+full list of options in the `documentation <https://flask-cors.corydolphin.com/en/latest/api.html#extension>`__.
 
 .. code:: python
 
@@ -56,7 +56,7 @@ Resource specific CORS
 Alternatively, you can specify CORS options on a resource and origin
 level of granularity by passing a dictionary as the `resources` option,
 mapping paths to a set of options. See the
-full list of options in the `documentation <http://flask-cors.corydolphin.com/en/latest/api.html#extension>`__.
+full list of options in the `documentation <https://flask-cors.corydolphin.com/en/latest/api.html#extension>`__.
 
 .. code:: python
 
@@ -73,7 +73,7 @@ Route specific CORS via decorator
 This extension also exposes a simple decorator to decorate flask routes
 with. Simply add ``@cross_origin()`` below a call to Flask's
 ``@app.route(..)`` to allow CORS on a given route. See the
-full list of options in the `decorator documentation <http://flask-cors.corydolphin.com/en/latest/api.html#decorator>`__.
+full list of options in the `decorator documentation <https://flask-cors.corydolphin.com/en/latest/api.html#decorator>`__.
 
 .. code:: python
 
@@ -86,7 +86,7 @@ Documentation
 -------------
 
 For a full list of options, please see the full
-`documentation <http://flask-cors.corydolphin.com/en/latest/api.html>`__
+`documentation <https://flask-cors.corydolphin.com/en/latest/api.html>`__
 
 Troubleshooting
 ---------------
