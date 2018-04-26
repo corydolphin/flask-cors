@@ -250,7 +250,7 @@ def probably_regex(maybe_regex):
     if isinstance(maybe_regex, RegexObject):
         return True
     else:
-        common_regex_chars = ['*','\\',']', '?']
+        common_regex_chars = ['*','\\', ']', '?', '$', '^', '[', ']', '(', ')']
         # Use common characters used in regular expressions as a proxy
         # for if this string is in fact a regex.
         return any((c in maybe_regex for c in common_regex_chars))
