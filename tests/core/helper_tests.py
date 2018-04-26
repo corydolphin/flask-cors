@@ -17,7 +17,7 @@ except ImportError:
     import unittest
 
 from flask_cors.core import *
-
+import re
 
 class InternalsTestCase(unittest.TestCase):
     def test_try_match(self):
@@ -84,10 +84,15 @@ class InternalsTestCase(unittest.TestCase):
             [re.compile(r'/api/v1/.*'), '/foo', re.compile(r'/.*')]
         )
 
-    def test_probably_regex(self):
-        self.assertTrue(probably_regex("http://*.example.com"))
-        self.assertTrue(probably_regex("*"))
-        self.assertFalse(probably_regex("http://example.com"))
-        self.assertTrue(probably_regex("http://[\w].example.com"))
-        self.assertTrue(probably_regex("http://\w+.example.com"))
-        self.assertTrue(probably_regex("https?://example.com"))
+    def test_maybe_precompile_regex(self):
+        self.assertEquals(maybe_precompile_regex("http://*.example.com"), re.compile("http://*.example.com"))
+        self.assertEquals(maybe_precompile_regex("*"), re.compile(".*"))
+        self.assertEquals(maybe_precompile_regex("http://[\w].example.com"), re.compile("http://[\w].example.com"))
+        self.assertEquals(maybe_precompile_regex("^https://.+example.com$"), re.compile("^https://.+example.com$"))
+        self.assertEquals(maybe_precompile_regex("http://.example.com"), re.compile("http://[\w].example.com"))
+        self.assertEquals(maybe_precompile_regex("http://\w+.example.com"), re.compile("http://\w+.example.com"))
+        self.assertEquals(maybe_precompile_regex("https?://example.com"), re.compile("https?://example.com"))
+
+        # should not compile the non-regex-string to a regex
+        self.assertEquals(maybe_precompile_regex("http://example.com"), "http://example.com")
+
