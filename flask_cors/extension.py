@@ -170,7 +170,7 @@ class CORS(object):
 def make_after_request_function(resources):
     def cors_after_request(resp):
         # If CORS headers are set in a view decorator, pass
-        if resp.headers.get(ACL_ORIGIN):
+        if resp.headers is not None and resp.headers.get(ACL_ORIGIN):
             LOG.debug('CORS have been already evaluated, skipping')
             return resp
 
