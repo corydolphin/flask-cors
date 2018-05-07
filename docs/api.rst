@@ -46,6 +46,9 @@ cross origins, simply set the `supports_credentials` option to `True`. E.G.
     def helloWorld():
       return "Hello, %s" % session['username']
 
+
+The above code enables Flask backend to accept cookies to be submitted from cross origin sites. But if you are sending Xhr requests (ajax calls) to a cross-origin server, by default chrome or any modern browser won't send cookies and session with the request. You should use ``withCredentials = True`` while sending Xhr request to enable that. You should keep in mind about the necessary security concerns. Related MDN doc: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+
 Using `CORS` with Blueprints
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
