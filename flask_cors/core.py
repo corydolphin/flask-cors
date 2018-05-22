@@ -62,7 +62,7 @@ def parse_resources(resources):
     if isinstance(resources, dict):
         # To make the API more consistent with the decorator, allow a
         # resource of '*', which is not actually a valid regexp.
-        resources = [(re_fix(k), v) for k, v in resources.items()]
+        resources = [(maybe_precompile_regex(k), v) for k, v in resources.items()]
 
         # Sort by regex length to provide consistency of matching and
         # to provide a proxy for specificity of match. E.G. longer
@@ -71,20 +71,18 @@ def parse_resources(resources):
             maybe_regex, _ = pair
             return len(get_regexp_pattern(maybe_regex))
 
-        return sorted(resources,
-                      key=pattern_length,
-                      reverse=True)
+        return sorted(resources, key=pattern_length, reverse=True)
 
     elif isinstance(resources, string_types):
-        return [(re_fix(resources), {})]
+        return [(maybe_precompile_regex(resources), {})]
 
     elif isinstance(resources, collections.Iterable):
-        return [(re_fix(r), {}) for r in resources]
+        return [(maybe_precompile_regex(r), {}) for r in resources]
 
     # Type of compiled regex is not part of the public API. Test for this
     # at runtime.
     elif isinstance(resources,  RegexObject):
-        return [(re_fix(resources), {})]
+        return [(maybe_precompile_regex(resources), {})]
 
     else:
         raise ValueError("Unexpected value for resources argument.")
@@ -145,7 +143,7 @@ def get_cors_origins(options, request_origin):
                 return ['*']
         else:
             # Return all origins that are not regexes.
-            return sorted([o for o in origins if not probably_regex(o)])
+            return sorted([o for o in origins if not isinstance(o, RegexObject)])
 
     # Terminate these steps, return the original request untouched.
     else:
@@ -210,7 +208,7 @@ def get_cors_headers(options, request_headers, request_method):
             pass
         elif (len(options.get('origins')) > 1 or
               len(origins_to_set) > 1 or
-              any(map(probably_regex, options.get('origins')))):
+              any([isinstance(o, RegexObject) for o in options.get('origins')])):
             headers.add('Vary', 'Origin')
 
     return MultiDict((k, v) for k, v in headers.items() if v)
@@ -246,22 +244,25 @@ def set_cors_headers(resp, options):
 
     return resp
 
-def probably_regex(maybe_regex):
-    if isinstance(maybe_regex, RegexObject):
-        return True
-    else:
-        common_regex_chars = ['*','\\',']', '?']
-        # Use common characters used in regular expressions as a proxy
-        # for if this string is in fact a regex.
-        return any((c in maybe_regex for c in common_regex_chars))
-
-def re_fix(reg):
+def maybe_precompile_regex(maybe_regex):
     """
-        Replace the invalid regex r'*' with the valid, wildcard regex r'/.*' to
+        Precompiles regexes after sanitizing the regex by replacing 
+        the invalid regex r'*' with the valid, wildcard regex r'/.*' to
         enable the CORS app extension to have a more user friendly api.
-    """
-    return r'.*' if reg == r'*' else reg
 
+        This helpful sanitization may have been a bad idea, in retrospect.
+    """
+    # Precompiled regex. It is already 'fixed'.
+    if (isinstance(maybe_regex, RegexObject)):
+        return maybe_regex;
+
+    maybe_regex = r'.*' if maybe_regex == r'*' else maybe_regex
+    # Use common characters used in regular expressions as a proxy
+    # for if this string is in fact a regex.
+    common_regex_chars = ['*', '\\', ']', '?', '$', '^', '[', ']', '(', ')']
+    if any((c in maybe_regex for c in common_regex_chars)):
+        return re.compile(maybe_regex, flags=re.IGNORECASE)
+    return maybe_regex
 
 def try_match_any(inst, patterns):
     return any(try_match(inst, pattern) for pattern in patterns)
@@ -271,8 +272,6 @@ def try_match(request_origin, maybe_regex):
     """Safely attempts to match a pattern or string to a request origin."""
     if isinstance(maybe_regex, RegexObject):
         return re.match(maybe_regex, request_origin)
-    elif probably_regex(maybe_regex):
-        return re.match(maybe_regex, request_origin, flags=re.IGNORECASE)
     else:
         try:
             return request_origin.lower() == maybe_regex.lower()
@@ -343,7 +342,7 @@ def ensure_iterable(inst):
         return inst
 
 def sanitize_regex_param(param):
-    return [re_fix(x) for x in ensure_iterable(param)]
+    return [maybe_precompile_regex(x) for x in ensure_iterable(param)]
 
 
 def serialize_options(opts):
