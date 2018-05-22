@@ -364,7 +364,7 @@ class AppExtensionBadRegexp(FlaskCorsTestCase):
         '''
 
         self.app = Flask(__name__)
-        CORS(self.app, resources="[")
+        CORS(self.app, resources="}")
 
         @self.app.route('/')
         def index():
