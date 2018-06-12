@@ -1,7 +1,10 @@
 # Change Log
 
+## 3.0.6
+Manual error in release process. Identical contents at 3.0.5. 
+
 ## 3.0.5
-Improve heuristic for detection of regular expressions.
+Fixes incorrect handling of regexes containg `[`, and a few other special characters. Fixes Issue [#212](https://github.com/corydolphin/flask-cors/issues/212) 
 
 ## 3.0.4
 Handle response.headers being None. (Fixes issue #217)
