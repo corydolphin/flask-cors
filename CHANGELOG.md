@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.0.5
+Improve heuristic for detection of regular expressions.
+
 ## 3.0.4
 Handle response.headers being None. (Fixes issue #217)
 
