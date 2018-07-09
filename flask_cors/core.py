@@ -213,7 +213,7 @@ def get_cors_headers(options, request_headers, request_method):
               any(map(probably_regex, options.get('origins')))):
             headers.add('Vary', 'Origin')
 
-    return MultiDict((k, v) for k, v in headers.items() if v)
+    return MultiDict((k, v) for k, v in headers.items(multi=True) if v)
 
 
 def set_cors_headers(resp, options):
@@ -241,7 +241,7 @@ def set_cors_headers(resp, options):
 
     LOG.debug('Settings CORS headers: %s', str(headers_to_set))
 
-    for k, v in headers_to_set.items():
+    for k, v in headers_to_set.items(multi=True):
         resp.headers.add(k, v)
 
     return resp
