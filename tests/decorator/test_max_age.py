@@ -9,7 +9,6 @@
     :license: MIT, see LICENSE for more details.
 """
 from datetime import timedelta
-import sys
 from ..base_test import FlaskCorsTestCase
 from flask import Flask
 
@@ -53,10 +52,6 @@ class MaxAgeTestCase(FlaskCorsTestCase):
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
-        # timedelta.total_seconds is not available in older versions of Python
-        if sys.version_info < (2, 7):
-            return
-
         resp = self.preflight('/test_time_delta', origin='www.example.com')
         self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 

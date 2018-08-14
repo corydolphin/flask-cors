@@ -9,10 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from flask import Flask
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
+import unittest
 
 from flask_cors import *
 from flask_cors.core import *
@@ -26,7 +23,7 @@ class FlaskCorsTestCase(unittest.TestCase):
         http://erikzaadi.com/2012/09/13/inheritance-within-python-unit-tests/
         """
         doc = self.id()[self.id().rfind('.')+1:]
-        return "%s.%s" % (self.__class__.__name__, doc)
+        return "{}.{}".format(self.__class__.__name__, doc)
 
     def iter_verbs(self, c):
         ''' A simple helper method to iterate through a range of
@@ -36,7 +33,9 @@ class FlaskCorsTestCase(unittest.TestCase):
         for verb in ['get', 'head', 'options']:
             yield getattr(c, verb)
 
-    def iter_responses(self, path, verbs=['get', 'head', 'options'], **kwargs):
+    def iter_responses(self, path, verbs=None, **kwargs):
+        if verbs is None:
+            verbs = ['get', 'head', 'options']
         for verb in verbs:
             yield self._request(verb.lower(), path, **kwargs)
 
