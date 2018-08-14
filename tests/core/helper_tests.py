@@ -25,7 +25,7 @@ class InternalsTestCase(unittest.TestCase):
         self.assertEquals(flexible_str('Bar, Foo, Qux'), 'Bar, Foo, Qux')
 
     def test_flexible_str_set(self):
-        self.assertEquals(flexible_str(set(['Foo', 'Bar', 'Qux'])),
+        self.assertEquals(flexible_str({'Foo', 'Bar', 'Qux'}),
                           'Bar, Foo, Qux')
 
     def test_serialize_options(self):

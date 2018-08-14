@@ -147,7 +147,7 @@ class CORS(object):
 
         # Create a human readable form of these resources by converting the compiled
         # regular expressions into strings.
-        resources_human = dict([(get_regexp_pattern(pattern), opts) for (pattern,opts) in resources])
+        resources_human = {get_regexp_pattern(pattern): opts for (pattern,opts) in resources}
         LOG.debug("Configuring CORS with resources: %s", resources_human)
 
         cors_after_request = make_after_request_function(resources)
