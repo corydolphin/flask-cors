@@ -9,10 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from flask import Flask
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
+import unittest
 
 from flask_cors import *
 from flask_cors.core import *
