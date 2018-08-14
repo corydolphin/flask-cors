@@ -34,10 +34,10 @@ CORS(app, resources=r'/api/*')
 
 @app.route("/")
 def helloWorld():
-    '''
+    """
         Since the path '/' does not match the regular expression r'/api/*',
         this route does not have CORS headers set.
-    '''
+    """
     return '''
 <html>
     <h1>Hello CORS!</h1>
@@ -50,7 +50,7 @@ def helloWorld():
 
 @app.route("/api/v1/users/")
 def list_users():
-    '''
+    """
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set. The expected result is as follows:
 
@@ -68,13 +68,13 @@ def list_users():
             "success": true
         }
 
-    '''
+    """
     return jsonify(user="joe")
 
 
 @app.route("/api/v1/users/create", methods=['POST'])
 def create_user():
-    '''
+    """
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set.
 
@@ -112,12 +112,12 @@ def create_user():
           "success": true
         }
 
-    '''
+    """
     return jsonify(success=True)
 
 @app.route("/api/exception")
 def get_exception():
-    '''
+    """
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set.
 
@@ -137,7 +137,7 @@ def get_exception():
         Content-Length: 0
         Server: Werkzeug/0.9.6 Python/2.7.9
         Date: Sat, 31 Jan 2015 22:25:22 GMT
-    '''
+    """
     raise Exception("example")
 
 @app.errorhandler(500)
