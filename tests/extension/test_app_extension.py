@@ -25,7 +25,7 @@ class AppExtensionRegexp(FlaskCorsTestCase):
             r'/test_list': {'origins': ["http://foo.com", "http://bar.com"]},
             r'/test_string': {'origins': 'http://foo.com'},
             r'/test_set': {
-                'origins': set(["http://foo.com", "http://bar.com"])
+                'origins': {"http://foo.com", "http://bar.com"}
             },
             r'/test_subdomain_regex': {
                 'origins': r"http?://\w*\.?example\.com:?\d*/?.*"
@@ -136,7 +136,7 @@ class AppExtensionRegexp(FlaskCorsTestCase):
     def test_regex_list(self):
         for parent in 'example.com', 'otherexample.com':
             for sub in letters:
-                domain = "http://%s.%s.com" % (sub, parent)
+                domain = "http://{}.{}.com".format(sub, parent)
                 for resp in self.iter_responses('/test_regex_list',
                                                 headers={'origin': domain}):
                     self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))

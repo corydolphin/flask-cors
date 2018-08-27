@@ -52,7 +52,7 @@ class OriginsTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
         @self.app.route('/test_set')
-        @cross_origin(origins=set(["http://foo.com", "http://bar.com"]))
+        @cross_origin(origins={"http://foo.com", "http://bar.com"})
         def test_set():
             return 'Welcome!'
 
@@ -164,7 +164,7 @@ class OriginsTestCase(FlaskCorsTestCase):
     def test_regex_list(self):
         for parent in 'example.com', 'otherexample.com':
             for sub in letters:
-                domain = "http://%s.%s.com" % (sub, parent)
+                domain = "http://{}.{}.com".format(sub, parent)
                 for resp in self.iter_responses('/test_regex_list',
                                                 headers={'origin': domain}):
                     self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
