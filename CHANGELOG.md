@@ -1,7 +1,7 @@
 # Change Log
 
 ## 3.0.7
-Updated logging.warn to logging.warning (#234)
+Updated logging.warn to logging.warning (#234) Thanks Vaibhav
 
 ## 3.0.6
 Manual error in release process. Identical contents at 3.0.5. 
