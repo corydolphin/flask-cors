@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.0.8
+DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated, and in 3.8 it will stop working
+
 ## 3.0.7
 Updated logging.warn to logging.warning (#234) Thanks Vaibhav
 
