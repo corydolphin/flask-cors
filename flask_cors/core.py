@@ -9,7 +9,12 @@
 """
 import re
 import logging
-import collections
+try:
+    # on python 3
+    from collections.abc import Iterable
+except ImportError:
+    # on python 2.7 and pypy
+    from collections import Iterable
 from datetime import timedelta
 from six import string_types
 from flask import request, current_app
@@ -78,7 +83,7 @@ def parse_resources(resources):
     elif isinstance(resources, string_types):
         return [(re_fix(resources), {})]
 
-    elif isinstance(resources, collections.Iterable):
+    elif isinstance(resources, Iterable):
         return [(re_fix(r), {}) for r in resources]
 
     # Type of compiled regex is not part of the public API. Test for this
@@ -319,7 +324,7 @@ def flexible_str(obj):
     if obj is None:
         return None
     elif(not isinstance(obj, string_types)
-            and isinstance(obj, collections.Iterable)):
+            and isinstance(obj, Iterable)):
         return ', '.join(str(item) for item in sorted(obj))
     else:
         return str(obj)
@@ -337,7 +342,7 @@ def ensure_iterable(inst):
     """
     if isinstance(inst, string_types):
         return [inst]
-    elif not isinstance(inst, collections.Iterable):
+    elif not isinstance(inst, Iterable):
         return [inst]
     else:
         return inst
