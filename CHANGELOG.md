@@ -1,7 +1,8 @@
 # Change Log
 
 ## 3.0.8
-DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated, and in 3.8 it will stop working
+Fixes : DeprecationWarning: Using or importing the ABCs from 'collections' in Python 3.7.
+Thank you @juanmaneo and @jdevera for the contribution.
 
 ## 3.0.7
 Updated logging.warn to logging.warning (#234) Thanks Vaibhav
