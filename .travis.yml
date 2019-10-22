@@ -21,6 +21,8 @@ matrix:
 env:
 - FLASK=0.10.1
 - FLASK=0.10
+- FLASK=1.0
+- FLASK=1.1.1
 
 install:
   - pip install -U setuptools pep8 six coverage docutils pygments flask==$FLASK
