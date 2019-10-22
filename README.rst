@@ -6,7 +6,7 @@ Flask-CORS
 
 A Flask extension for handling Cross Origin Resource Sharing (CORS),
 making cross-origin AJAX possible.
-
+<force rebuild>
 This package has a simple philosophy, when you want to enable CORS, you
 wish to enable it for all use cases on a domain. This means no mucking
 around with different allowed headers, methods, etc. By default,
