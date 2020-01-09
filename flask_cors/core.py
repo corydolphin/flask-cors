@@ -359,7 +359,7 @@ def serialize_options(opts):
 
     for key in opts.keys():
         if key not in DEFAULT_OPTIONS:
-             LOG.warning("Unknown option passed to Flask-CORS: %s", key)
+            LOG.warning("Unknown option passed to Flask-CORS: %s", key)
 
     # Ensure origins is a list of allowed origins with at least one entry.
     options['origins'] = sanitize_regex_param(options.get('origins'))
