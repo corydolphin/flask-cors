@@ -39,8 +39,8 @@ class AppExtensionRegexp(FlaskCorsTestCase):
             r'/test_send_wildcard_with_origin' : {
                 'send_wildcard':True
             },
-            re.compile('/test_compiled_subdomain_\w*'): {
-                'origins': re.compile("http://example\d+.com")
+            re.compile(r'/test_compiled_subdomain_\w*'): {
+                'origins': re.compile(r"http://example\d+.com")
             },
             r'/test_defaults':{}
         })
