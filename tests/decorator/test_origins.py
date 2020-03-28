@@ -140,7 +140,7 @@ class OriginsTestCase(FlaskCorsTestCase):
         resp = self.get('/test_set', origin='http://bar.com')
 
         allowed = resp.headers.get(ACL_ORIGIN)
-        # Order is not garaunteed
+        # Order is not guaranteed
         self.assertEqual(allowed, 'http://bar.com')
 
     def test_not_matching_origins(self):
@@ -180,7 +180,7 @@ class OriginsTestCase(FlaskCorsTestCase):
             or '?') will be skipped.
 
             Thus, the list of returned Access-Control-Allow-Origin header
-            is garaunteed to be 'null', the origin or "*", as per the w3
+            is guaranteed to be 'null', the origin or "*", as per the w3
             http://www.w3.org/TR/cors/#access-control-allow-origin-response-header
 
         '''
