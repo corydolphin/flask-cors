@@ -369,21 +369,17 @@ def serialize_options(opts):
 
     # Ensure origins is a list of allowed origins with at least one entry.
     origins = options.get('origins')
-    if callable(origins):
-        options['origins'] = origins  # keep it as a function in options
-        origins = origins()  # but resolve for test below
-    else:
+    if not callable(origins):
         origins = sanitize_regex_param(origins)  # sanitize if not a fn
-        options['origins'] = origins  # and save the sanitized version to the options
+    options['origins'] = origins  # keep it as a function in options
     options['allow_headers'] = sanitize_regex_param(options.get('allow_headers'))
 
     # This is expressly forbidden by the spec. Raise a value error so people
     # don't get burned in production.
-    if r'.*' in origins and options['supports_credentials'] and options['send_wildcard']:
+    if not callable(origins) and r'.*' in origins and options['supports_credentials'] and options['send_wildcard']:
         raise ValueError("Cannot use supports_credentials in conjunction with"
                          "an origin string of '*'. See: "
                          "http://www.w3.org/TR/cors/#resource-requests")
-
 
 
     serialize_option(options, 'expose_headers')
