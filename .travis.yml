@@ -24,7 +24,7 @@ env:
 - DEPEENDENCIES="flask==1.1"
 
 install:
-  - pip install -U setuptools pep8 six coverage docutils pygments $DEPEENDENCIES
+  - pip install -U setuptools pep8 six coverage docutils pygments packaging $DEPEENDENCIES
 
 script:
   - coverage erase
