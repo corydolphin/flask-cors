@@ -33,7 +33,8 @@ setup(
     platforms='any',
     install_requires=install_requires,
     tests_require=[
-        'nose'
+        'nose',
+        'packaging'
     ],
     test_suite='nose.collector',
     classifiers=[
