@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.0.9
+### Security
+ - Escape path before evaluating resource rules (thanks to Colby Morgan). Prior to this, flask-cors incorrectly
+ evaluated CORS resource matching before path expansion. E.g. "/api/../foo.txt" would incorrectly match resources for
+ "/api/*" whereas the path actually expands simply to "/foo.txt"
+
 ## 3.0.8
 Fixes : DeprecationWarning: Using or importing the ABCs from 'collections' in Python 3.7.
 Thank you @juanmaneo and @jdevera for the contribution.
