@@ -10,14 +10,21 @@ python:
   - '3.7'
   - '3.8'
   - pypy
-      
+
+matrix:
+  exclude:
+    - python: 3.4
+    - env:
+        - DEPEENDENCIES="flask==1.1"
+
 env:
-- FLASK=0.10.1 WERKZEUG_DEP="werkzeug==0.16.1"
-- FLASK=0.10 WERKZEUG_DEP="werkzeug==0.16.1"
-- FLASK=1.0 WERKZEUG_DEP=""
-- FLASK=1.1 WERKZEUG_DEP=""
+- DEPEENDENCIES="flask==0.10.1 werkzeug==0.16.1" # pin werkzeug for Flask 10, 10.1 since Flask does not pin it itself.
+- DEPEENDENCIES="flask==0.10 werkzeug==0.16.1"
+- DEPEENDENCIES="flask==1.0"
+- DEPEENDENCIES="flask==1.1"
+
 install:
-  - pip install -U setuptools pep8 six coverage docutils pygments flask==$FLASK $WERKZEUG_DEP
+  - pip install -U setuptools pep8 six coverage docutils pygments $DEPEENDENCIES
 
 script:
   - coverage erase
