@@ -7,23 +7,24 @@ python:
   - '3.4'
   - '3.5'
   - '3.6'
+  - '3.7'
+  - '3.8'
   - pypy
 
-# from https://github.com/travis-ci/travis-ci/issues/9815
-# https://github.com/travis-ci/travis-ci/issues/9069#issuecomment-425720905
-# Enable 3.7 without globally enabling sudo and dist: xenial for other build jobs
 matrix:
-  include:
-    - python: 3.7
-      dist: xenial
-      sudo: true
-      
+  exclude:
+    - python: 3.4
+    - env:
+        - DEPEENDENCIES="flask==1.1"
+
 env:
-- FLASK=0.10.1
-- FLASK=0.10
+- DEPEENDENCIES="flask==0.10.1 werkzeug==0.16.1" # pin werkzeug for Flask 10, 10.1 since Flask does not pin it itself.
+- DEPEENDENCIES="flask==0.10 werkzeug==0.16.1"
+- DEPEENDENCIES="flask==1.0"
+- DEPEENDENCIES="flask==1.1"
 
 install:
-  - pip install -U setuptools pep8 six coverage docutils pygments flask==$FLASK
+  - pip install -U setuptools pep8 six coverage docutils pygments packaging $DEPEENDENCIES
 
 script:
   - coverage erase

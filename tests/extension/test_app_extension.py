@@ -204,7 +204,7 @@ class AppExtensionString(FlaskCorsTestCase):
     def setUp(self):
         self.app = Flask(__name__)
         CORS(self.app, resources=r'/api/*',
-             headers='Content-Type',
+             allow_headers='Content-Type',
              expose_headers='X-Total-Count',
              origins='http://bar.com')
 
@@ -223,6 +223,10 @@ class AppExtensionString(FlaskCorsTestCase):
 
         @self.app.route('/')
         def index():
+            return 'Welcome'
+
+        @self.app.route('/foo.txt')
+        def foo_txt():
             return 'Welcome'
 
     def test_exposed(self):

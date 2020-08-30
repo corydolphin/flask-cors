@@ -10,6 +10,10 @@
 """
 from flask import request
 from .core import *
+try:
+    from urllib.parse import unquote_plus
+except ImportError:
+    from urllib import unquote_plus
 
 LOG = logging.getLogger(__name__)
 
@@ -173,9 +177,9 @@ def make_after_request_function(resources):
         if resp.headers is not None and resp.headers.get(ACL_ORIGIN):
             LOG.debug('CORS have been already evaluated, skipping')
             return resp
-
+        normalized_path = unquote_plus(request.path)
         for res_regex, res_options in resources:
-            if try_match(request.path, res_regex):
+            if try_match(normalized_path, res_regex):
                 LOG.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
                       request.path, get_regexp_pattern(res_regex), res_options)
                 set_cors_headers(resp, res_options)

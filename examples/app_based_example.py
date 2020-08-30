@@ -124,7 +124,7 @@ def get_exception():
         Browsers will first make a preflight request to verify that the resource
         allows cross-origin POSTs with a JSON Content-Type, which can be simulated
         as:
-        $ curl --include -X OPTIONS http://127.0.0.1:5000/exception \
+        $ curl --include -X OPTIONS http://127.0.0.1:5000/api/exception \
             --header Access-Control-Request-Method:POST \
             --header Access-Control-Request-Headers:Content-Type \
             --header Origin:www.examplesite.com
