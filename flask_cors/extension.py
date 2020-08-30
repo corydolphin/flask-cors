@@ -10,7 +10,11 @@
 """
 from flask import request
 from .core import *
-from urllib.parse import unquote_plus
+try:
+    from urllib.parse import unquote_plus
+except ImportError:
+    from urllib import unquote_plus
+
 LOG = logging.getLogger(__name__)
 
 class CORS(object):
