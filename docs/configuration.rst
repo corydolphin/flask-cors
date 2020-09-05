@@ -14,6 +14,9 @@ See :ref:`below <locations>` for more information.
 Configuration options
 ~~~~~~~~~~~~~~~~~~~~~
 
+Configuration options are consistently named across the various :ref:`locations <locations>` where they can be set.
+A configuration option called *example* can be set with the resource dictionary key *example*, as the keyword argument *example* or as the Flask app configuration key *CORS_EXAMPLE*.
+
 The configuration options recognised by Flask-CORS are:
 
 CORS_ALLOW_HEADERS (:py:class:`~typing.List` or :py:class:`str`)
@@ -87,7 +90,7 @@ Default values
 * CORS_MAX_AGE: None
 * CORS_METHODS: [":http:method:`get`", ":http:method:`head`", ":http:method:`post`", ":http:method:`options`", ":http:method:`put`", ":http:method:`patch`", ":http:method:`delete`"]
 * CORS_ORIGINS: "*"
-* CORS_RESOURCES: r"/*"
+* CORS_RESOURCES: r"/\*"
 * CORS_SEND_WILDCARD: False
 * CORS_SUPPORTS_CREDENTIALS: False
 * CORS_VARY_HEADER: True
