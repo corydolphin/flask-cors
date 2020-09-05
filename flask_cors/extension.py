@@ -93,7 +93,7 @@ class CORS(object):
         `Access-Control-Allow-Credentials` header in responses. This allows
         cookies and credentials to be submitted across domains.
 
-        :note: This option cannot be used in conjuction with a '*' origin
+        :note: This option cannot be used in conjunction with a '*' origin
 
         Default : False
     :type supports_credentials: bool
