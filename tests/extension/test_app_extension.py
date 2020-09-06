@@ -39,8 +39,8 @@ class AppExtensionRegexp(FlaskCorsTestCase):
             r'/test_send_wildcard_with_origin' : {
                 'send_wildcard':True
             },
-            re.compile('/test_compiled_subdomain_\w*'): {
-                'origins': re.compile("http://example\d+.com")
+            re.compile(r'/test_compiled_subdomain_\w*'): {
+                'origins': re.compile(r"http://example\d+.com")
             },
             r'/test_defaults':{}
         })
@@ -162,7 +162,7 @@ class AppExtensionRegexp(FlaskCorsTestCase):
                                             origin=domain):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
-        self.assertEquals("http://example.com",
+        self.assertEqual("http://example.com",
             self.get('/test_regex_mixed_list', origin='http://example.com').headers.get(ACL_ORIGIN))
 
 
