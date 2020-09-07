@@ -5,5 +5,6 @@
    :name: mastertoc
 
    self
+   configuration
    api
 
