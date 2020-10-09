@@ -111,7 +111,7 @@ def get_regexp_pattern(regexp):
 
 
 def get_cors_origins(options, request_origin):
-    origins = options.get('origins')
+    origins = retrieve_origins(options, request_origin)
     wildcard = r'.*' in origins
 
     # If the Origin header is not present terminate this set of steps.
@@ -174,7 +174,8 @@ def get_allow_headers(options, acl_request_headers):
 
 
 def get_cors_headers(options, request_headers, request_method):
-    origins_to_set = get_cors_origins(options, request_headers.get('Origin'))
+    request_origin = request_headers.get('Origin')
+    origins_to_set = get_cors_origins(options, request_origin)
     headers = MultiDict()
 
     if not origins_to_set:  # CORS is not enabled for this route
@@ -211,11 +212,13 @@ def get_cors_headers(options, request_headers, request_method):
         # Only set header if the origin returned will vary dynamically,
         # i.e. if we are not returning an asterisk, and there are multiple
         # origins that can be matched.
+        origins = retrieve_origins(options, request_origin)
+
         if headers[ACL_ORIGIN] == '*':
             pass
-        elif (len(options.get('origins')) > 1 or
+        elif (len(origins) > 1 or
               len(origins_to_set) > 1 or
-              any(map(probably_regex, options.get('origins')))):
+              any(map(probably_regex, origins))):
             headers.add('Vary', 'Origin')
 
     return MultiDict((k, v) for k, v in headers.items() if v)
@@ -350,6 +353,11 @@ def ensure_iterable(inst):
 def sanitize_regex_param(param):
     return [re_fix(x) for x in ensure_iterable(param)]
 
+def retrieve_origins(options, request_origin):
+    origins = options.get('origins')
+    if callable(origins):
+        origins = sanitize_regex_param(origins(request_origin))
+    return origins
 
 def serialize_options(opts):
     """
@@ -362,12 +370,19 @@ def serialize_options(opts):
             LOG.warning("Unknown option passed to Flask-CORS: %s", key)
 
     # Ensure origins is a list of allowed origins with at least one entry.
-    options['origins'] = sanitize_regex_param(options.get('origins'))
+    origins = options.get('origins')
+    if not callable(origins):
+        origins = sanitize_regex_param(origins)  # sanitize if not a fn
+    options['origins'] = origins  # keep it as a function in options
     options['allow_headers'] = sanitize_regex_param(options.get('allow_headers'))
 
     # This is expressly forbidden by the spec. Raise a value error so people
     # don't get burned in production.
-    if r'.*' in options['origins'] and options['supports_credentials'] and options['send_wildcard']:
+    if (not callable(origins) 
+        and r'.*' in origins 
+        and options['supports_credentials']
+        and options['send_wildcard']
+    ):
         raise ValueError("Cannot use supports_credentials in conjunction with"
                          "an origin string of '*'. See: "
                          "http://www.w3.org/TR/cors/#resource-requests")

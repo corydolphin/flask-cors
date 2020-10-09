@@ -16,6 +16,12 @@ from flask_cors import *
 from flask_cors.core import *
 
 letters = 'abcdefghijklmnopqrstuvwxyz'  # string.letters is not PY3 compatible
+dynamic_pattern = "dynamic"
+
+def _dynamic_origin(origin):
+    if dynamic_pattern in origin:
+        return origin
+    return ""
 
 class OriginsTestCase(FlaskCorsTestCase):
     def setUp(self):
@@ -79,6 +85,11 @@ class OriginsTestCase(FlaskCorsTestCase):
         @self.app.route('/test_multiple_protocols')
         @cross_origin(origins="https?://example.com")
         def test_multiple_protocols():
+            return ''
+
+        @self.app.route('/test_dynamic_origin')
+        @cross_origin(origins=_dynamic_origin)
+        def test_dynamic_origin():
             return ''
 
     def test_defaults_no_origin(self):
@@ -198,6 +209,15 @@ class OriginsTestCase(FlaskCorsTestCase):
         logging.getLogger('flask_cors').level = logging.DEBUG
         resp = self.get('test_multiple_protocols', origin='https://example.com')
         self.assertEqual('https://example.com', resp.headers.get(ACL_ORIGIN))
+
+    def test_dynamic_header(self):
+        ''' If the origin contains the variable dynamic_pattern, the 
+        Access-Control-Allow-Origin should be echoed
+        '''
+        resp = self.get('/test_dynamic_origin', origin='http://foo.com')
+        self.assertEqual(resp.headers.get(ACL_ORIGIN), None)
+        resp = self.get('/test_dynamic_origin', origin='http://foo-dynamic.com')
+        self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo-dynamic.com')
 
 
 if __name__ == "__main__":
