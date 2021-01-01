@@ -20,6 +20,12 @@ matrix:
     - env:
         - DEPEENDENCIES="flask==1.1"
 
+# Disable version  pypy for ppc64le
+jobs:
+  exclude:
+   - arch: ppc64le
+     python: pypy
+
 env:
 - DEPEENDENCIES="flask==0.10.1 werkzeug==0.16.1" # pin werkzeug for Flask 10, 10.1 since Flask does not pin it itself.
 - DEPEENDENCIES="flask==0.10 werkzeug==0.16.1"
