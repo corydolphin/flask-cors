@@ -19,10 +19,6 @@ matrix:
     - python: 3.4
     - env:
         - DEPEENDENCIES="flask==1.1"
-
-# Disable version  pypy for ppc64le
-jobs:
-  exclude:
    - arch: ppc64le
      python: pypy
 
