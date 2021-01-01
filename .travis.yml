@@ -17,10 +17,10 @@ python:
 matrix:
   exclude:
     - python: 3.4
+    - arch: ppc64le
+      python: pypy
     - env:
         - DEPEENDENCIES="flask==1.1"
-   - arch: ppc64le
-     python: pypy
 
 env:
 - DEPEENDENCIES="flask==0.10.1 werkzeug==0.16.1" # pin werkzeug for Flask 10, 10.1 since Flask does not pin it itself.
