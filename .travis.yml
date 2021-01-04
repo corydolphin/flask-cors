@@ -2,6 +2,9 @@ sudo: false
 cache:
 - pip
 language: python
+arch:
+  - amd64
+  - ppc64le
 python:
   - '2.7'
   - '3.4'
@@ -14,6 +17,8 @@ python:
 matrix:
   exclude:
     - python: 3.4
+    - arch: ppc64le
+      python: pypy
     - env:
         - DEPEENDENCIES="flask==1.1"
 
