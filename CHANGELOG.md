@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.0.10
+Adds support for PPC64 and ARM64 builds for distribution. Thanks @sreekanth370
+
 ## 3.0.9
 ### Security
  - Escape path before evaluating resource rules (thanks to Colby Morgan). Prior to this, flask-cors incorrectly
