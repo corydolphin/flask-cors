@@ -107,7 +107,7 @@ I do my best to include every contribution proposed in any way that I can.
 Credits
 -------
 
-This Flask extension is based upon the `Decorator for the HTTP Access Control <http://flask.pocoo.org/snippets/56/>`__ written by Armin Ronacher.
+This Flask extension is based upon the `Decorator for the HTTP Access Control <https://web.archive.org/web/20190128010149/http://flask.pocoo.org/snippets/56/>`__ written by Armin Ronacher.
 
 .. |Build Status| image:: https://api.travis-ci.org/corydolphin/flask-cors.svg?branch=master
    :target: https://travis-ci.org/corydolphin/flask-cors
