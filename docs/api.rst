@@ -70,7 +70,7 @@ Using the `CORS` extension
    :lines: 29-
 
 
-Using the `cross_origins` decorator
+Using the `cross_origin` decorator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. literalinclude:: ../examples/view_based_example.py
