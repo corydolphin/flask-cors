@@ -184,6 +184,11 @@ def make_after_request_function(resources):
         normalized_path = unquote_plus(request.path)
         for res_regex, res_options in resources:
             if try_match(normalized_path, res_regex):
+                # if we reach here, the decorator has not evaluated the request
+                # so use the allowed methods from the view function because methods
+                # from view function are to be preferred to app level methods
+                if resp.headers is not None and resp.headers.get('allow'):
+                    res_options['methods'] = resp.headers.get('allow')
                 LOG.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
                       request.path, get_regexp_pattern(res_regex), res_options)
                 set_cors_headers(resp, res_options)
