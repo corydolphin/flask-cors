@@ -223,7 +223,7 @@ def get_cors_headers(options, request_headers, request_method):
 
 def set_cors_headers(resp, options):
     """
-    Performs the actual evaluation of Flas-CORS options and actually
+    Performs the actual evaluation of Flask-CORS options and actually
     modifies the response object.
 
     This function is used both in the decorator and the after_request
