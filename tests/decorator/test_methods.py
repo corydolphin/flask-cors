@@ -17,7 +17,7 @@ from flask_cors.core import *
 
 
 class MethodsCase(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/defaults')
@@ -30,7 +30,7 @@ class MethodsCase(FlaskCorsTestCase):
         def test_get():
             return 'Only allow POST'
 
-    def test_defaults(self):
+    def test_defaults(self) -> None:
         ''' Access-Control-Allow-Methods headers should only be returned
             if the client makes an OPTIONS request.
         '''
@@ -41,7 +41,7 @@ class MethodsCase(FlaskCorsTestCase):
         for method in ALL_METHODS:
             self.assertTrue(method in res.headers.get(ACL_METHODS))
 
-    def test_methods_defined(self):
+    def test_methods_defined(self) -> None:
         ''' If the methods parameter is defined, it should override the default
             methods defined by the user.
         '''

@@ -16,7 +16,7 @@ from flask_cors.core import *
 
 
 class OriginsW3TestCase(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/')
@@ -38,7 +38,7 @@ class OriginsW3TestCase(FlaskCorsTestCase):
             '''
             return 'Welcome!'
 
-    def test_wildcard_origin_header(self):
+    def test_wildcard_origin_header(self) -> None:
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
         '''
@@ -50,14 +50,14 @@ class OriginsW3TestCase(FlaskCorsTestCase):
                 example_origin
             )
 
-    def test_wildcard_no_origin_header(self):
+    def test_wildcard_no_origin_header(self) -> None:
         ''' If there is no Origin header in the request, the
             Access-Control-Allow-Origin header should not be included.
         '''
         for resp in self.iter_responses('/'):
             self.assertTrue(ACL_ORIGIN not in resp.headers)
 
-    def test_wildcard_default_origins(self):
+    def test_wildcard_default_origins(self) -> None:
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed back.
         '''

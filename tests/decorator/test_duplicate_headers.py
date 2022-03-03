@@ -14,7 +14,7 @@ from flask_cors.core import *
 
 
 class AllowsMultipleHeaderEntries(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/test_multiple_set_cookie_headers')
@@ -25,7 +25,7 @@ class AllowsMultipleHeaderEntries(FlaskCorsTestCase):
             resp.headers.add('set-cookie', 'bar')
             return resp
 
-    def test_multiple_set_cookie_headers(self):
+    def test_multiple_set_cookie_headers(self) -> None:
         resp = self.get('/test_multiple_set_cookie_headers')
         self.assertEqual(len(resp.headers.getlist('set-cookie')), 2)
 

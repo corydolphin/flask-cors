@@ -17,7 +17,7 @@ from flask_cors.core import *
 
 
 class MaxAgeTestCase(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/defaults')
@@ -35,20 +35,20 @@ class MaxAgeTestCase(FlaskCorsTestCase):
         def test_time_delta():
             return 'Open!'
 
-    def test_defaults(self):
+    def test_defaults(self) -> None:
         ''' By default, no max-age headers should be returned
         '''
         for resp in self.iter_responses('/defaults', origin='www.example.com'):
             self.assertFalse(ACL_MAX_AGE in resp.headers)
 
-    def test_string(self):
+    def test_string(self) -> None:
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''
         resp = self.preflight('/test_string', origin='www.example.com')
         self.assertEqual(resp.headers.get(ACL_MAX_AGE), '600')
 
-    def test_time_delta(self):
+    def test_time_delta(self) -> None:
         ''' If the methods parameter is defined, always return the allowed
             methods defined by the user.
         '''

@@ -16,7 +16,7 @@ from flask_cors.core import *
 
 
 class FlaskCorsTestCase(unittest.TestCase):
-    def shortDescription(self):
+    def shortDescription(self) -> str:
         """
         Get's the one liner description to be displayed.
         Source:
@@ -37,7 +37,7 @@ class FlaskCorsTestCase(unittest.TestCase):
         for verb in verbs:
             yield self._request(verb.lower(), path, **kwargs)
 
-    def _request(self, verb, *args, **kwargs):
+    def _request(self, verb: str, *args, **kwargs):
         _origin = kwargs.pop('origin', None)
         headers = kwargs.pop('headers', {})
         if _origin:

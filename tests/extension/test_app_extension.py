@@ -19,7 +19,7 @@ from flask_cors.core import *
 letters = 'abcdefghijklmnopqrstuvwxyz'  # string.letters is not PY3 compatible
 
 class AppExtensionRegexp(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
         CORS(self.app, resources={
             r'/test_list': {'origins': ["http://foo.com", "http://bar.com"]},
@@ -65,14 +65,14 @@ class AppExtensionRegexp(FlaskCorsTestCase):
         def test_set():
             return 'Welcome!'
 
-    def test_defaults_no_origin(self):
+    def test_defaults_no_origin(self) -> None:
         ''' If there is no Origin header in the request,
             by default the '*' should be sent
         '''
         for resp in self.iter_responses('/test_defaults'):
             self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
-    def test_defaults_with_origin(self):
+    def test_defaults_with_origin(self) -> None:
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be included.
         '''
@@ -80,7 +80,7 @@ class AppExtensionRegexp(FlaskCorsTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://example.com')
 
-    def test_send_wildcard_with_origin(self):
+    def test_send_wildcard_with_origin(self) -> None:
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be included.
         '''
@@ -88,21 +88,21 @@ class AppExtensionRegexp(FlaskCorsTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
-    def test_list_serialized(self):
+    def test_list_serialized(self) -> None:
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed.
         '''
         resp = self.get('/test_list', origin='http://bar.com')
         self.assertEqual(resp.headers.get(ACL_ORIGIN),'http://bar.com')
 
-    def test_string_serialized(self):
+    def test_string_serialized(self) -> None:
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
         resp = self.get('/test_string', origin='http://foo.com')
         self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
 
-    def test_set_serialized(self):
+    def test_set_serialized(self) -> None:
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
@@ -112,18 +112,18 @@ class AppExtensionRegexp(FlaskCorsTestCase):
         # Order is not guaranteed
         self.assertEqual(allowed, 'http://bar.com')
 
-    def test_not_matching_origins(self):
+    def test_not_matching_origins(self) -> None:
         for resp in self.iter_responses('/test_list',origin="http://bazz.com"):
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
-    def test_subdomain_regex(self):
+    def test_subdomain_regex(self) -> None:
         for sub in letters:
             domain = "http://%s.example.com" % sub
             for resp in self.iter_responses('/test_subdomain_regex',
                                             headers={'origin': domain}):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
-    def test_compiled_subdomain_regex(self):
+    def test_compiled_subdomain_regex(self) -> None:
         for sub in [1, 100, 200]:
             domain = "http://example%s.com" % sub
             for resp in self.iter_responses('/test_compiled_subdomain_regex',
@@ -133,7 +133,7 @@ class AppExtensionRegexp(FlaskCorsTestCase):
                                         headers={'origin': "http://examplea.com"}):
             self.assertEqual(None, resp.headers.get(ACL_ORIGIN))
 
-    def test_regex_list(self):
+    def test_regex_list(self) -> None:
         for parent in 'example.com', 'otherexample.com':
             for sub in letters:
                 domain = "http://{}.{}.com".format(sub, parent)
@@ -141,7 +141,7 @@ class AppExtensionRegexp(FlaskCorsTestCase):
                                                 headers={'origin': domain}):
                     self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
-    def test_regex_mixed_list(self):
+    def test_regex_mixed_list(self) -> None:
         '''
             Tests  the corner case occurs when the send_always setting is True
             and no Origin header in the request, it is not possible to match
@@ -167,7 +167,7 @@ class AppExtensionRegexp(FlaskCorsTestCase):
 
 
 class AppExtensionList(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
         CORS(self.app, resources=[r'/test_exposed', r'/test_other_exposed'],
              origins=['http://foo.com', 'http://bar.com'])
@@ -184,24 +184,24 @@ class AppExtensionList(FlaskCorsTestCase):
         def exposed2():
             return 'Welcome!'
 
-    def test_exposed(self):
+    def test_exposed(self) -> None:
         for resp in self.iter_responses('/test_exposed', origin='http://foo.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN),'http://foo.com')
 
-    def test_other_exposed(self):
+    def test_other_exposed(self) -> None:
         for resp in self.iter_responses('/test_other_exposed', origin='http://bar.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://bar.com')
 
-    def test_unexposed(self):
+    def test_unexposed(self) -> None:
         for resp in self.iter_responses('/test_unexposed', origin='http://foo.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
 
 class AppExtensionString(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
         CORS(self.app, resources=r'/api/*',
              allow_headers='Content-Type',
@@ -229,7 +229,7 @@ class AppExtensionString(FlaskCorsTestCase):
         def foo_txt():
             return 'Welcome'
 
-    def test_exposed(self):
+    def test_exposed(self) -> None:
         for path in '/api/v1/foo', '/api/v1/bar':
             for resp in self.iter_responses(path, origin='http://bar.com'):
                 self.assertEqual(resp.status_code, 200)
@@ -241,13 +241,13 @@ class AppExtensionString(FlaskCorsTestCase):
                 self.assertFalse(ACL_ORIGIN in resp.headers)
                 self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
-    def test_unexposed(self):
+    def test_unexposed(self) -> None:
         for resp in self.iter_responses('/', origin='http://bar.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
             self.assertFalse(ACL_EXPOSE_HEADERS in resp.headers)
 
-    def test_override(self):
+    def test_override(self) -> None:
         for resp in self.iter_responses('/api/v1/special', origin='http://foo.com'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
@@ -261,7 +261,7 @@ class AppExtensionString(FlaskCorsTestCase):
 
 
 class AppExtensionError(FlaskCorsTestCase):
-    def test_value_error(self):
+    def test_value_error(self) -> None:
         try:
             app = Flask(__name__)
             CORS(app, resources=5)
@@ -271,7 +271,7 @@ class AppExtensionError(FlaskCorsTestCase):
 
 
 class AppExtensionDefault(FlaskCorsTestCase):
-    def test_default(self):
+    def test_default(self) -> None:
         '''
             By default match all.
         '''
@@ -289,7 +289,7 @@ class AppExtensionDefault(FlaskCorsTestCase):
 
 
 class AppExtensionExampleApp(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
         CORS(self.app, resources={
             r'/api/*': {'origins': ['http://blah.com', 'http://foo.bar']}
@@ -307,14 +307,14 @@ class AppExtensionExampleApp(FlaskCorsTestCase):
         def test_exact_match():
             return ''
 
-    def test_index(self):
+    def test_index(self) -> None:
         '''
             If regex does not match, do not set CORS
         '''
         for resp in self.iter_responses('/', origin='http://foo.bar'):
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
-    def test_wildcard(self):
+    def test_wildcard(self) -> None:
         '''
             Match anything matching the path /api/* with an origin
             of 'http://blah.com' or 'http://foo.bar'
@@ -324,7 +324,7 @@ class AppExtensionExampleApp(FlaskCorsTestCase):
                 self.assertTrue(ACL_ORIGIN in resp.headers)
                 self.assertEqual(origin, resp.headers.get(ACL_ORIGIN))
 
-    def test_exact_match(self):
+    def test_exact_match(self) -> None:
         '''
             Match anything matching the path /api/* with an origin
             of 'http://blah.com' or 'http://foo.bar'
@@ -336,7 +336,7 @@ class AppExtensionExampleApp(FlaskCorsTestCase):
 
 
 class AppExtensionCompiledRegexp(FlaskCorsTestCase):
-    def test_compiled_regex(self):
+    def test_compiled_regex(self) -> None:
         '''
             Ensure we do not error if the user sepcifies an bad regular
             expression.
@@ -361,7 +361,7 @@ class AppExtensionCompiledRegexp(FlaskCorsTestCase):
 
 
 class AppExtensionBadRegexp(FlaskCorsTestCase):
-    def test_value_error(self):
+    def test_value_error(self) -> None:
         '''
             Ensure we do not error if the user sepcifies an bad regular
             expression.

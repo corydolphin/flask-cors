@@ -17,7 +17,7 @@ from flask_cors.core import *
 
 
 class SupportsCredentialsCase(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/test_credentials_supported')
@@ -35,14 +35,14 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
         def test_default():
             return 'Open!'
 
-    def test_credentials_supported(self):
+    def test_credentials_supported(self) -> None:
         ''' The specified route should return the
             Access-Control-Allow-Credentials header.
         '''
         resp = self.get('/test_credentials_supported', origin='www.example.com')
         self.assertEqual(resp.headers.get(ACL_CREDENTIALS), 'true')
 
-    def test_default(self):
+    def test_default(self) -> None:
         ''' The default behavior should be to disallow credentials.
         '''
         resp = self.get('/test_default', origin='www.example.com')
@@ -51,7 +51,7 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
         resp = self.get('/test_default')
         self.assertFalse(ACL_CREDENTIALS in resp.headers)
 
-    def test_credentials_unsupported(self):
+    def test_credentials_unsupported(self) -> None:
         ''' The default behavior should be to disallow credentials.
         '''
         resp = self.get('/test_credentials_unsupported', origin='www.example.com')

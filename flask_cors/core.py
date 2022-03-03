@@ -7,6 +7,7 @@
     :copyright: (c) 2016 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+from difflib import Match
 import re
 import logging
 try:
@@ -18,7 +19,11 @@ except ImportError:
 from datetime import timedelta
 from six import string_types
 from flask import request, current_app
-from werkzeug.datastructures import Headers, MultiDict
+from werkzeug.datastructures import EnvironHeaders, Headers, MultiDict
+from flask.app import Flask
+from flask.wrappers import Response
+from typing import Any, Dict, List, Optional, Pattern, Set, Union
+from werkzeug.local import LocalProxy
 
 LOG = logging.getLogger(__name__)
 
@@ -63,7 +68,7 @@ DEFAULT_OPTIONS = dict(origins='*',
                        always_send=True)
 
 
-def parse_resources(resources):
+def parse_resources(resources: Any) -> List[Any]:
     if isinstance(resources, dict):
         # To make the API more consistent with the decorator, allow a
         # resource of '*', which is not actually a valid regexp.
@@ -95,7 +100,7 @@ def parse_resources(resources):
         raise ValueError("Unexpected value for resources argument.")
 
 
-def get_regexp_pattern(regexp):
+def get_regexp_pattern(regexp: Union[Pattern, str]) -> str:
     """
     Helper that returns regexp pattern from given value.
 
@@ -110,7 +115,7 @@ def get_regexp_pattern(regexp):
         return str(regexp)
 
 
-def get_cors_origins(options, request_origin):
+def get_cors_origins(options: Dict[str, Any], request_origin: Optional[str]) -> Optional[List[str]]:
     origins = options.get('origins')
     wildcard = r'.*' in origins
 
@@ -158,7 +163,7 @@ def get_cors_origins(options, request_origin):
         return None
 
 
-def get_allow_headers(options, acl_request_headers):
+def get_allow_headers(options: Dict[str, Optional[Union[str, List[str], bool, int]]], acl_request_headers: Optional[str]) -> Optional[str]:
     if acl_request_headers:
         request_headers = [h.strip() for h in acl_request_headers.split(',')]
 
@@ -173,7 +178,7 @@ def get_allow_headers(options, acl_request_headers):
     return None
 
 
-def get_cors_headers(options, request_headers, request_method):
+def get_cors_headers(options: Dict[str, Any], request_headers: EnvironHeaders, request_method: str) -> MultiDict:
     origins_to_set = get_cors_origins(options, request_headers.get('Origin'))
     headers = MultiDict()
 
@@ -221,7 +226,7 @@ def get_cors_headers(options, request_headers, request_method):
     return MultiDict((k, v) for k, v in headers.items() if v)
 
 
-def set_cors_headers(resp, options):
+def set_cors_headers(resp: Response, options: Dict[str, Any]) -> Response:
     """
     Performs the actual evaluation of Flask-CORS options and actually
     modifies the response object.
@@ -251,7 +256,7 @@ def set_cors_headers(resp, options):
 
     return resp
 
-def probably_regex(maybe_regex):
+def probably_regex(maybe_regex: Union[Pattern, str]) -> bool:
     if isinstance(maybe_regex, RegexObject):
         return True
     else:
@@ -260,7 +265,7 @@ def probably_regex(maybe_regex):
         # for if this string is in fact a regex.
         return any((c in maybe_regex for c in common_regex_chars))
 
-def re_fix(reg):
+def re_fix(reg: Union[Pattern, str]) -> Union[Pattern, str]:
     """
         Replace the invalid regex r'*' with the valid, wildcard regex r'/.*' to
         enable the CORS app extension to have a more user friendly api.
@@ -268,11 +273,11 @@ def re_fix(reg):
     return r'.*' if reg == r'*' else reg
 
 
-def try_match_any(inst, patterns):
+def try_match_any(inst: str, patterns: List[Union[str, Pattern]]) -> bool:
     return any(try_match(inst, pattern) for pattern in patterns)
 
 
-def try_match(request_origin, maybe_regex):
+def try_match(request_origin: str, maybe_regex: Union[Pattern, str]) -> Optional[Union[Match, bool]]:
     """Safely attempts to match a pattern or string to a request origin."""
     if isinstance(maybe_regex, RegexObject):
         return re.match(maybe_regex, request_origin)
@@ -285,7 +290,7 @@ def try_match(request_origin, maybe_regex):
             return request_origin == maybe_regex
 
 
-def get_cors_options(appInstance, *dicts):
+def get_cors_options(appInstance: Union[LocalProxy, Flask], *dicts) -> Dict[str, Any]:
     """
     Compute CORS options for an application by combining the DEFAULT_OPTIONS,
     the app's configuration-specified options and any dictionaries passed. The
@@ -300,7 +305,7 @@ def get_cors_options(appInstance, *dicts):
     return serialize_options(options)
 
 
-def get_app_kwarg_dict(appInstance=None):
+def get_app_kwarg_dict(appInstance: Optional[Union[LocalProxy, Flask]]=None) -> Dict[Any, Any]:
     """Returns the dictionary of CORS specific app configurations."""
     app = (appInstance or current_app)
 
@@ -314,7 +319,7 @@ def get_app_kwarg_dict(appInstance=None):
     }
 
 
-def flexible_str(obj):
+def flexible_str(obj: Optional[Union[List[str], str]]) -> Optional[str]:
     """
     A more flexible str function which intelligently handles stringifying
     strings, lists and other iterables. The results are lexographically sorted
@@ -330,13 +335,13 @@ def flexible_str(obj):
         return str(obj)
 
 
-def serialize_option(options_dict, key, upper=False):
+def serialize_option(options_dict: Dict[str, Any], key: str, upper: bool=False) -> None:
     if key in options_dict:
         value = flexible_str(options_dict[key])
         options_dict[key] = value.upper() if upper else value
 
 
-def ensure_iterable(inst):
+def ensure_iterable(inst: Union[List[str], Pattern, str, Set[str]]) -> Union[List[str], List[Pattern], Set[str]]:
     """
     Wraps scalars or string types as a list, or returns the iterable instance.
     """
@@ -347,11 +352,11 @@ def ensure_iterable(inst):
     else:
         return inst
 
-def sanitize_regex_param(param):
+def sanitize_regex_param(param: Union[List[str], Set[str], Pattern, str]) -> List[Union[str, Pattern]]:
     return [re_fix(x) for x in ensure_iterable(param)]
 
 
-def serialize_options(opts):
+def serialize_options(opts: Dict[str, Any]) -> Dict[str, Any]:
     """
     A helper method to serialize and processes the options dictionary.
     """

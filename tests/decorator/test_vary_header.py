@@ -17,7 +17,7 @@ from flask_cors.core import *
 
 
 class VaryHeaderTestCase(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/')
@@ -41,7 +41,7 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             return Response('', status=200,
                             headers={'Vary': 'Accept-Encoding'})
 
-    def test_default(self):
+    def test_default(self) -> None:
         '''
             By default, allow all domains, which means the Vary:Origin header
             should be set.
@@ -49,7 +49,7 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
         for resp in self.iter_responses('/', origin="http://foo.com"):
             self.assertTrue('Vary' in resp.headers)
 
-    def test_consistent_origin(self):
+    def test_consistent_origin(self) -> None:
         '''
             If the Access-Control-Allow-Origin header will change dynamically,
             the Vary:Origin header should be set.
@@ -57,7 +57,7 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
         for resp in self.iter_responses('/test_consistent_origin', origin="http://foo.com"):
             self.assertFalse('Vary' in resp.headers)
 
-    def test_varying_origin(self):
+    def test_varying_origin(self) -> None:
         ''' Resources that wish to enable themselves to be shared with
             multiple Origins but do not respond uniformly with "*" must
             in practice generate the Access-Control-Allow-Origin header
@@ -73,7 +73,7 @@ class VaryHeaderTestCase(FlaskCorsTestCase):
             self.assertHasACLOrigin(resp)
             self.assertEqual(resp.headers.get('Vary'), 'Origin')
 
-    def test_consistent_origin_concat(self):
+    def test_consistent_origin_concat(self) -> None:
         '''
             If Flask-Cors adds a Vary header and there is already a Vary
             header set, the headers should be combined and comma-separated.

@@ -10,6 +10,9 @@
 """
 from flask import request
 from .core import *
+from flask.app import Flask
+from typing import Any, Callable, List, Optional
+
 try:
     from urllib.parse import unquote_plus
 except ImportError:
@@ -131,12 +134,12 @@ class CORS(object):
     :type vary_header: bool
     """
 
-    def __init__(self, app=None, **kwargs):
+    def __init__(self, app: Optional[Flask]=None, **kwargs) -> None:
         self._options = kwargs
         if app is not None:
             self.init_app(app, **kwargs)
 
-    def init_app(self, app, **kwargs):
+    def init_app(self, app: Flask, **kwargs) -> None:
         # The resources and options may be specified in the App Config, the CORS constructor
         # or the kwargs to the call to init_app.
         options = get_cors_options(app, self._options, kwargs)
@@ -175,7 +178,7 @@ class CORS(object):
                 app.handle_user_exception = _after_request_decorator(
                     app.handle_user_exception)
 
-def make_after_request_function(resources):
+def make_after_request_function(resources: List[Any]) -> Callable:
     def cors_after_request(resp):
         # If CORS headers are set in a view decorator, pass
         if resp.headers is not None and resp.headers.get(ACL_ORIGIN):

@@ -18,7 +18,7 @@ from flask_cors.core import *
 letters = 'abcdefghijklmnopqrstuvwxyz'  # string.letters is not PY3 compatible
 
 class OriginsTestCase(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/')
@@ -81,14 +81,14 @@ class OriginsTestCase(FlaskCorsTestCase):
         def test_multiple_protocols():
             return ''
 
-    def test_defaults_no_origin(self):
+    def test_defaults_no_origin(self) -> None:
         ''' If there is no Origin header in the request, the
             Access-Control-Allow-Origin header should be '*' by default.
         '''
         for resp in self.iter_responses('/'):
             self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
-    def test_defaults_with_origin(self):
+    def test_defaults_with_origin(self) -> None:
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be included.
         '''
@@ -96,7 +96,7 @@ class OriginsTestCase(FlaskCorsTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://example.com')
 
-    def test_always_send_no_wildcard(self):
+    def test_always_send_no_wildcard(self) -> None:
         '''
             If send_wildcard=False, but the there is '*' in the
             allowed origins, we should send it anyways.
@@ -105,13 +105,13 @@ class OriginsTestCase(FlaskCorsTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
-    def test_always_send_no_wildcard_origins(self):
+    def test_always_send_no_wildcard_origins(self) -> None:
         for resp in self.iter_responses('/'):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
 
-    def test_send_wildcard_with_origin(self):
+    def test_send_wildcard_with_origin(self) -> None:
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be included.
         '''
@@ -119,21 +119,21 @@ class OriginsTestCase(FlaskCorsTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.headers.get(ACL_ORIGIN), '*')
 
-    def test_list_serialized(self):
+    def test_list_serialized(self) -> None:
         ''' If there is an Origin header in the request, the
             Access-Control-Allow-Origin header should be echoed.
         '''
         resp = self.get('/test_list', origin='http://bar.com')
         self.assertEqual(resp.headers.get(ACL_ORIGIN),'http://bar.com')
 
-    def test_string_serialized(self):
+    def test_string_serialized(self) -> None:
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
         resp = self.get('/test_string', origin='http://foo.com')
         self.assertEqual(resp.headers.get(ACL_ORIGIN), 'http://foo.com')
 
-    def test_set_serialized(self):
+    def test_set_serialized(self) -> None:
         ''' If there is an Origin header in the request,
             the Access-Control-Allow-Origin header should be echoed back.
         '''
@@ -143,25 +143,25 @@ class OriginsTestCase(FlaskCorsTestCase):
         # Order is not guaranteed
         self.assertEqual(allowed, 'http://bar.com')
 
-    def test_not_matching_origins(self):
+    def test_not_matching_origins(self) -> None:
         for resp in self.iter_responses('/test_list',origin="http://bazz.com"):
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
-    def test_subdomain_regex(self):
+    def test_subdomain_regex(self) -> None:
         for sub in letters:
             domain = "http://%s.example.com" % sub
             for resp in self.iter_responses('/test_subdomain_regex',
                                             headers={'origin': domain}):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
-    def test_compiled_subdomain_regex(self):
+    def test_compiled_subdomain_regex(self) -> None:
         for sub in letters:
             domain = "http://%s.example.com" % sub
             for resp in self.iter_responses('/test_compiled_subdomain_regex',
                                             headers={'origin': domain}):
                 self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
-    def test_regex_list(self):
+    def test_regex_list(self) -> None:
         for parent in 'example.com', 'otherexample.com':
             for sub in letters:
                 domain = "http://{}.{}.com".format(sub, parent)
@@ -169,7 +169,7 @@ class OriginsTestCase(FlaskCorsTestCase):
                                                 headers={'origin': domain}):
                     self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
 
-    def test_regex_mixed_list(self):
+    def test_regex_mixed_list(self) -> None:
         '''
             Tests  the corner case occurs when the send_always setting is True
             and no Origin header in the request, it is not possible to match
@@ -193,7 +193,7 @@ class OriginsTestCase(FlaskCorsTestCase):
         self.assertEqual("http://example.com",
             self.get('/test_regex_mixed_list', origin='http://example.com').headers.get(ACL_ORIGIN))
 
-    def test_multiple_protocols(self):
+    def test_multiple_protocols(self) -> None:
         import logging
         logging.getLogger('flask_cors').level = logging.DEBUG
         resp = self.get('test_multiple_protocols', origin='https://example.com')

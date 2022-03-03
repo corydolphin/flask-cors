@@ -12,10 +12,11 @@
 from functools import update_wrapper
 from flask import make_response, request, current_app
 from .core import *
+from typing import Callable
 
 LOG = logging.getLogger(__name__)
 
-def cross_origin(*args, **kwargs):
+def cross_origin(*args, **kwargs) -> Callable:
     """
     This function is the decorator which is used to wrap a Flask route with.
     In the simplest case, simply use the default parameters to allow all
