@@ -186,7 +186,7 @@ def get_cors_headers(options, request_headers, request_method):
     headers[ACL_EXPOSE_HEADERS] = options.get('expose_headers')
 
     if options.get('supports_credentials'):
-        headers[ACL_CREDENTIALS] = 'true'  # case sensative
+        headers[ACL_CREDENTIALS] = 'true'  # case sensitive
 
     # This is a preflight request
     # http://www.w3.org/TR/cors/#resource-preflight-requests

@@ -21,7 +21,7 @@ The configuration options recognised by Flask-CORS are:
 
 CORS_ALLOW_HEADERS (:py:class:`~typing.List` or :py:class:`str`)
    Headers to accept from the client.
-   Headers in the :http:header:`Access-Control-Request-Headers` request header (usually part of the preflight OPTIONS request) maching headers in this list will be included in the :http:header:`Access-Control-Allow-Headers` response header.
+   Headers in the :http:header:`Access-Control-Request-Headers` request header (usually part of the preflight OPTIONS request) machine, marching, matching headers in this list will be included in the :http:header:`Access-Control-Allow-Headers` response header.
 
 CORS_ALWAYS_SEND (:py:class:`bool`)
    Usually, if a request doesn't include an :http:header:`Origin` header, the client did not request CORS.

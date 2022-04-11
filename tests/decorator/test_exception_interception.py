@@ -117,7 +117,7 @@ class ExceptionInterceptionDefaultTestCase(FlaskCorsTestCase):
         '''
             If a 500 handler is setup by the user, responses should have
             CORS matching rules applied, regardless of whether or not
-            intercept_exceptions is enbaled.
+            intercept_exceptions is enabled.
         '''
         return_string = "Simple error handler"
 
@@ -168,7 +168,7 @@ class NoExceptionInterceptionTestCase(ExceptionInterceptionDefaultTestCase):
         '''
             If a 500 handler is setup by the user, responses should have
             CORS matching rules applied, regardless of whether or not
-            intercept_exceptions is enbaled.
+            intercept_exceptions is enabled.
         '''
         return_string = "Simple error handler"
 
