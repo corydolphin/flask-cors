@@ -21,8 +21,8 @@ def cross_origin(*args, **kwargs):
     In the simplest case, simply use the default parameters to allow all
     origins in what is the most permissive configuration. If this method
     modifies state or performs authentication which may be brute-forced, you
-    should add some degree of protection, such as Cross Site Forgery
-    Request protection.
+    should add some degree of protection, such as Cross Site Request Forgery
+    protection.
 
     :param origins:
         The origin, or list of origins to allow requests from.
