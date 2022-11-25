@@ -143,7 +143,7 @@ def get_exception():
 @app.errorhandler(500)
 def server_error(e):
     logging.exception('An error occurred during a request. %s', e)
-    return "An internal error occured", 500
+    return "An internal error occurred", 500
 
 
 if __name__ == "__main__":

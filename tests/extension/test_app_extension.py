@@ -338,7 +338,7 @@ class AppExtensionExampleApp(FlaskCorsTestCase):
 class AppExtensionCompiledRegexp(FlaskCorsTestCase):
     def test_compiled_regex(self):
         '''
-            Ensure we do not error if the user sepcifies an bad regular
+            Ensure we do not error if the user specifies an bad regular
             expression.
         '''
         import re
@@ -363,7 +363,7 @@ class AppExtensionCompiledRegexp(FlaskCorsTestCase):
 class AppExtensionBadRegexp(FlaskCorsTestCase):
     def test_value_error(self):
         '''
-            Ensure we do not error if the user sepcifies an bad regular
+            Ensure we do not error if the user specifies an bad regular
             expression.
         '''
 
