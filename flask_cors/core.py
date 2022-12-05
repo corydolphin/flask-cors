@@ -29,6 +29,7 @@ ACL_ALLOW_HEADERS = 'Access-Control-Allow-Headers'
 ACL_EXPOSE_HEADERS = 'Access-Control-Expose-Headers'
 ACL_CREDENTIALS = 'Access-Control-Allow-Credentials'
 ACL_MAX_AGE = 'Access-Control-Max-Age'
+ACL_ACCEPT = 'Accept'
 
 # Request Header
 ACL_REQUEST_METHOD = 'Access-Control-Request-Method'
@@ -201,6 +202,7 @@ def get_cors_headers(options, request_headers, request_method):
             # list of methods do not set any additional headers and terminate
             # this set of steps.
             headers[ACL_ALLOW_HEADERS] = get_allow_headers(options, request_headers.get(ACL_REQUEST_HEADERS))
+            headers[ACL_ACCEPT] = '*/*'
             headers[ACL_MAX_AGE] = options.get('max_age')
             headers[ACL_METHODS] = options.get('methods')
         else:
