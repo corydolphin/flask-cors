@@ -29,10 +29,12 @@ ACL_ALLOW_HEADERS = 'Access-Control-Allow-Headers'
 ACL_EXPOSE_HEADERS = 'Access-Control-Expose-Headers'
 ACL_CREDENTIALS = 'Access-Control-Allow-Credentials'
 ACL_MAX_AGE = 'Access-Control-Max-Age'
+ACL_RESPONSE_PRIVATE_NETWORK = 'Access-Control-Allow-Private-Network'
 
 # Request Header
 ACL_REQUEST_METHOD = 'Access-Control-Request-Method'
 ACL_REQUEST_HEADERS = 'Access-Control-Request-Headers'
+ACL_REQUEST_HEADER_PRIVATE_NETWORK = 'Access-Control-Request-Private-Network'
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']
 CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_ALLOW_HEADERS',
@@ -187,6 +189,10 @@ def get_cors_headers(options, request_headers, request_method):
 
     if options.get('supports_credentials'):
         headers[ACL_CREDENTIALS] = 'true'  # case sensitive
+
+    if ACL_REQUEST_HEADER_PRIVATE_NETWORK in request_headers \
+            and request_headers.get(ACL_REQUEST_HEADER_PRIVATE_NETWORK) == 'true':
+        headers[ACL_RESPONSE_PRIVATE_NETWORK] = 'true'
 
     # This is a preflight request
     # http://www.w3.org/TR/cors/#resource-preflight-requests
