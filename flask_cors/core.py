@@ -48,6 +48,12 @@ CONFIG_OPTIONS = ['CORS_ORIGINS', 'CORS_METHODS', 'CORS_ALLOW_HEADERS',
 # to a view.
 FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 
+# Invalid CORS response data
+INVALID_CORS_STATUS_MIN = 400
+INVALID_CORS_STATUS_MAX = 499
+INVALID_CORS_DEFAULT_STATUS= 200
+INVALID_CORS_RESPONSE_DATA = ['']
+
 # Strange, but this gets the type of a compiled regex, which is otherwise not
 # exposed in a public API.
 RegexObject = type(re.compile(''))
@@ -63,7 +69,7 @@ DEFAULT_OPTIONS = dict(origins='*',
                        resources=r'/*',
                        intercept_exceptions=True,
                        always_send=True,
-                       invalid_cors_status_code=200)
+                       invalid_cors_status_code=INVALID_CORS_DEFAULT_STATUS)
 
 
 def parse_resources(resources):
@@ -237,6 +243,12 @@ def set_cors_headers(resp, options):
     callback
     """
 
+    invalid_cors_status_code = options.get('invalid_cors_status_code')
+    change_body = invalid_cors_status_code != INVALID_CORS_DEFAULT_STATUS
+    if (invalid_cors_status_code < INVALID_CORS_STATUS_MIN
+            or INVALID_CORS_STATUS_MAX < invalid_cors_status_code):
+        invalid_cors_status_code = INVALID_CORS_DEFAULT_STATUS
+
     # If CORS has already been evaluated via the decorator, skip
     if hasattr(resp, FLASK_CORS_EVALUATED):
         LOG.debug('CORS have been already evaluated, skipping')
@@ -253,8 +265,17 @@ def set_cors_headers(resp, options):
 
     LOG.debug('Settings CORS headers: %s', str(headers_to_set))
 
-    for k, v in headers_to_set.items():
-        resp.headers.add(k, v)
+    # Set response code to invalid_cors_status_code when CORS request is invalid.
+    # When invalid_cors_status_code is set to Client Error Response Code,
+    # changes response with status `invalid_cors_status_code` and body
+    # `INVALID_CORS_RESPONSE_DATA`.
+    # Or else changes nothing (response status is 200 and with body).
+    if (ACL_ORIGIN not in headers_to_set.keys() and change_body):
+        resp.status_code = invalid_cors_status_code
+        resp.response = INVALID_CORS_RESPONSE_DATA
+    else:
+        for k, v in headers_to_set.items():
+            resp.headers.add(k, v)
 
     return resp
 
