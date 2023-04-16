@@ -62,7 +62,8 @@ DEFAULT_OPTIONS = dict(origins='*',
                        vary_header=True,
                        resources=r'/*',
                        intercept_exceptions=True,
-                       always_send=True)
+                       always_send=True,
+                       invalid_cors_status_code=200)
 
 
 def parse_resources(resources):
