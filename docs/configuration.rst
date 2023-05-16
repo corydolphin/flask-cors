@@ -114,7 +114,7 @@ App level configuration settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It's good practice to keep your application configuration settings in one place.
-This is also possible with Flask-CORS using the same configuration options in the Flas application's config object.
+This is also possible with Flask-CORS using the same configuration options in the Flask application's config object.
 
 Default settings
 ^^^^^^^^^^^^^^^^
