@@ -1,5 +1,17 @@
 # Change Log
 
+## 3.1.01
+* Include examples to specify that schema and port must be included in … by @YPCrumble in https://github.com/corydolphin/flask-cors/pull/294
+* two small changes to the documentation, based on issue #290 by @bbbart in https://github.com/corydolphin/flask-cors/pull/291
+* Fix typo by @sunarch in https://github.com/corydolphin/flask-cors/pull/304
+* FIX: typo in CSRF by @sattamjh in https://github.com/corydolphin/flask-cors/pull/315
+* Test against recent Python versions by @pylipp in https://github.com/corydolphin/flask-cors/pull/314
+* Correct spelling mistakes by @EdwardBetts in https://github.com/corydolphin/flask-cors/pull/311
+* 'Access-Control-Allow-Private-Network = true' header for http response by @chelo-kjml in https://github.com/corydolphin/flask-cors/pull/318
+* docs: Fix a few typos by @timgates42 in https://github.com/corydolphin/flask-cors/pull/323
+* [Docs] Fix typo in configuration documentation by @sachit-shroff in https://github.com/corydolphin/flask-cors/pull/316
+
+
 ## 3.0.10
 Adds support for PPC64 and ARM64 builds for distribution. Thanks @sreekanth370
 
@@ -17,10 +29,10 @@ Thank you @juanmaneo and @jdevera for the contribution.
 Updated logging.warn to logging.warning (#234) Thanks Vaibhav
 
 ## 3.0.6
-Manual error in release process. Identical contents at 3.0.5. 
+Manual error in release process. Identical contents at 3.0.5.
 
 ## 3.0.5
-Fixes incorrect handling of regexes containing `[`, and a few other special characters. Fixes Issue [#212](https://github.com/corydolphin/flask-cors/issues/212) 
+Fixes incorrect handling of regexes containing `[`, and a few other special characters. Fixes Issue [#212](https://github.com/corydolphin/flask-cors/issues/212)
 
 ## 3.0.4
 Handle response.headers being None. (Fixes issue #217)
