@@ -14,7 +14,7 @@ from flask_cors.core import *
 
 
 class ExposeHeadersTestCase(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/test_default')
@@ -27,12 +27,12 @@ class ExposeHeadersTestCase(FlaskCorsTestCase):
         def test_override():
             return 'Welcome!'
 
-    def test_default(self):
+    def test_default(self) -> None:
         for resp in self.iter_responses('/test_default', origin='www.example.com'):
             self.assertTrue(resp.headers.get(ACL_EXPOSE_HEADERS) is None,
                             "No Access-Control-Expose-Headers by default")
 
-    def test_override(self):
+    def test_override(self) -> None:
         ''' The specified headers should be returned in the ACL_EXPOSE_HEADERS
             and correctly serialized if it is a list.
         '''

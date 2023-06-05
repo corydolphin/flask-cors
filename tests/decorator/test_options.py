@@ -17,7 +17,7 @@ from flask_cors.core import *
 
 
 class OptionsTestCase(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/test_default')
@@ -35,7 +35,7 @@ class OptionsTestCase(FlaskCorsTestCase):
         def test_options_and_not_auto():
             return 'Welcome!'
 
-    def test_defaults(self):
+    def test_defaults(self) -> None:
         '''
             The default behavior should automatically provide OPTIONS
             and return CORS headers.
@@ -48,7 +48,7 @@ class OptionsTestCase(FlaskCorsTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(ACL_ORIGIN in resp.headers)
 
-    def test_no_options_and_not_auto(self):
+    def test_no_options_and_not_auto(self) -> None:
         '''
             If automatic_options is False, and the view func does not provide
             OPTIONS, then Flask's default handling will occur, and no CORS
@@ -62,7 +62,7 @@ class OptionsTestCase(FlaskCorsTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(ACL_ORIGIN in resp.headers)
 
-    def test_options_and_not_auto(self):
+    def test_options_and_not_auto(self) -> None:
         '''
             If OPTIONS is in methods, and automatic_options is False,
             the view function must return a response.

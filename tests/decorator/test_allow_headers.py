@@ -13,7 +13,7 @@ from flask_cors import *
 from flask_cors.core import *
 
 class AllowHeadersTestCaseIntegration(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
 
         @self.app.route('/test_default')
@@ -32,19 +32,19 @@ class AllowHeadersTestCaseIntegration(FlaskCorsTestCase):
         def test_allow_headers_regex():
             return 'Welcome!'
 
-    def test_default(self):
+    def test_default(self) -> None:
         for resp in self.iter_responses('/test_default'):
             self.assertTrue(resp.headers.get(ACL_ALLOW_HEADERS) is None,
                             "Default should have no allowed headers")
 
-    def test_allow_headers_no_request_headers(self):
+    def test_allow_headers_no_request_headers(self) -> None:
         '''
         No ACL_REQUEST_HEADERS sent, ACL_ALLOW_HEADERS should be empty
         '''
         resp = self.preflight('/test_allow_headers', origin='www.example.com')
         self.assertEqual(resp.headers.get(ACL_ALLOW_HEADERS), None)
 
-    def test_allow_headers_with_request_headers(self):
+    def test_allow_headers_with_request_headers(self) -> None:
         '''
             If there is an Access-Control-Request-Method header in the request
             and Access-Control-Request-Method is allowed for cross origin
@@ -58,7 +58,7 @@ class AllowHeadersTestCaseIntegration(FlaskCorsTestCase):
         self.assertEqual(resp.headers.get(ACL_ALLOW_HEADERS),
                          'X-Example-Header-A')
 
-    def test_allow_headers_with_request_headers_case_insensitive(self):
+    def test_allow_headers_with_request_headers_case_insensitive(self) -> None:
         '''
             HTTP headers are case insensitive. We should respect that
             and match regardless of case, returning the casing sent by
@@ -70,7 +70,7 @@ class AllowHeadersTestCaseIntegration(FlaskCorsTestCase):
         self.assertEqual(resp.headers.get(ACL_ALLOW_HEADERS),
                          'X-Example-header-a')
 
-    def test_allow_headers_with_unmatched_request_headers(self):
+    def test_allow_headers_with_unmatched_request_headers(self) -> None:
         '''
             If every element in the Access-Control-Request-Headers is not an
             allowed header, then the matching headers should be returned.
@@ -87,7 +87,7 @@ class AllowHeadersTestCaseIntegration(FlaskCorsTestCase):
         self.assertEqual(resp.headers.get(ACL_ALLOW_HEADERS),
                          'X-Example-Header-A')
 
-    def test_allow_headers_regex(self):
+    def test_allow_headers_regex(self) -> None:
         '''
             If every element in the Access-Control-Request-Headers is not an
             allowed header, then the matching headers should be returned.

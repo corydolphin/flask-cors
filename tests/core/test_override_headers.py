@@ -13,7 +13,7 @@ from flask_cors import *
 from flask_cors.core import *
 
 class ResponseHeadersOverrideTestCaseIntegration(FlaskCorsTestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = Flask(__name__)
         CORS(self.app)
 
@@ -22,7 +22,7 @@ class ResponseHeadersOverrideTestCaseIntegration(FlaskCorsTestCase):
             response = Response(headers={"custom": "dictionary"})
             return 'Welcome'
 
-    def test_override_headers(self):
+    def test_override_headers(self) -> None:
         '''
             Ensure we work even if response.headers is set to something other than a MultiDict.
         '''
