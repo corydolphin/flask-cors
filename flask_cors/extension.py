@@ -8,12 +8,19 @@
     :copyright: (c) 2016 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+import logging
+from urllib.parse import unquote_plus
 from flask import request
-from .core import *
-try:
-    from urllib.parse import unquote_plus
-except ImportError:
-    from urllib import unquote_plus
+
+from .core import (
+    parse_resources,
+    get_cors_options,
+    get_regexp_pattern,
+    ACL_ORIGIN,
+    try_match,
+    set_cors_headers
+)
+
 
 LOG = logging.getLogger(__name__)
 
@@ -149,9 +156,9 @@ class CORS(object):
         # the app's configuration, the constructor, the kwargs to init_app, and
         # finally the options specified in the resources dictionary.
         resources = [
-                     (pattern, get_cors_options(app, options, opts))
-                     for (pattern, opts) in resources
-                    ]
+            (pattern, get_cors_options(app, options, opts))
+            for (pattern, opts) in resources
+        ]
 
         # Create a human readable form of these resources by converting the compiled
         # regular expressions into strings.

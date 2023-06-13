@@ -9,9 +9,11 @@
     :copyright: (c) 2016 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+import logging
 from functools import update_wrapper
 from flask import make_response, request, current_app
-from .core import *
+
+from .core import get_cors_options, set_cors_headers, FLASK_CORS_EVALUATED
 
 LOG = logging.getLogger(__name__)
 

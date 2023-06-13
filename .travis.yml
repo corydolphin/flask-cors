@@ -7,19 +7,14 @@ arch:
   - ppc64le
   - arm64
 python:
-  - '2.7'
-  - '3.4'
-  - '3.5'
-  - '3.6'
-  - '3.7'
   - '3.8'
   - '3.9'
   - '3.10'
+  - '3.11'
   - pypy
 
 matrix:
   exclude:
-    - python: 3.4
     - arch: ppc64le
       python: pypy
     - arch: arm64
@@ -32,9 +27,10 @@ env:
 - DEPEENDENCIES="flask==0.10 werkzeug==0.16.1"
 - DEPEENDENCIES="flask==1.0"
 - DEPEENDENCIES="flask==1.1"
+- DEPEENDENCIES="flask==2.3.2"
 
 install:
-  - pip install -U setuptools pep8 six coverage docutils pygments packaging $DEPEENDENCIES
+  - pip install -U setuptools pep8 coverage docutils pygments packaging $DEPEENDENCIES
 
 script:
   - coverage erase

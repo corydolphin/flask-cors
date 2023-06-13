@@ -9,14 +9,8 @@
 """
 import re
 import logging
-try:
-    # on python 3
-    from collections.abc import Iterable
-except ImportError:
-    # on python 2.7 and pypy
-    from collections import Iterable
+from collections.abc import Iterable
 from datetime import timedelta
-from six import string_types
 from flask import request, current_app
 from werkzeug.datastructures import Headers, MultiDict
 
@@ -52,17 +46,17 @@ FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 # exposed in a public API.
 RegexObject = type(re.compile(''))
 DEFAULT_OPTIONS = dict(origins='*',
-                       methods=ALL_METHODS,
-                       allow_headers='*',
-                       expose_headers=None,
-                       supports_credentials=False,
-                       max_age=None,
-                       send_wildcard=False,
-                       automatic_options=True,
-                       vary_header=True,
-                       resources=r'/*',
-                       intercept_exceptions=True,
-                       always_send=True)
+    methods=ALL_METHODS,
+    allow_headers='*',
+    expose_headers=None,
+    supports_credentials=False,
+    max_age=None,
+    send_wildcard=False,
+    automatic_options=True,
+    vary_header=True,
+    resources=r'/*',
+    intercept_exceptions=True,
+    always_send=True)
 
 
 def parse_resources(resources):
@@ -82,7 +76,7 @@ def parse_resources(resources):
                       key=pattern_length,
                       reverse=True)
 
-    elif isinstance(resources, string_types):
+    elif isinstance(resources, str):
         return [(re_fix(resources), {})]
 
     elif isinstance(resources, Iterable):
@@ -268,8 +262,8 @@ def probably_regex(maybe_regex):
 
 def re_fix(reg):
     """
-        Replace the invalid regex r'*' with the valid, wildcard regex r'/.*' to
-        enable the CORS app extension to have a more user friendly api.
+    Replace the invalid regex r'*' with the valid, wildcard regex r'/.*' to
+    enable the CORS app extension to have a more user friendly api.
     """
     return r'.*' if reg == r'*' else reg
 
@@ -329,9 +323,8 @@ def flexible_str(obj):
     """
     if obj is None:
         return None
-    elif(not isinstance(obj, string_types)
-            and isinstance(obj, Iterable)):
-        return ', '.join(str(item) for item in sorted(obj))
+    elif not isinstance(obj, str) and isinstance(obj, Iterable):
+        return ", ".join(str(item) for item in sorted(obj))
     else:
         return str(obj)
 
@@ -346,7 +339,7 @@ def ensure_iterable(inst):
     """
     Wraps scalars or string types as a list, or returns the iterable instance.
     """
-    if isinstance(inst, string_types):
+    if isinstance(inst, str):
         return [inst]
     elif not isinstance(inst, Iterable):
         return [inst]
@@ -375,7 +368,7 @@ def serialize_options(opts):
     # don't get burned in production.
     if r'.*' in options['origins'] and options['supports_credentials'] and options['send_wildcard']:
         raise ValueError("Cannot use supports_credentials in conjunction with"
-                         "an origin string of '*'. See: "
+            "an origin string of '*'. See: "
                          "http://www.w3.org/TR/cors/#resource-requests")
 
 
