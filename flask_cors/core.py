@@ -46,17 +46,17 @@ FLASK_CORS_EVALUATED = '_FLASK_CORS_EVALUATED'
 # exposed in a public API.
 RegexObject = type(re.compile(''))
 DEFAULT_OPTIONS = dict(origins='*',
-    methods=ALL_METHODS,
-    allow_headers='*',
-    expose_headers=None,
-    supports_credentials=False,
-    max_age=None,
-    send_wildcard=False,
-    automatic_options=True,
-    vary_header=True,
-    resources=r'/*',
-    intercept_exceptions=True,
-    always_send=True)
+                       methods=ALL_METHODS,
+                       allow_headers='*',
+                       expose_headers=None,
+                       supports_credentials=False,
+                       max_age=None,
+                       send_wildcard=False,
+                       automatic_options=True,
+                       vary_header=True,
+                       resources=r'/*',
+                       intercept_exceptions=True,
+                       always_send=True)
 
 
 def parse_resources(resources):
@@ -262,8 +262,8 @@ def probably_regex(maybe_regex):
 
 def re_fix(reg):
     """
-    Replace the invalid regex r'*' with the valid, wildcard regex r'/.*' to
-    enable the CORS app extension to have a more user friendly api.
+        Replace the invalid regex r'*' with the valid, wildcard regex r'/.*' to
+        enable the CORS app extension to have a more user friendly api.
     """
     return r'.*' if reg == r'*' else reg
 
@@ -368,7 +368,7 @@ def serialize_options(opts):
     # don't get burned in production.
     if r'.*' in options['origins'] and options['supports_credentials'] and options['send_wildcard']:
         raise ValueError("Cannot use supports_credentials in conjunction with"
-            "an origin string of '*'. See: "
+                         "an origin string of '*'. See: "
                          "http://www.w3.org/TR/cors/#resource-requests")
 
 

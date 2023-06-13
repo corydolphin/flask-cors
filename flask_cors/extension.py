@@ -156,9 +156,9 @@ class CORS(object):
         # the app's configuration, the constructor, the kwargs to init_app, and
         # finally the options specified in the resources dictionary.
         resources = [
-            (pattern, get_cors_options(app, options, opts))
-            for (pattern, opts) in resources
-        ]
+                     (pattern, get_cors_options(app, options, opts))
+                     for (pattern, opts) in resources
+                    ]
 
         # Create a human readable form of these resources by converting the compiled
         # regular expressions into strings.
