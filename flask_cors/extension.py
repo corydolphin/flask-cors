@@ -8,12 +8,19 @@
     :copyright: (c) 2016 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+import logging
+from urllib.parse import unquote_plus
 from flask import request
-from .core import *
-try:
-    from urllib.parse import unquote_plus
-except ImportError:
-    from urllib import unquote_plus
+
+from .core import (
+    parse_resources,
+    get_cors_options,
+    get_regexp_pattern,
+    ACL_ORIGIN,
+    try_match,
+    set_cors_headers
+)
+
 
 LOG = logging.getLogger(__name__)
 

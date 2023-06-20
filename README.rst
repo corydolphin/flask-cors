@@ -97,6 +97,9 @@ Tests
 A simple set of tests is included in ``test/``. 
 To run, install nose, and simply invoke ``nosetests`` or ``python setup.py test`` to exercise the tests.
 
+If nosetests does not work for you, due to it no longer working with newer python versions.
+You can use pytest to run the tests instead.
+
 Contributing
 ------------
 

@@ -9,14 +9,8 @@
 """
 import re
 import logging
-try:
-    # on python 3
-    from collections.abc import Iterable
-except ImportError:
-    # on python 2.7 and pypy
-    from collections import Iterable
+from collections.abc import Iterable
 from datetime import timedelta
-from six import string_types
 from flask import request, current_app
 from werkzeug.datastructures import Headers, MultiDict
 
@@ -82,7 +76,7 @@ def parse_resources(resources):
                       key=pattern_length,
                       reverse=True)
 
-    elif isinstance(resources, string_types):
+    elif isinstance(resources, str):
         return [(re_fix(resources), {})]
 
     elif isinstance(resources, Iterable):
@@ -329,9 +323,8 @@ def flexible_str(obj):
     """
     if obj is None:
         return None
-    elif(not isinstance(obj, string_types)
-            and isinstance(obj, Iterable)):
-        return ', '.join(str(item) for item in sorted(obj))
+    elif not isinstance(obj, str) and isinstance(obj, Iterable):
+        return ", ".join(str(item) for item in sorted(obj))
     else:
         return str(obj)
 
@@ -346,7 +339,7 @@ def ensure_iterable(inst):
     """
     Wraps scalars or string types as a list, or returns the iterable instance.
     """
-    if isinstance(inst, string_types):
+    if isinstance(inst, str):
         return [inst]
     elif not isinstance(inst, Iterable):
         return [inst]
