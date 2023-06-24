@@ -1,0 +1,30 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10", "3.11"]
+        dependencies:
+            - "flask==0.10.1 werkzeug==0.16.1" # pin werkzeug for Flask 10, 10.1 since Flask does not pin it itself.
+            - "flask==0.10 werkzeug==0.16.1"
+            - "flask==1.0"
+            - "flask==1.1"
+            - "flask==2.3.2"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      # You can test your matrix by printing the current Python version
+      - name: Install deps
+        run: pip install -U setuptools pep8 coverage docutils pygments packaging pytest pytest-cov ${{ matrix.dependencies }}
+      - name: Run tests
+        run: |
+            coverage erase
+            python setup.py clean build install
+            pytest --cov=flask_cors

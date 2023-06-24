@@ -33,10 +33,10 @@ setup(
     platforms='any',
     install_requires=install_requires,
     tests_require=[
-        'nose',
+        'pytest',
         'packaging'
     ],
-    test_suite='nose.collector',
+    test_suite='tests',
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
