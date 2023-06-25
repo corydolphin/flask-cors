@@ -9,10 +9,7 @@ jobs:
       matrix:
         python-version: [ "3.8", "3.9", "3.10", "3.11"]
         dependencies:
-            - "flask==0.10.1 werkzeug==0.16.1" # pin werkzeug for Flask 10, 10.1 since Flask does not pin it itself.
-            - "flask==0.10 werkzeug==0.16.1"
-            - "flask==1.0"
-            - "flask==1.1"
+            - "flask==1.1 Jinja2==3.0.3 itsdangerous==2.0.1 werkzeug==2.0.3"
             - "flask==2.3.2"
     steps:
       - uses: actions/checkout@v3
