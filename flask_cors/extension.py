@@ -160,7 +160,7 @@ class CORS(object):
                      for (pattern, opts) in resources
                     ]
 
-        # Create a human readable form of these resources by converting the compiled
+        # Create a human-readable form of these resources by converting the compiled
         # regular expressions into strings.
         resources_human = {get_regexp_pattern(pattern): opts for (pattern,opts) in resources}
         LOG.debug("Configuring CORS with resources: %s", resources_human)
