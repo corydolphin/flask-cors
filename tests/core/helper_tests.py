@@ -22,10 +22,10 @@ class InternalsTestCase(unittest.TestCase):
         self.assertTrue(try_match('www.com/foo', 'www.com/fo*'))
 
     def test_flexible_str_str(self):
-        self.assertEquals(flexible_str('Bar, Foo, Qux'), 'Bar, Foo, Qux')
+        self.assertEqual(flexible_str('Bar, Foo, Qux'), 'Bar, Foo, Qux')
 
     def test_flexible_str_set(self):
-        self.assertEquals(flexible_str({'Foo', 'Bar', 'Qux'}),
+        self.assertEqual(flexible_str({'Foo', 'Bar', 'Qux'}),
                           'Bar, Foo, Qux')
 
     def test_serialize_options(self):
@@ -43,14 +43,14 @@ class InternalsTestCase(unittest.TestCase):
     def test_get_allow_headers_empty(self):
         options = serialize_options({'allow_headers': r'*'})
 
-        self.assertEquals(get_allow_headers(options, ''), None)
-        self.assertEquals(get_allow_headers(options, None), None)
+        self.assertEqual(get_allow_headers(options, ''), None)
+        self.assertEqual(get_allow_headers(options, None), None)
 
     def test_get_allow_headers_matching(self):
         options = serialize_options({'allow_headers': r'*'})
 
-        self.assertEquals(get_allow_headers(options, 'X-FOO'), 'X-FOO')
-        self.assertEquals(
+        self.assertEqual(get_allow_headers(options, 'X-FOO'), 'X-FOO')
+        self.assertEqual(
             get_allow_headers(options, 'X-Foo, X-Bar'),
             'X-Bar, X-Foo'
         )
@@ -58,9 +58,9 @@ class InternalsTestCase(unittest.TestCase):
     def test_get_allow_headers_matching_none(self):
         options = serialize_options({'allow_headers': r'X-FLASK-.*'})
 
-        self.assertEquals(get_allow_headers(options, 'X-FLASK-CORS'),
+        self.assertEqual(get_allow_headers(options, 'X-FLASK-CORS'),
                           'X-FLASK-CORS')
-        self.assertEquals(
+        self.assertEqual(
             get_allow_headers(options, 'X-NOT-FLASK-CORS'),
             ''
         )
