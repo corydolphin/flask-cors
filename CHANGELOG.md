@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.0.0
+* Remove support for Python versions older than 3.8 by @WAKayser in https://github.com/corydolphin/flask-cors/pull/330
+* Add GHA tooling by @corydolphin in https://github.com/corydolphin/flask-cors/pull/331
+
 ## 3.1.01
 * Include examples to specify that schema and port must be included in … by @YPCrumble in https://github.com/corydolphin/flask-cors/pull/294
 * two small changes to the documentation, based on issue #290 by @bbbart in https://github.com/corydolphin/flask-cors/pull/291
