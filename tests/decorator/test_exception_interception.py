@@ -8,9 +8,9 @@
     :copyright: (c) 2016 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+import importlib.metadata
 import unittest
 
-import flask
 from packaging import version
 from ..base_test import FlaskCorsTestCase
 from flask import Flask, abort
@@ -202,7 +202,7 @@ class NoExceptionInterceptionTestCase(ExceptionInterceptionDefaultTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertFalse(ACL_ORIGIN in resp.headers)
 
-    @unittest.skipIf(version.parse(flask.__version__) >= version.parse("1.1"),
+    @unittest.skipIf(version.parse(importlib.metadata.version("flask")) >= version.parse("1.1"),
                      "Flask 1.1 changed interception behavior, so after request handlers are always run. "
                      "This obviates the need for our hacky interception")
     def test_acl_uncaught_exception_500(self):

@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "test requirements"
+version = "0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+coverage = {extras = ["toml"], version = "*"}
+pytest = "*"
+pytest-randomly = "*"
+pyfakefs = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
