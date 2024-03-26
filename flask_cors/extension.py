@@ -70,9 +70,11 @@ class CORS(object):
         The origin(s) may be regular expressions, case-sensitive strings,
         or else an asterisk.
 
-        :note: origins must include the schema and the port (if not port 80),
-        e.g.,
-        `CORS(app, origins=["http://localhost:8000", "https://example.com"])`.
+        ..  note::
+
+            origins must include the schema and the port (if not port 80),
+            e.g.,
+            `CORS(app, origins=["http://localhost:8000", "https://example.com"])`.
 
         Default : '*'
     :type origins: list, string or regex
