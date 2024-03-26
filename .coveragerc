@@ -1,0 +1,17 @@
+[run]
+branch = true
+parallel = true
+data_file = .tox/.coverage-data-files/.coverage
+source =
+    flask_cors
+    tests
+
+
+[paths]
+source =
+    src
+    */site-packages
+
+
+[report]
+fail_under = 84
