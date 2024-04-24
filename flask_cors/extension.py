@@ -194,7 +194,7 @@ def make_after_request_function(resources):
         for res_regex, res_options in resources:
             if try_match(normalized_path, res_regex):
                 LOG.debug("Request to '%s' matches CORS resource '%s'. Using options: %s",
-                      request.path, get_regexp_pattern(res_regex), res_options)
+                      repr(request.path), get_regexp_pattern(res_regex), res_options)
                 set_cors_headers(resp, res_options)
                 break
         else:
