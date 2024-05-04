@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.0.1
+### Security
+* Address [CVE-2024-1681](https://github.com/advisories/GHSA-84pr-m4jr-85g5) which is a log injection vulnerability when the log level is set to debug by @aneshujevic in https://github.com/corydolphin/flask-cors/pull/351
+
 ## 4.0.0
 * Remove support for Python versions older than 3.8 by @WAKayser in https://github.com/corydolphin/flask-cors/pull/330
 * Add GHA tooling by @corydolphin in https://github.com/corydolphin/flask-cors/pull/331
