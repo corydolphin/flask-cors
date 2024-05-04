@@ -7,14 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.8", "3.9", "3.10", "3.11"]
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12"]
         dependencies:
             - "flask==1.1 Jinja2==3.0.3 itsdangerous==2.0.1 werkzeug==2.0.3"
             - "flask==2.3.2"
+            - "flask==3.0.1"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
