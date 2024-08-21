@@ -23,6 +23,19 @@ CORS_ALLOW_HEADERS (:py:class:`~typing.List` or :py:class:`str`)
    Headers to accept from the client.
    Headers in the :http:header:`Access-Control-Request-Headers` request header (usually part of the preflight OPTIONS request) matching headers in this list will be included in the :http:header:`Access-Control-Allow-Headers` response header.
 
+CORS_ALLOW_PRIVATE_NETWORK (:py:class:`bool`)
+   If True, the response header :http:header:`Access-Control-Allow-Private-Network`
+   will be set with the value 'true' whenever the request header
+   :http:header:`Access-Control-Request-Private-Network` has a value 'true'.
+
+   If False, the reponse header :http:header:`Access-Control-Allow-Private-Network`
+   will be set with the value 'false' whenever the request header
+   :http:header:`Access-Control-Request-Private-Network` has a value of 'true'.
+
+   If the request header :http:header:`Access-Control-Request-Private-Network` is
+   not present or has a value other than 'true', the response header
+   :http:header:`Access-Control-Allow-Private-Network` will not be set.
+
 CORS_ALWAYS_SEND (:py:class:`bool`)
    Usually, if a request doesn't include an :http:header:`Origin` header, the client did not request CORS.
    This means we can ignore this request.
@@ -83,6 +96,7 @@ Default values
 ~~~~~~~~~~~~~~
 
 * CORS_ALLOW_HEADERS: "*"
+* CORS_ALLOW_PRIVATE_NETWORK: True
 * CORS_ALWAYS_SEND: True
 * CORS_AUTOMATIC_OPTIONS: True
 * CORS_EXPOSE_HEADERS: None
