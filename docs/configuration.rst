@@ -54,13 +54,13 @@ CORS_INTERCEPT_EXCEPTIONS (:py:class:`bool`)
    Whether to deal with Flask exception handlers or leave them alone (with respect to CORS headers).
 
 CORS_MAX_AGE (:py:class:`~datetime.timedelta`, :py:class:`int` or :py:class:`str`)
-   The maximum time for which this CORS request may be cached. 
+   The maximum time for which this CORS request may be cached.
    This value is set as the :http:header:`Access-Control-Max-Age` header.
 
 CORS_METHODS (:py:class:`~typing.List` or :py:class:`str`)
    The method(s) which the allowed origins are allowed to access.
    These are included in the :http:header:`Access-Control-Allow-Methods` response headers to the preflight OPTIONS requests.
-   
+
 .. _cors_origins_setting:
 
 CORS_ORIGINS (:py:class:`~typing.List`, :py:class:`str` or :py:class:`re.Pattern`)
@@ -68,23 +68,23 @@ CORS_ORIGINS (:py:class:`~typing.List`, :py:class:`str` or :py:class:`re.Pattern
    An origin configured here that matches the value of the :http:header:`Origin` header in a preflight OPTIONS request is returned as the value of the :http:header:`Access-Control-Allow-Origin` response header.
 
 CORS_RESOURCES (:py:class:`~typing.Dict`, :py:class:`~typing.List` or :py:class:`str`)
-   The series of regular expression and (optionally) associated CORS options to be applied to the given resource path.                       
-   
+   The series of regular expression and (optionally) associated CORS options to be applied to the given resource path.
+
    If the value is a dictionary, it's keys must be regular expressions matching resources, and the values must be another dictionary of configuration options, as described in this section.
-   
-   If the argument is a list, it is expected to be a list of regular expressions matching resources for which the app-wide configured options are applied.     
-   
-   If the argument is a string, it is expected to be a regular expression matching resources for which the app-wide configured options are applied.        
+
+   If the argument is a list, it is expected to be a list of regular expressions matching resources for which the app-wide configured options are applied.
+
+   If the argument is a string, it is expected to be a regular expression matching resources for which the app-wide configured options are applied.
 
 CORS_SEND_WILDCARD (:py:class:`bool`)
    If :ref:`CORS_ORIGINS <cors_origins_setting>` is ``"*"`` and this is true, then the :http:header:`Access-Control-Allow-Origin` response header's value with be ``"*"`` as well, instead of the value of the :http:header:`Origin` request header.
 
 CORS_SUPPORTS_CREDENTIALS (:py:class:`bool`)
-   Allows users to make authenticated requests. 
-   If true, injects the :http:header:`Access-Control-Allow-Credentials` header in responses. 
-   This allows cookies and credentials to be submitted across domains.                 
-   
-   :note: This option cannot be used in conjunction with a "*" origin  
+   Allows users to make authenticated requests.
+   If true, injects the :http:header:`Access-Control-Allow-Credentials` header in responses.
+   This allows cookies and credentials to be submitted across domains.
+
+   :note: This option cannot be used in conjunction with a "*" origin
 
 CORS_VARY_HEADER: (:py:class:`bool`)
    Enables or disables the injection of the :http:header:`Vary` response header is set to ``Origin``.
@@ -96,7 +96,7 @@ Default values
 ~~~~~~~~~~~~~~
 
 * CORS_ALLOW_HEADERS: "*"
-* CORS_ALLOW_PRIVATE_NETWORK: True
+* CORS_ALLOW_PRIVATE_NETWORK: False
 * CORS_ALWAYS_SEND: True
 * CORS_AUTOMATIC_OPTIONS: True
 * CORS_EXPOSE_HEADERS: None

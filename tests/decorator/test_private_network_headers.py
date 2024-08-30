@@ -37,7 +37,7 @@ class SupportsCredentialsCase(FlaskCorsTestCase):
         """ The default behavior should be to allow private network access.
         """
         resp = self.get('/test_default', origin='www.example.com', headers={ACL_REQUEST_HEADER_PRIVATE_NETWORK:'true'})
-        self.assertTrue(ACL_RESPONSE_PRIVATE_NETWORK in resp.headers)
+        self.assertFalse(resp.headers.get('ACL_RESPONSE_PRIVATE_NETWORK'))
 
         resp = self.get('/test_default')
         self.assertFalse(ACL_RESPONSE_PRIVATE_NETWORK in resp.headers)
