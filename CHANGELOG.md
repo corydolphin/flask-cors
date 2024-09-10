@@ -2,7 +2,13 @@
 
 ## 5.0.0
 ### Security
-* Breaking: Change default to disable private network access by @corydolphin in #368. This effectively resolves GHSA-hxwh-jpp2-84pm https://osv.dev/vulnerability/PYSEC-2024-71
+* Breaking: Change default to disable private network access by @corydolphin in https://github.com/corydolphin/flask-cors/pull/368. This effectively resolves GHSA-hxwh-jpp2-84pm https://osv.dev/vulnerability/PYSEC-2024-71
+
+## 4.0.2
+* Bump requests from 2.31.0 to 2.32.0 in /docs by @dependabot in https://github.com/corydolphin/flask-cors/pull/358
+* Backwards Compatible Fix for CVE-2024-6221 by @adrianosela in https://github.com/corydolphin/flask-cors/pull/363
+* Add unit tests for Private-Network by @corydolphin in https://github.com/corydolphin/flask-cors/pull/367
+
 
 ## 4.0.1
 ### Security
