@@ -1,5 +1,9 @@
 # Change Log
 
+## 5.0.0
+### Security
+* Breaking: Change default to disable private network access by @corydolphin in #368. This effectively resolves GHSA-hxwh-jpp2-84pm https://osv.dev/vulnerability/PYSEC-2024-71
+
 ## 4.0.1
 ### Security
 * Address [CVE-2024-1681](https://github.com/advisories/GHSA-84pr-m4jr-85g5) which is a log injection vulnerability when the log level is set to debug by @aneshujevic in https://github.com/corydolphin/flask-cors/pull/351
