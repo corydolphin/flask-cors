@@ -137,7 +137,7 @@ def get_cors_origins(options, request_origin):
         if wildcard:
             # If wildcard is in the origins, even if 'send_wildcard' is False,
             # simply send the wildcard. Unless supports_credentials is True,
-            # since that is forbidded by the spec..
+            # since that is forbidden by the spec..
             # It is the most-likely to be correct thing to do (the only other
             # option is to return nothing, which  almost certainly not what
             # the developer wants if the '*' origin was specified.
