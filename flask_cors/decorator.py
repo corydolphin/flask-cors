@@ -127,7 +127,7 @@ def cross_origin(*args, **kwargs):
             if options.get('automatic_options') and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
             else:
-                resp = make_response(f(*args, **kwargs))
+                resp = make_response(current_app.ensure_sync(f)(*args, **kwargs))
 
             set_cors_headers(resp, options)
             setattr(resp, FLASK_CORS_EVALUATED, True)
