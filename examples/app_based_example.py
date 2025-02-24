@@ -7,38 +7,42 @@ to add cross origin support to your flask app!
 :copyright: (c) 2016 by Cory Dolphin.
 :license:   MIT/X11, see LICENSE for more details.
 """
-from flask import Flask, jsonify
+
 import logging
+
+from flask import Flask, jsonify
+
 try:
     from flask_cors import CORS  # The typical way to import flask-cors
 except ImportError:
     # Path hack allows examples to be run without installation.
     import os
+
     parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parentdir)
 
     from flask_cors import CORS
 
 
-app = Flask('FlaskCorsAppBasedExample')
+app = Flask("FlaskCorsAppBasedExample")
 logging.basicConfig(level=logging.INFO)
 
 # To enable logging for flask-cors,
-logging.getLogger('flask_cors').level = logging.DEBUG
+logging.getLogger("flask_cors").level = logging.DEBUG
 
 # One of the simplest configurations. Exposes all resources matching /api/* to
 # CORS and allows the Content-Type header, which is necessary to POST JSON
 # cross origin.
-CORS(app, resources=r'/api/*')
+CORS(app, resources=r"/api/*")
 
 
 @app.route("/")
 def helloWorld():
     """
-        Since the path '/' does not match the regular expression r'/api/*',
-        this route does not have CORS headers set.
+    Since the path '/' does not match the regular expression r'/api/*',
+    this route does not have CORS headers set.
     """
-    return '''
+    return """
 <html>
     <h1>Hello CORS!</h1>
     <h3> End to end editable example with jquery! </h3>
@@ -46,7 +50,8 @@ def helloWorld():
     <script src="//static.jsbin.com/js/embed.min.js?3.35.12"></script>
 
 </html>
-'''
+"""
+
 
 @app.route("/api/v1/users/")
 def list_users():
@@ -72,7 +77,7 @@ def list_users():
     return jsonify(user="joe")
 
 
-@app.route("/api/v1/users/create", methods=['POST'])
+@app.route("/api/v1/users/create", methods=["POST"])
 def create_user():
     """
         Since the path matches the regular expression r'/api/*', this resource
@@ -115,6 +120,7 @@ def create_user():
     """
     return jsonify(success=True)
 
+
 @app.route("/api/exception")
 def get_exception():
     """
@@ -140,9 +146,10 @@ def get_exception():
     """
     raise Exception("example")
 
+
 @app.errorhandler(500)
 def server_error(e):
-    logging.exception('An error occurred during a request. %s', e)
+    logging.exception("An error occurred during a request. %s", e)
     return "An internal error occurred", 500
 
 

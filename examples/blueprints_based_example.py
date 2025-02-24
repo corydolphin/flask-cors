@@ -7,26 +7,31 @@ to add cross origin support to your flask app!
 :copyright: (c) 2016 by Cory Dolphin.
 :license:   MIT/X11, see LICENSE for more details.
 """
-from flask import Flask, jsonify, Blueprint
+
 import logging
+
+from flask import Blueprint, Flask, jsonify
+
 try:
     from flask_cors import CORS  # The typical way to import flask-cors
 except ImportError:
     # Path hack allows examples to be run without installation.
     import os
+
     parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parentdir)
 
     from flask_cors import CORS
 
 
-api_v1 = Blueprint('API_v1', __name__)
+api_v1 = Blueprint("API_v1", __name__)
 
-CORS(api_v1) # enable CORS on the API_v1 blue print
+CORS(api_v1)  # enable CORS on the API_v1 blue print
+
 
 @api_v1.route("/api/v1/users/")
 def list_users():
-    '''
+    """
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set. The expected result is as follows:
 
@@ -44,13 +49,13 @@ def list_users():
             "success": true
         }
 
-    '''
+    """
     return jsonify(user="joe")
 
 
-@api_v1.route("/api/v1/users/create", methods=['POST'])
+@api_v1.route("/api/v1/users/create", methods=["POST"])
 def create_user():
-    '''
+    """
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set.
 
@@ -88,24 +93,26 @@ def create_user():
           "success": true
         }
 
-    '''
+    """
     return jsonify(success=True)
 
-public_routes = Blueprint('public', __name__)
+
+public_routes = Blueprint("public", __name__)
+
 
 @public_routes.route("/")
 def helloWorld():
-    '''
-        Since the path '/' does not match the regular expression r'/api/*',
-        this route does not have CORS headers set.
-    '''
-    return '''<h1>Hello CORS!</h1> Read about my spec at the
+    """
+    Since the path '/' does not match the regular expression r'/api/*',
+    this route does not have CORS headers set.
+    """
+    return """<h1>Hello CORS!</h1> Read about my spec at the
 <a href="http://www.w3.org/TR/cors/">W3</a> Or, checkout my documentation
-on <a href="https://github.com/corydolphin/flask-cors">Github</a>'''
+on <a href="https://github.com/corydolphin/flask-cors">Github</a>"""
 
 
 logging.basicConfig(level=logging.INFO)
-app = Flask('FlaskCorsBlueprintBasedExample')
+app = Flask("FlaskCorsBlueprintBasedExample")
 app.register_blueprint(api_v1)
 app.register_blueprint(public_routes)
 
