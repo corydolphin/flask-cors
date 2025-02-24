@@ -1,0 +1,69 @@
+site_name: flask-cors
+repo_url: https://github.com/corydolphin/flask-cors
+site_url: https://corydolphin.github.io/flask-cors
+site_description: CORS
+site_author: Cory Dolphin
+edit_uri: edit/main/docs/
+repo_name: corydolphin/flask-cors
+copyright: Maintained by <a href="https://corydolphin.com">corydolphin</a>.
+
+nav:
+  - Home: index.md
+  - API Docs:
+      - Extension: extension.md
+      - Decorator: decorator.md
+  - Examples:
+      - Extension: examples/extension.md
+      - Decorator: examples/decorator.md
+      - Decorator: examples/blueprints.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["flask_cors"]
+          options:
+            docstring_style: sphinx
+theme:
+  name: material
+  feature:
+    tabs: true
+  features:
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/corydolphin/flask-cors
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/flask-cors
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

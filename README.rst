@@ -91,14 +91,12 @@ If things aren't working as you expect, enable logging to help understand what i
     logging.getLogger('flask_cors').level = logging.DEBUG
 
 
-Tests
------
 
-A simple set of tests is included in ``test/``.
-To run, install nose, and simply invoke ``nosetests`` or ``python setup.py test`` to exercise the tests.
+Set Up Your Development Environment
+---
+The development environment uses `uv` for Python version management as well as dependency management.
+There are helpful Makefile targets to do everything you need. Use `make test` to get started!
 
-If nosetests does not work for you, due to it no longer working with newer python versions.
-You can use pytest to run the tests instead.
 
 Contributing
 ------------
