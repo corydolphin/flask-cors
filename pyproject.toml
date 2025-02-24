@@ -47,6 +47,8 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 py-modules = ["flask_cors"]
+# This is a workaround for https://github.com/astral-sh/uv/issues/9513
+license-files = []
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
