@@ -36,7 +36,6 @@ See the full list of options in the `documentation <https://flask-cors.readthedo
 
 .. code:: python
 
-
     from flask import Flask
     from flask_cors import CORS
 
@@ -70,6 +69,8 @@ Simply add ``@cross_origin()`` below a call to Flask's ``@app.route(..)`` to all
 See the full list of options in the `decorator documentation <https://flask-cors.readthedocs.io/en/latest/api.html#decorator>`__.
 
 .. code:: python
+
+    from flask_cors import cross_origin
 
     @app.route("/")
     @cross_origin()
