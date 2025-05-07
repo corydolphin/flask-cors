@@ -1,0 +1,8 @@
+// Font Stack Function
+//
+// Returns a full font stack based on the given fontface and its variant.
+
+@function font-stack($family, $variant: 'regular') {
+  @warn '`font-stack` will be deprecated in verion 1.0.0. Please use `font-family` instead, which uses the same signature.';
+  @return font-family($family, $variant);
+}
