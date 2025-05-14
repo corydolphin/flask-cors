@@ -378,5 +378,61 @@ class AppExtensionBadRegexp(FlaskCorsTestCase):
             self.assertEqual(resp.status_code, 200)
 
 
+class AppExtensionPlusInPath(FlaskCorsTestCase):
+    '''
+        Regression test for CVE-2024-6844:
+        Ensures that we correctly differentiate '+' from ' ' in URL paths.
+    '''
+
+    def setUp(self):
+        self.app = Flask(__name__)
+        CORS(self.app, resources={
+            r'/service\+path': {'origins': ['http://foo.com']},
+            r'/service path': {'origins': ['http://bar.com']},
+        })
+
+        @self.app.route('/service+path')
+        def plus_path():
+            return 'plus'
+
+        @self.app.route('/service path')
+        def space_path():
+            return 'space'
+
+        self.client = self.app.test_client()
+
+    def test_plus_path_origin_allowed(self):
+        '''
+        Ensure that CORS matches + literally and allows the correct origin
+        '''
+        response = self.client.get('/service+path', headers={'Origin': 'http://foo.com'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get(ACL_ORIGIN), 'http://foo.com')
+
+    def test_space_path_origin_allowed(self):
+        '''
+        Ensure that CORS treats /service path differently and allows correct origin
+        '''
+        response = self.client.get('/service%20path', headers={'Origin': 'http://bar.com'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get(ACL_ORIGIN), 'http://bar.com')
+
+    def test_plus_path_rejects_other_origin(self):
+        '''
+        Origin not allowed for + path should be rejected
+        '''
+        response = self.client.get('/service+path', headers={'Origin': 'http://bar.com'})
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.headers.get(ACL_ORIGIN))
+
+    def test_space_path_rejects_other_origin(self):
+        '''
+        Origin not allowed for space path should be rejected
+        '''
+        response = self.client.get('/service%20path', headers={'Origin': 'http://foo.com'})
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.headers.get(ACL_ORIGIN))
+
+
 if __name__ == "__main__":
     unittest.main()
