@@ -1,0 +1,15 @@
+// Font Family Key Function
+//
+// Returns the key for a font family, or the key for an aliased font family.
+
+@function font-family-key($family) {
+  @if (map-has-key($fonts, $family)) {
+    @return $family;
+  }
+  @else if (variable-exists(font-aliases) and map-has-key($font-aliases, $family)) {
+    @return map-get($font-aliases, $family);
+  }
+  @else {
+    @return flask-error('Could not find requested font `#{$family}` in `$fonts` or `$font-aliases`.');
+  }
+}
