@@ -17,9 +17,12 @@ from flask_cors.core import *
 
 
 class InternalsTestCase(unittest.TestCase):
-    def test_try_match(self):
-        self.assertFalse(try_match('www.com/foo', 'www.com/fo'))
-        self.assertTrue(try_match('www.com/foo', 'www.com/fo*'))
+    def test_try_match_pattern(self):
+        self.assertFalse(try_match_pattern('www.com/foo', 'www.com/fo', caseSensitive=True))
+        self.assertTrue(try_match_pattern('www.com/foo', 'www.com/fo*', caseSensitive=True))
+        self.assertTrue(try_match_pattern('www.com', 'WwW.CoM', caseSensitive=False))
+        self.assertTrue(try_match_pattern('/foo', '/fo*', caseSensitive=True))
+        self.assertFalse(try_match_pattern('/foo', '/Fo*', caseSensitive=True))
 
     def test_flexible_str_str(self):
         self.assertEqual(flexible_str('Bar, Foo, Qux'), 'Bar, Foo, Qux')
