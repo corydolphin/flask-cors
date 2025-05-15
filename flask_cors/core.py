@@ -69,14 +69,17 @@ def parse_resources(resources):
         # resource of '*', which is not actually a valid regexp.
         resources = [(re_fix(k), v) for k, v in resources.items()]
 
-        # Sort by regex length to provide consistency of matching and
-        # to provide a proxy for specificity of match. E.G. longer
-        # regular expressions are tried first.
-        def pattern_length(pair):
-            maybe_regex, _ = pair
-            return len(get_regexp_pattern(maybe_regex))
+        # Sort patterns with static (literal) paths first, then by regex specificity
+        def sort_key(pair):
+            pattern, _ = pair
+            if isinstance(pattern, RegexObject):
+                return (1, 0, pattern.pattern.count("/"), -len(pattern.pattern))
+            elif probably_regex(pattern):
+                return (1, 1, pattern.count("/"), -len(pattern))
+            else:
+                return (0, 0, pattern.count("/"), -len(pattern))
 
-        return sorted(resources, key=pattern_length, reverse=True)
+        return sorted(resources, key=sort_key)
 
     elif isinstance(resources, str):
         return [(re_fix(resources), {})]

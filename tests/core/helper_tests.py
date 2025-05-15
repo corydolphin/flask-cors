@@ -81,7 +81,7 @@ class InternalsTestCase(unittest.TestCase):
 
         self.assertEqual(
             [r[0] for r in resources],
-            [re.compile(r'/api/v1/.*'), '/foo', re.compile(r'/.*')]
+            ['/foo', re.compile(r'/api/v1/.*'), re.compile(r'/.*')]
         )
 
     def test_probably_regex(self):
