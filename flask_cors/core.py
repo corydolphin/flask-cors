@@ -300,7 +300,7 @@ def try_match_pattern(value, pattern, caseSensitive=True):
     try:
         v = str(value)
         p = str(pattern)
-        return v == p if caseSensitive else v.lower() == p.lower()
+        return v == p if caseSensitive else v.casefold() == p.casefold()
     except Exception:
         return value == pattern
 
