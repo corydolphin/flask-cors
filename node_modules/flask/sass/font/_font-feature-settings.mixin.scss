@@ -1,0 +1,10 @@
+
+// Used primarily with font mixins.
+@mixin font-feature-settings($type: 'kern') {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: '#{$type}';
+  -webkit-font-feature-settings: '#{$type}';
+  -moz-font-feature-settings: '#{$type}';
+  -moz-font-feature-settings: '#{$type}=1';
+}

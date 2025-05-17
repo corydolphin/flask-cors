@@ -1,0 +1,35 @@
+{
+  "name": "flask",
+  "version": "0.2.10",
+  "description": "Helper files for Sass projects.",
+  "main": "sass/_flask.scss",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaradlight/flask.git"
+  },
+  "keywords": [
+    "css",
+    "sass",
+    "utility"
+  ],
+  "author": "Jarad Light (https://github.com/jaradlight)",
+  "contributors": [
+    "Chris Eastwood (https://github.com/drclaw)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jaradlight/flask/issues"
+  },
+  "homepage": "https://github.com/jaradlight/flask",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-mocha": "^2.1.3",
+    "gulp-shell": "^0.5.1",
+    "path": "^0.12.7",
+    "sass-true": "^2.0.2",
+    "sassdoc": "^2.1.15"
+  }
+}
