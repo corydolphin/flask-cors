@@ -3,7 +3,7 @@ name = "flask-cors"
 version = "0.0.1"
 description = "A Flask extension simplifying CORS support"
 authors = [{ name = "Cory Dolphin", email = "corydolphin@gmail.com" }]
-readme = "README.md"
+readme = "README.rst"
 keywords = ['python']
 requires-python = ">=3.9,<4.0"
 classifiers = [
