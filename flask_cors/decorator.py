@@ -67,7 +67,7 @@ def cross_origin(*args, **kwargs):
     :type supports_credentials: bool
 
     :param max_age:
-        The maximum time for which this CORS request maybe cached. This value
+        The maximum time for which this CORS request may be cached. This value
         is set as the `Access-Control-Max-Age` header.
 
         Default : None
