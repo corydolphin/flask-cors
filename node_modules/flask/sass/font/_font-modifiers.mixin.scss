@@ -1,0 +1,24 @@
+@mixin font-modifiers($name, $italic, $bold, $bold-italic) {
+  em,
+  i {
+    font-family: font-family($name, $italic);
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  strong,
+  b {
+    font-family: font-family($name, $bold);
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  strong em,
+  strong i,
+  b em,
+  b i {
+    font-family: font-family($name, $bold-italic);
+    font-weight: normal;
+    font-style: normal;
+  }
+}
