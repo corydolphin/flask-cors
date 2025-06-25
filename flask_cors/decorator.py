@@ -102,6 +102,24 @@ def cross_origin(*args, **kwargs):
         Default : True
     :type automatic_options: bool
 
+    :param invalid_cors_status_code:
+        Response status code when CORS request is invalid.
+
+        According to the CORS spec documentation from
+        `WHATWG <setuptools pep8 six coverage docutils pygments packaging>`_,
+        any response status code can be returned for CORS request.
+        Sometimes, for security, you wish flask_cors just returns HTTP
+        reponse without processing the HTTP request.
+
+        If `invalid_cors_status_code` set to client error response, from 400
+        to 499, flask_cors just returns HTTP response with that status code
+        and process nothing to the HTTP request.
+        Or else, flask_cors returns HTTP response with status code 200 and
+        response content to the HTTP request.
+
+        Default : 200
+    :type vary_header: int
+
     """
     _options = kwargs
 
