@@ -208,15 +208,9 @@ def get_cors_headers(options, request_headers, request_method):
 
     # http://www.w3.org/TR/cors/#resource-implementation
     if options.get('vary_header'):
-        # Only set header if the origin returned will vary dynamically,
-        # i.e. if we are not returning an asterisk, and there are multiple
-        # origins that can be matched.
-        if headers[ACL_ORIGIN] == '*':
-            pass
-        elif (len(options.get('origins')) > 1 or
-              len(origins_to_set) > 1 or
-              any(map(probably_regex, options.get('origins')))):
-            headers.add('Vary', 'Origin')
+        # Always set a vary header, so that intermediate caches know
+        # that there might be varying versions of this resource.
+        headers.add('Vary', 'Origin')
 
     return MultiDict((k, v) for k, v in headers.items() if v)
 
