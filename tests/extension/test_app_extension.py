@@ -378,5 +378,28 @@ class AppExtensionBadRegexp(FlaskCorsTestCase):
             self.assertEqual(resp.status_code, 200)
 
 
+class AppExtensionPreflight(FlaskCorsTestCase):
+    def test_preflight(self):
+        ''' Ensure that view function methods override app level defaults '''
+        self.app = Flask(__name__)
+        CORS(self.app)
+
+        @self.app.route('/')
+        def index():
+            return 'Welcome'
+
+        @self.app.route('/test', methods=['POST'])
+        def index2():
+            return 'Welcome 2'
+
+        res = self.preflight('/', 'GET', origin='www.example.com')
+        self.assertTrue('POST' not in res.headers.get(ACL_METHODS))
+        self.assertTrue('GET' in res.headers.get(ACL_METHODS))
+
+        res = self.preflight('/test', 'POST', origin='www.example.com')
+        self.assertTrue('POST' in res.headers.get(ACL_METHODS))
+        self.assertTrue('GET' not in res.headers.get(ACL_METHODS))
+
+
 if __name__ == "__main__":
     unittest.main()

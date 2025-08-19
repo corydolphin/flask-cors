@@ -126,6 +126,11 @@ def cross_origin(*args, **kwargs):
 
             if options.get('automatic_options') and request.method == 'OPTIONS':
                 resp = current_app.make_default_options_response()
+                # if decorator does not have methods, then use the allowed methods
+                # from the view function. view function methods are preferred to
+                # decorator but not to app level options.
+                if 'methods' not in _options and resp.headers.get('allow'):
+                    options['methods'] = resp.headers.get('allow')
             else:
                 resp = make_response(f(*args, **kwargs))
 
