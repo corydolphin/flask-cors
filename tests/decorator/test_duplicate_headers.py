@@ -6,6 +6,7 @@
     Flask-Cors tests module
 """
 
+import unittest
 from ..base_test import FlaskCorsTestCase
 from flask import Flask, Response
 

@@ -177,7 +177,7 @@ def get_allow_headers(options, acl_request_headers):
 
 def get_cors_headers(options, request_headers, request_method):
     origins_to_set = get_cors_origins(options, request_headers.get("Origin"))
-    headers = MultiDict()
+    headers: MultiDict = MultiDict()
 
     if not origins_to_set:  # CORS is not enabled for this route
         return headers
@@ -185,7 +185,8 @@ def get_cors_headers(options, request_headers, request_method):
     for origin in origins_to_set:
         headers.add(ACL_ORIGIN, origin)
 
-    headers[ACL_EXPOSE_HEADERS] = options.get("expose_headers")
+    if options.get("expose_headers"):
+        headers[ACL_EXPOSE_HEADERS] = options.get("expose_headers")
 
     if options.get("supports_credentials"):
         headers[ACL_CREDENTIALS] = "true"  # case sensitive

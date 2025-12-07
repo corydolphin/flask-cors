@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import unittest
 from ..base_test import FlaskCorsTestCase
 from flask import Flask
 

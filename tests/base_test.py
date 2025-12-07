@@ -16,6 +16,8 @@ from flask_cors.core import *
 
 
 class FlaskCorsTestCase(unittest.TestCase):
+    app: Flask
+
     def shortDescription(self):
         """
         Get's the one liner description to be displayed.
