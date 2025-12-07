@@ -110,3 +110,9 @@ skip_empty = true
 [tool.coverage.run]
 branch = true
 source = ["flask_cors"]
+
+[tool.mypy]
+# Global options:
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = true

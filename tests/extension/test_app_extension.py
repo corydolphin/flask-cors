@@ -10,6 +10,7 @@
 """
 
 import re
+import unittest
 from ..base_test import FlaskCorsTestCase
 from flask import Flask, jsonify
 
