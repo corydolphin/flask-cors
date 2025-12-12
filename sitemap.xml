@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://corydolphin.github.io/flask-cors/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+    <url>
+         <loc>https://corydolphin.github.io/flask-cors/decorator/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+    <url>
+         <loc>https://corydolphin.github.io/flask-cors/extension/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+    <url>
+         <loc>https://corydolphin.github.io/flask-cors/examples/blueprints/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+    <url>
+         <loc>https://corydolphin.github.io/flask-cors/examples/decorator/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+    <url>
+         <loc>https://corydolphin.github.io/flask-cors/examples/extension/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+</urlset>
