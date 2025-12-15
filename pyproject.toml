@@ -6,6 +6,7 @@ authors = [{ name = "Cory Dolphin", email = "corydolphin@gmail.com" }]
 readme = "README.rst"
 keywords = ['python']
 license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.9,<4.0"
 classifiers = [
     "Intended Audience :: Developers",
