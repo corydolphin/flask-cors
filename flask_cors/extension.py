@@ -56,9 +56,14 @@ class CORS:
 
         ..  note::
 
-            origins must include the schema and the port (if not port 80),
+            origins must include the scheme and the port (if different than default),
             e.g.,
             `CORS(app, origins=["http://localhost:8000", "https://example.com"])`.
+
+            when using regexes, escape needed characters and assert end of string
+            e.g.,
+            `CORS(app, origins=[r"https://.*\\.example\\.com\\Z"])
+            And not `r"https://.*\\.example\\.com"` which would allow `https://a.example.com.attacker.com`
 
         Default : '*'
     :type origins: list, string or regex
