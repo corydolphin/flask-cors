@@ -1,0 +1,16 @@
+// Palette Color Key Function
+//
+// Returns the key for a palette color, or the key for an aliased palette color.
+// Returns false if key is not found in $palettes of $palette-aliases.
+
+@function palette-color-key($color) {
+  @if (map-has-key($palettes, $color)) {
+    @return $color;
+  }
+  @else if (variable-exists(palette-aliases) and map-has-key($palette-aliases, $color)) {
+    @return map-get($palette-aliases, $color);
+  }
+  @else {
+    @return flask-error('Could not find requested color `#{$color}` in `$palettes` or `$palette-aliases`.');
+  }
+}

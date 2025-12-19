@@ -1,0 +1,7 @@
+// Font Family Function
+//
+// Returns a full font family based on the given fontface and its variant.
+
+@function font-family($family, $variant: 'regular') {
+  @return font-name($family, $variant), font-fallback($family);
+}

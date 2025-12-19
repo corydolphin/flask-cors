@@ -1,0 +1,19 @@
+// Scss Font Name Mixin
+//
+// Based on:
+// http://erskinedesign.com/blog/friendlier-colour-names-sass-maps/
+
+// Looks in the map variable $font for the requested font name string.
+// Look at sass/variables/_fonts.scss
+
+@function font-name($family, $variant: 'regular') {
+  $family-key: font-family-key($family);
+
+  @if (type-of($family-key) == list) {
+    @return font-name(nth($family-key, 1), nth($family-key, 2));
+  }
+
+  @if ($family-key and map-has-key($fonts, $family-key)) {
+    @return map-get(map-get($fonts, $family-key), $variant);
+  }
+}

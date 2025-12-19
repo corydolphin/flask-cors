@@ -1,0 +1,8 @@
+// Font Family Mixin
+//
+// Adds the font family property, populated with the output of the
+// font-family function based on a given fontface and its variant.
+
+@mixin font-family($family, $variant: 'regular') {
+  font-family: font-family($family, $variant);
+}
