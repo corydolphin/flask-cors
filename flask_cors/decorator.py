@@ -1,5 +1,6 @@
 import logging
 from functools import update_wrapper
+from inspect import iscoroutinefunction
 
 from flask import current_app, make_response, request
 
@@ -111,19 +112,36 @@ def cross_origin(*args, **kwargs):
             f.required_methods.add("OPTIONS")
             f.provide_automatic_options = False
 
-        def wrapped_function(*args, **kwargs):
-            # Handle setting of Flask-Cors parameters
-            options = get_cors_options(current_app, _options)
+        # Check if the wrapped function is async to support Flask 2.0+ async views
+        if iscoroutinefunction(f):
+            async def async_wrapped_function(*args, **kwargs):
+                # Handle setting of Flask-Cors parameters
+                options = get_cors_options(current_app, _options)
 
-            if options.get("automatic_options") and request.method == "OPTIONS":
-                resp = current_app.make_default_options_response()
-            else:
-                resp = make_response(f(*args, **kwargs))
+                if options.get("automatic_options") and request.method == "OPTIONS":
+                    resp = current_app.make_default_options_response()
+                else:
+                    resp = make_response(await f(*args, **kwargs))
 
-            set_cors_headers(resp, options)
-            setattr(resp, FLASK_CORS_EVALUATED, True)
-            return resp
+                set_cors_headers(resp, options)
+                setattr(resp, FLASK_CORS_EVALUATED, True)
+                return resp
 
-        return update_wrapper(wrapped_function, f)
+            return update_wrapper(async_wrapped_function, f)
+        else:
+            def wrapped_function(*args, **kwargs):
+                # Handle setting of Flask-Cors parameters
+                options = get_cors_options(current_app, _options)
+
+                if options.get("automatic_options") and request.method == "OPTIONS":
+                    resp = current_app.make_default_options_response()
+                else:
+                    resp = make_response(f(*args, **kwargs))
+
+                set_cors_headers(resp, options)
+                setattr(resp, FLASK_CORS_EVALUATED, True)
+                return resp
+
+            return update_wrapper(wrapped_function, f)
 
     return decorator

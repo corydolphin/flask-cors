@@ -23,6 +23,9 @@ dependencies = [
     "Werkzeug>=0.7"
 ]
 
+[project.optional-dependencies]
+async = ["asgiref>=3.2"]
+
 [project.urls]
 Homepage = "https://corydolphin.github.io/flask-cors/"
 Repository = "https://github.com/corydolphin/flask-cors"
@@ -31,6 +34,8 @@ Documentation = "https://corydolphin.github.io/flask-cors/"
 [dependency-groups]
 dev = [
     "pytest>=7.2.0",
+    "pytest-asyncio>=0.23.0",
+    "asgiref>=3.2",
     "pre-commit>=2.20.0",
     "tox-uv>=1.11.3",
     "deptry>=0.22.0",
@@ -53,6 +58,8 @@ license-files = []
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
 target-version = "py39"
