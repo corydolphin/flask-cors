@@ -8,6 +8,7 @@
     :copyright: (c) 2016 by Cory Dolphin.
     :license: MIT, see LICENSE for more details.
 """
+import unittest
 from datetime import timedelta
 from ..base_test import FlaskCorsTestCase
 from flask import Flask
