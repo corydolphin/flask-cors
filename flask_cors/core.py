@@ -113,6 +113,18 @@ def get_regexp_pattern(regexp):
 
 def get_cors_origins(options, request_origin):
     origins = options.get("origins")
+
+    # If origins is a callable, invoke it to get the actual origins.
+    # The callable receives the request origin and should return:
+    # - A string (single origin or "*")
+    # - A list/set of allowed origins
+    # - None to deny the request
+    if callable(origins):
+        origins = origins(request_origin)
+        if origins is None:
+            return None
+        origins = sanitize_regex_param(origins)
+
     wildcard = r".*" in origins
 
     # If the Origin header is not present terminate this set of steps.
@@ -223,7 +235,8 @@ def get_cors_headers(options, request_headers, request_method):
         # origins that can be matched.
         if headers[ACL_ORIGIN] == "*":
             pass
-        elif (
+        # If origins is callable, always vary since origins are dynamic
+        elif callable(options.get("origins")) or (
             len(options.get("origins")) > 1
             or len(origins_to_set) > 1
             or any(map(probably_regex, options.get("origins")))
@@ -284,6 +297,7 @@ def re_fix(reg):
 def try_match_any_pattern(inst, patterns, caseSensitive=True):
     return any(try_match_pattern(inst, pattern, caseSensitive) for pattern in patterns)
 
+
 def try_match_pattern(value, pattern, caseSensitive=True):
     """
     Safely attempts to match a pattern or string to a value. This
@@ -306,6 +320,7 @@ def try_match_pattern(value, pattern, caseSensitive=True):
         return v == p if caseSensitive else v.casefold() == p.casefold()
     except Exception:
         return value == pattern
+
 
 def get_cors_options(appInstance, *dicts):
     """
@@ -378,12 +393,24 @@ def serialize_options(opts):
             LOG.warning("Unknown option passed to Flask-CORS: %s", key)
 
     # Ensure origins is a list of allowed origins with at least one entry.
-    options["origins"] = sanitize_regex_param(options.get("origins"))
+    # If origins is a callable, preserve it for runtime evaluation.
+    origins = options.get("origins")
+    if callable(origins):
+        options["origins"] = origins
+    else:
+        options["origins"] = sanitize_regex_param(origins)
+
     options["allow_headers"] = sanitize_regex_param(options.get("allow_headers"))
 
     # This is expressly forbidden by the spec. Raise a value error so people
     # don't get burned in production.
-    if r".*" in options["origins"] and options["supports_credentials"] and options["send_wildcard"]:
+    # Skip this check for callable origins since we can't know the values until runtime.
+    if (
+        not callable(options["origins"])
+        and r".*" in options["origins"]
+        and options["supports_credentials"]
+        and options["send_wildcard"]
+    ):
         raise ValueError(
             "Cannot use supports_credentials in conjunction with"
             "an origin string of '*'. See: "
