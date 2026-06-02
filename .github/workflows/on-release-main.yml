@@ -55,7 +55,7 @@ jobs:
         run: uv build
 
       - name: Publish package
-        run: uv publish --trusted-publishing always
+        uses: pypa/gh-action-pypi-publish@v1.14.0
 
   deploy-docs:
     needs: publish
