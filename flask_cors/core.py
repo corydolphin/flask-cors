@@ -127,7 +127,7 @@ def get_cors_origins(options, request_origin):
         # If the value of the Origin header is a case-insensitive match
         # for any of the values in list of origins.
         # NOTE: Per RFC 1035 and RFC 4343 schemes and hostnames are case insensitive.
-        elif try_match_any_pattern(request_origin, origins, caseSensitive=False):
+        elif try_match_any_pattern(request_origin, origins, caseSensitive=False, enforceEndOfString=True):
             LOG.debug(
                 "The request's Origin header matches. Sending CORS headers.",
             )
@@ -281,22 +281,25 @@ def re_fix(reg):
     return r".*" if reg == r"*" else reg
 
 
-def try_match_any_pattern(inst, patterns, caseSensitive=True):
-    return any(try_match_pattern(inst, pattern, caseSensitive) for pattern in patterns)
+def try_match_any_pattern(inst, patterns, caseSensitive=True, enforceEndOfString=False):
+    return any(try_match_pattern(inst, pattern, caseSensitive, enforceEndOfString) for pattern in patterns)
 
-def try_match_pattern(value, pattern, caseSensitive=True):
+def try_match_pattern(value, pattern, caseSensitive=True, enforceEndOfString=False):
     """
     Safely attempts to match a pattern or string to a value. This
     function can be used to match request origins, headers, or paths.
     The value of caseSensitive should be set in accordance to the
     data being compared e.g. origins and headers are case insensitive
     whereas paths are case-sensitive
+    The value of enforceEndOfString should be true when using for origins
     """
     if isinstance(pattern, RegexObject):
         return re.match(pattern, value)
     if probably_regex(pattern):
         flags = 0 if caseSensitive else re.IGNORECASE
         try:
+            if enforceEndOfString and not pattern.endswith(("$", "\\Z")):
+                pattern = pattern + "\\Z"
             return re.match(pattern, value, flags=flags)
         except re.error:
             return False

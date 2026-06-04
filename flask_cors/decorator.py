@@ -22,6 +22,11 @@ def cross_origin(*args, **kwargs):
         The origin(s) may be regular expressions, case-sensitive strings,
         or else an asterisk
 
+        ..  note:
+        
+            When using regexes, ensure that you assert the position at the
+            end of the string
+
         Default : '*'
     :type origins: list, string or regex
 

@@ -57,22 +57,22 @@ class OriginsTestCase(FlaskCorsTestCase):
             return 'Welcome!'
 
         @self.app.route('/test_subdomain_regex')
-        @cross_origin(origins=r"http?://\w*\.?example\.com:?\d*/?.*")
+        @cross_origin(origins=r"https?://\w*\.?example\.com:?\d*\Z")
         def test_subdomain_regex():
             return ''
 
         @self.app.route('/test_compiled_subdomain_regex')
-        @cross_origin(origins=re.compile(r"http?://\w*\.?example\.com:?\d*/?.*"))
+        @cross_origin(origins=re.compile(r"https?://\w*\.?example\.com:?\d*\Z"))
         def test_compiled_subdomain_regex():
             return ''
 
         @self.app.route('/test_regex_list')
-        @cross_origin(origins=[r".*.example.com", r".*.otherexample.com"])
+        @cross_origin(origins=[r"https?://.*\.example\.com\Z", r"https?://.*\.otherexample.com\Z"])
         def test_regex_list():
             return ''
 
         @self.app.route('/test_regex_mixed_list')
-        @cross_origin(origins=["http://example.com", r".*.otherexample.com"])
+        @cross_origin(origins=["http://example.com", r"https?://.*\.otherexample\.com\Z"])
         def test_regex_mixed_list():
             return ''
 
@@ -146,6 +146,8 @@ class OriginsTestCase(FlaskCorsTestCase):
     def test_not_matching_origins(self):
         for resp in self.iter_responses('/test_list',origin="http://bazz.com"):
             self.assertFalse(ACL_ORIGIN in resp.headers)
+        for resp in self.iter_responses('/test_list',origin="http://bar.com.attacker.com"):
+            self.assertFalse(ACL_ORIGIN in resp.headers)
 
     def test_subdomain_regex(self):
         for sub in letters:
@@ -164,10 +166,18 @@ class OriginsTestCase(FlaskCorsTestCase):
     def test_regex_list(self):
         for parent in 'example.com', 'otherexample.com':
             for sub in letters:
-                domain = "http://{}.{}.com".format(sub, parent)
+                domain = "http://{}.{}".format(sub, parent)
                 for resp in self.iter_responses('/test_regex_list',
                                                 headers={'origin': domain}):
                     self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
+    
+    def test_regex_list_unallowed_origin(self):
+        for parent in 'example.com', 'otherexample.com':
+            for sub in letters:
+                domain = "http://{}.{}.com.attacker.com".format(sub, parent)
+                for resp in self.iter_responses('/test_regex_list',
+                                                headers={'origin': domain}):
+                    self.assertFalse(ACL_ORIGIN in resp.headers)
 
     def test_regex_mixed_list(self):
         '''
@@ -198,6 +208,8 @@ class OriginsTestCase(FlaskCorsTestCase):
         logging.getLogger('flask_cors').level = logging.DEBUG
         resp = self.get('test_multiple_protocols', origin='https://example.com')
         self.assertEqual('https://example.com', resp.headers.get(ACL_ORIGIN))
+        resp = self.options('test_multiple_protocols', origin='https://example.com.attacker.com')
+        self.assertFalse(ACL_ORIGIN in resp.headers)
 
 
 if __name__ == "__main__":
