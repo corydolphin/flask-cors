@@ -4,38 +4,74 @@ on:
   release:
     types: [published]
 
+# Least privilege by default; each job opts in to exactly what it needs.
+permissions: {}
+
 jobs:
-  publish:
+  # Build the distributions WITHOUT id-token access and WITHOUT a restored
+  # cache, so no third-party code in the build path can mint a PyPI token or
+  # poison the release artifacts.
+  build:
     runs-on: ubuntu-latest
-    environment: release
     permissions:
-      id-token: write # this permission is mandatory for trusted publishing
+      contents: read
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           # Fetch the full history and all tags so that setuptools-scm can
           # derive the version from the released git tag.
           fetch-depth: 0
 
-      - name: Set up the environment
-        uses: ./.github/actions/setup-python-env
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+        with:
+          version: "0.6.2"
+          enable-cache: false
 
       - name: Build package
         run: uv build
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dist
+          path: dist/
+
+  # Minimal job that holds id-token: write. It only downloads the prebuilt
+  # distributions and publishes them, so the OIDC token is exposed to as
+  # little code as possible. `environment: release` lets you gate this step
+  # behind a required reviewer and restrict it to tags in repo settings.
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write # mandatory for trusted publishing
+    needs: [build]
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dist
+          path: dist/
 
       - name: Show built artifacts
         run: ls -l dist/
 
       - name: Publish package
-        run: uv publish --trusted-publishing always
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+        with:
+          attestations: true
+          print-hash: true
 
   deploy-docs:
     needs: publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # gh-deploy pushes the built docs to the gh-pages branch
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Set up the environment
         uses: ./.github/actions/setup-python-env
