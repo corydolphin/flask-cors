@@ -261,13 +261,10 @@ class AppExtensionString(FlaskCorsTestCase):
 
 
 class AppExtensionError(FlaskCorsTestCase):
-    def test_value_error(self):
-        try:
-            app = Flask(__name__)
+    def test_type_error(self):
+        app = Flask(__name__)
+        with self.assertRaises(TypeError):
             CORS(app, resources=5)
-            self.assertTrue(False, "Should've raised a value error")
-        except ValueError:
-            pass
 
 
 class AppExtensionDefault(FlaskCorsTestCase):

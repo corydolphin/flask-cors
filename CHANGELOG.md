@@ -1,5 +1,20 @@
 # Change Log
 
+## Unreleased
+### Typing
+* Flask-CORS is now fully type-annotated and ships a [PEP 561](https://peps.python.org/pep-0561/) `py.typed` marker, so downstream projects pick up its type hints automatically.
+* The resolved CORS options are now modelled with a frozen internal dataclass (`flask_cors.core._ComputedCorsOptions`) instead of a loose `dict[str, Any]`. `serialize_options` is the single boundary that normalizes raw, dynamically-typed input into this fully-typed structure, and the rest of the package reads options as attributes (`options.origins`) — so there is no string-key indexing and a missing/mistyped option is a type error rather than a possible runtime `KeyError`. The user-facing keyword schemas (`CorsOptionsInput` / `CrossOriginOptionsInput`) remain importable for typed call sites.
+* The keyword arguments to `CORS`, `CORS.init_app`, and `cross_origin` are now individually typed via [PEP 692](https://peps.python.org/pep-0692/) `Unpack` and the new `CorsOptionsInput` / `CrossOriginOptionsInput` `TypedDict`s. Type checkers now flag unknown options (with "did you mean" suggestions) and wrong value types at the call site, while runtime behaviour is unchanged.
+* The package now passes `mypy --strict` (plus `warn_redundant_casts` and `warn_unused_ignores`) with no errors, and static type checking is enforced in CI, the `Makefile`, `tox`, and the pre-commit hooks.
+
+### Changed
+* An invalid regular expression in `origins`, `allow_headers`, or `resources` now raises `ValueError` when CORS is configured, instead of being silently ignored.
+* `parse_resources` now raises `TypeError` instead of `ValueError` when the `resources` argument has an unsupported type. Code that explicitly catches `ValueError` here should be updated.
+
+### Internal
+* Origin, allow-header, and resource-path patterns are now resolved once, at configuration time, into either a compiled `re.Pattern` or a literal string (and the `.*` origin wildcard is captured as a computed `allow_all_origins` flag), so request handling matches directly instead of re-running a regex heuristic.
+* The `flask_cors` package is now clean under `ruff check` and `ruff format`, with assorted idiomatic cleanups (dict literals, a hoisted `frozenset` regex heuristic, assignment expressions).
+
 ## 4.0.1
 ### Security
 * Address [CVE-2024-1681](https://github.com/advisories/GHSA-84pr-m4jr-85g5) which is a log injection vulnerability when the log level is set to debug by @aneshujevic in https://github.com/corydolphin/flask-cors/pull/351
