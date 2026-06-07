@@ -5,10 +5,12 @@ build:
   tools:
     python: '3.12'
 
-sphinx:
-  configuration: 'docs/conf.py'
-  fail_on_warning: false
+mkdocs:
+  configuration: 'mkdocs.yml'
 
 python:
   install:
+    # Install the package itself so mkdocstrings can import flask_cors.
+    - method: pip
+      path: '.'
     - requirements: 'docs/requirements.txt'

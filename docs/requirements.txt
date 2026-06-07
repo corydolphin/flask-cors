@@ -1,0 +1,5 @@
+# Documentation build dependencies for Read the Docs.
+# Kept in sync with the docs-related entries in pyproject.toml's dev group.
+mkdocs>=1.4.2
+mkdocs-material>=8.5.10
+mkdocstrings[python]>=0.26.1
