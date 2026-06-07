@@ -2,7 +2,7 @@ Flask-CORS
 ==========
 
 |Build Status| |Latest Version| |Supported Python versions|
-|License|
+|License| |OpenSSF Scorecard|
 
 A Flask extension for handling Cross Origin Resource Sharing (CORS), making cross-origin AJAX possible.
 
@@ -118,3 +118,5 @@ This Flask extension is based upon the `Decorator for the HTTP Access Control <h
    :target: https://img.shields.io/pypi/pyversions/Flask-Cors.svg
 .. |License| image:: http://img.shields.io/:license-mit-blue.svg
    :target: https://pypi.python.org/pypi/Flask-Cors/
+.. |OpenSSF Scorecard| image:: https://api.scorecard.dev/projects/github.com/corydolphin/flask-cors/badge
+   :target: https://scorecard.dev/viewer/?uri=github.com/corydolphin/flask-cors
