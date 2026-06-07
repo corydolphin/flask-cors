@@ -1,5 +1,11 @@
 # Change Log
 
+## Unreleased
+* Add full type annotations and a `py.typed` marker. The package now passes `mypy --strict`, checked in CI.
+* Type the keyword arguments to `CORS`, `init_app`, and `cross_origin` so invalid options are caught by type checkers.
+* Resolve options into a frozen internal dataclass instead of a plain dict.
+* Invalid regular expressions now raise instead of being silently ignored.
+
 ## 4.0.1
 ### Security
 * Address [CVE-2024-1681](https://github.com/advisories/GHSA-84pr-m4jr-85g5) which is a log injection vulnerability when the log level is set to debug by @aneshujevic in https://github.com/corydolphin/flask-cors/pull/351
