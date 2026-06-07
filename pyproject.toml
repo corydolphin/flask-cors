@@ -20,7 +20,9 @@ classifiers = [
 ]
 dependencies = [
     "flask>=0.9",
-    "Werkzeug>=0.7"
+    "Werkzeug>=0.7",
+    # Provides typing.Unpack (PEP 692) for typing **kwargs on Python < 3.11.
+    "typing_extensions>=4.6.0; python_version < '3.11'",
 ]
 
 [project.urls]
@@ -59,8 +61,24 @@ packages = ["flask_cors"]
 # This is a workaround for https://github.com/astral-sh/uv/issues/9513
 license-files = []
 
+[tool.setuptools.package-data]
+# Ship the PEP 561 marker so downstream consumers pick up our type hints.
+flask_cors = ["py.typed"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.deptry.per_rule_ignores]
+# typing_extensions is only imported under TYPE_CHECKING (for PEP 692 Unpack on
+# Python < 3.11), so deptry cannot see it being used.
+DEP002 = ["typing_extensions"]
+
+[tool.mypy]
+files = ["flask_cors"]
+python_version = "3.9"
+strict = true
+warn_redundant_casts = true
+warn_unused_ignores = true
 
 [tool.ruff]
 target-version = "py39"
@@ -95,6 +113,8 @@ select = [
     "PGH",
     # pyupgrade
     "UP",
+    # flake8-type-checking
+    "TC",
     # ruff
     "RUF",
     # tryceratops
@@ -105,6 +125,9 @@ ignore = [
     "E501",
     # DoNotAssignLambda
     "E731",
+    # RaiseVanillaArgs: inline exception messages are intentional here; the
+    # spec-citing messages are more useful than custom exception classes.
+    "TRY003",
 ]
 
 [tool.ruff.lint.per-file-ignores]
