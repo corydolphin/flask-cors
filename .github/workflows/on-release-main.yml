@@ -63,18 +63,3 @@ jobs:
         with:
           attestations: true
           print-hash: true
-
-  deploy-docs:
-    needs: publish
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # gh-deploy pushes the built docs to the gh-pages branch
-    steps:
-      - name: Check out
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Set up the environment
-        uses: ./.github/actions/setup-python-env
-
-      - name: Deploy documentation
-        run: uv run mkdocs gh-deploy --force
