@@ -1,6 +1,6 @@
 site_name: flask-cors
 repo_url: https://github.com/corydolphin/flask-cors
-site_url: https://corydolphin.github.io/flask-cors
+site_url: https://flask-cors.corydolphin.com
 site_description: CORS
 site_author: Cory Dolphin
 edit_uri: edit/main/docs/
