@@ -26,9 +26,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://corydolphin.github.io/flask-cors/"
+Homepage = "https://flask-cors.corydolphin.com/"
 Repository = "https://github.com/corydolphin/flask-cors"
-Documentation = "https://corydolphin.github.io/flask-cors/"
+Documentation = "https://flask-cors.corydolphin.com/"
 
 [dependency-groups]
 dev = [
