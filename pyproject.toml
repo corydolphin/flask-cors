@@ -74,7 +74,10 @@ testpaths = ["tests"]
 DEP002 = ["typing_extensions"]
 
 [tool.mypy]
-files = ["flask_cors"]
+# ``tests/typecheck`` holds static-typing regression tests (e.g. Blueprint
+# support, see issue #410); it is type-checked alongside the package, as are the
+# ``examples``, so the public signatures cannot silently regress.
+files = ["flask_cors", "tests/typecheck", "examples"]
 python_version = "3.9"
 strict = true
 warn_redundant_casts = true

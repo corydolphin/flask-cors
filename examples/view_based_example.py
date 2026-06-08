@@ -7,16 +7,21 @@ to add cross origin support to your flask app!
 :copyright: (c) 2016 by Cory Dolphin.
 :license:   MIT/X11, see LICENSE for more details.
 """
-from flask import Flask, jsonify
+from __future__ import annotations
+
 import logging
+
+from flask import Flask, Response, jsonify
+
 try:
     # The typical way to import flask-cors
     from flask_cors import cross_origin
 except ImportError:
     # Path hack allows examples to be run without installation.
     import os
+    import sys
     parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    os.sys.path.insert(0, parentdir)
+    sys.path.insert(0, parentdir)
 
     from flask_cors import cross_origin
 
@@ -26,7 +31,7 @@ logging.basicConfig(level=logging.INFO)
 
 @app.route("/", methods=['GET'])
 @cross_origin()
-def helloWorld():
+def helloWorld() -> str:
     '''
         This view has CORS enabled for all domains, representing the simplest
         configuration of view-based decoration. The expected result is as
@@ -54,7 +59,7 @@ on <a href="https://github.com/corydolphin/flask-cors">Github</a>'''
 
 @app.route("/api/v1/users/create", methods=['GET', 'POST'])
 @cross_origin(allow_headers=['Content-Type'])
-def cross_origin_json_post():
+def cross_origin_json_post() -> Response:
     '''
         This view has CORS enabled for all domains, and allows browsers
         to send the Content-Type header, allowing cross domain AJAX POST

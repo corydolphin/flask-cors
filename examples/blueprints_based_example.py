@@ -7,15 +7,20 @@ to add cross origin support to your flask app!
 :copyright: (c) 2016 by Cory Dolphin.
 :license:   MIT/X11, see LICENSE for more details.
 """
-from flask import Flask, jsonify, Blueprint
+from __future__ import annotations
+
 import logging
+
+from flask import Blueprint, Flask, Response, jsonify
+
 try:
     from flask_cors import CORS  # The typical way to import flask-cors
 except ImportError:
     # Path hack allows examples to be run without installation.
     import os
+    import sys
     parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    os.sys.path.insert(0, parentdir)
+    sys.path.insert(0, parentdir)
 
     from flask_cors import CORS
 
@@ -25,7 +30,7 @@ api_v1 = Blueprint('API_v1', __name__)
 CORS(api_v1) # enable CORS on the API_v1 blue print
 
 @api_v1.route("/api/v1/users/")
-def list_users():
+def list_users() -> Response:
     '''
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set. The expected result is as follows:
@@ -49,7 +54,7 @@ def list_users():
 
 
 @api_v1.route("/api/v1/users/create", methods=['POST'])
-def create_user():
+def create_user() -> Response:
     '''
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set.
@@ -94,7 +99,7 @@ def create_user():
 public_routes = Blueprint('public', __name__)
 
 @public_routes.route("/")
-def helloWorld():
+def helloWorld() -> str:
     '''
         Since the path '/' does not match the regular expression r'/api/*',
         this route does not have CORS headers set.
