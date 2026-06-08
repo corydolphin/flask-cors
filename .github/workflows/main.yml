@@ -64,3 +64,24 @@ jobs:
 
       - name: Check if documentation can be built
         run: uv run mkdocs build
+
+  deploy-docs:
+    # Publish the docs to GitHub Pages on every push to main, but never from a
+    # pull request. Gated behind check-docs so a broken build is never deployed.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: check-docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # gh-deploy pushes the built docs to the gh-pages branch
+    concurrency:
+      group: deploy-docs
+      cancel-in-progress: false
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-python-env
+
+      - name: Deploy documentation
+        run: uv run mkdocs gh-deploy --force
