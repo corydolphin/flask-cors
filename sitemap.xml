@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://flask-cors.corydolphin.com/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://flask-cors.corydolphin.com/decorator/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://flask-cors.corydolphin.com/extension/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://flask-cors.corydolphin.com/examples/blueprints/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://flask-cors.corydolphin.com/examples/decorator/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+    <url>
+         <loc>https://flask-cors.corydolphin.com/examples/extension/</loc>
+         <lastmod>2026-06-08</lastmod>
+    </url>
+</urlset>
