@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any, TypedDict, Union, cast
 
-from flask import Flask, Response, current_app, request
+from flask import Blueprint, Flask, Response, current_app, request
 from werkzeug.datastructures import Headers, MultiDict
 
 LOG = logging.getLogger(__name__)
@@ -425,7 +425,7 @@ def try_match_pattern(value: Any, pattern: ResourcePattern, caseSensitive: bool 
     return v == p if caseSensitive else v.casefold() == p.casefold()
 
 
-def merge_options(appInstance: Flask | None, *dicts: Mapping[str, Any]) -> dict[str, Any]:
+def merge_options(appInstance: Flask | Blueprint | None, *dicts: Mapping[str, Any]) -> dict[str, Any]:
     """
     Merge the DEFAULT_OPTIONS, the app's configuration-specified options and any
     dictionaries passed into a single raw options mapping. The last specified
@@ -438,12 +438,12 @@ def merge_options(appInstance: Flask | None, *dicts: Mapping[str, Any]) -> dict[
     return options
 
 
-def get_cors_options(appInstance: Flask | None, *dicts: Mapping[str, Any]) -> _ComputedCorsOptions:
+def get_cors_options(appInstance: Flask | Blueprint | None, *dicts: Mapping[str, Any]) -> _ComputedCorsOptions:
     """Compute the resolved CORS options for an application (see merge_options)."""
     return serialize_options(merge_options(appInstance, *dicts))
 
 
-def get_app_kwarg_dict(appInstance: Flask | None = None) -> dict[str, Any]:
+def get_app_kwarg_dict(appInstance: Flask | Blueprint | None = None) -> dict[str, Any]:
     """Returns the dictionary of CORS specific app configurations."""
     app = appInstance or current_app
 

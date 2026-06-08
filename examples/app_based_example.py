@@ -7,15 +7,20 @@ to add cross origin support to your flask app!
 :copyright: (c) 2016 by Cory Dolphin.
 :license:   MIT/X11, see LICENSE for more details.
 """
-from flask import Flask, jsonify
+from __future__ import annotations
+
 import logging
+
+from flask import Flask, Response, jsonify
+
 try:
     from flask_cors import CORS  # The typical way to import flask-cors
 except ImportError:
     # Path hack allows examples to be run without installation.
     import os
+    import sys
     parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    os.sys.path.insert(0, parentdir)
+    sys.path.insert(0, parentdir)
 
     from flask_cors import CORS
 
@@ -33,7 +38,7 @@ CORS(app, resources=r'/api/*')
 
 
 @app.route("/")
-def helloWorld():
+def helloWorld() -> str:
     """
         Since the path '/' does not match the regular expression r'/api/*',
         this route does not have CORS headers set.
@@ -49,7 +54,7 @@ def helloWorld():
 '''
 
 @app.route("/api/v1/users/")
-def list_users():
+def list_users() -> Response:
     """
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set. The expected result is as follows:
@@ -73,7 +78,7 @@ def list_users():
 
 
 @app.route("/api/v1/users/create", methods=['POST'])
-def create_user():
+def create_user() -> Response:
     """
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set.
@@ -116,7 +121,7 @@ def create_user():
     return jsonify(success=True)
 
 @app.route("/api/exception")
-def get_exception():
+def get_exception() -> str:
     """
         Since the path matches the regular expression r'/api/*', this resource
         automatically has CORS headers set.
@@ -141,7 +146,7 @@ def get_exception():
     raise Exception("example")
 
 @app.errorhandler(500)
-def server_error(e):
+def server_error(e: Exception) -> tuple[str, int]:
     logging.exception('An error occurred during a request. %s', e)
     return "An internal error occurred", 500
 

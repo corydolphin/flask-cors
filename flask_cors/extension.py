@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 from urllib.parse import unquote
 
-from flask import Flask, Response, request
+from flask import Blueprint, Flask, Response, request
 
 from .core import (
     ACL_ORIGIN,
@@ -160,12 +160,12 @@ class CORS:
     :type allow_private_network: bool
     """
 
-    def __init__(self, app: Flask | None = None, **kwargs: Unpack[CorsOptionsInput]) -> None:
+    def __init__(self, app: Flask | Blueprint | None = None, **kwargs: Unpack[CorsOptionsInput]) -> None:
         self._options = kwargs
         if app is not None:
             self.init_app(app, **kwargs)
 
-    def init_app(self, app: Flask, **kwargs: Unpack[CorsOptionsInput]) -> None:
+    def init_app(self, app: Flask | Blueprint, **kwargs: Unpack[CorsOptionsInput]) -> None:
         # The resources and options may be specified in the App Config, the CORS constructor
         # or the kwargs to the call to init_app.
         merged = merge_options(app, self._options, kwargs)
@@ -193,23 +193,22 @@ class CORS:
         cors_after_request = make_after_request_function(resolved_resources)
         app.after_request(cors_after_request)
 
-        # Wrap exception handlers with cross_origin
-        # These error handlers will still respect the behavior of the route
-        if options.intercept_exceptions:
+        # Wrap exception handlers with cross_origin so error responses also
+        # receive CORS headers. Blueprints have no ``handle_exception`` /
+        # ``make_response``, so the ``hasattr`` guard skips them; the ``Any``
+        # alias lets us read and reassign those Flask-only methods without
+        # tripping mypy's attr-defined / method-assign checks for ``Blueprint``.
+        if options.intercept_exceptions and hasattr(app, "handle_exception"):
+            app_any: Any = app
 
             def _after_request_decorator(f: Callable[..., Any]) -> Callable[..., Response]:
                 def wrapped_function(*args: Any, **kwargs: Any) -> Response:
-                    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                    return cors_after_request(app_any.make_response(f(*args, **kwargs)))
 
                 return wrapped_function
 
-            if hasattr(app, "handle_exception"):
-                # Wrap Flask's exception handlers so error responses also
-                # receive CORS headers. An ``Any`` alias lets us reassign the
-                # bound methods without tripping mypy's method-assign check.
-                app_any: Any = app
-                app_any.handle_exception = _after_request_decorator(app.handle_exception)
-                app_any.handle_user_exception = _after_request_decorator(app.handle_user_exception)
+            app_any.handle_exception = _after_request_decorator(app_any.handle_exception)
+            app_any.handle_user_exception = _after_request_decorator(app_any.handle_user_exception)
 
 
 def make_after_request_function(
