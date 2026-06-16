@@ -30,6 +30,16 @@ class MethodsCase(FlaskCorsTestCase):
         def test_get():
             return 'Only allow POST'
 
+        @self.app.route('/defaults_async')
+        @cross_origin()
+        async def defaults_async():
+            return 'Should only return headers on pre-flight OPTIONS request'
+
+        @self.app.route('/test_methods_defined_async')
+        @cross_origin(methods=['POST'])
+        async def test_get_async():
+            return 'Only allow POST'
+
     def test_defaults(self):
         ''' Access-Control-Allow-Methods headers should only be returned
             if the client makes an OPTIONS request.
@@ -38,6 +48,12 @@ class MethodsCase(FlaskCorsTestCase):
         self.assertFalse(ACL_METHODS in self.get('/defaults', origin='www.example.com').headers)
         self.assertFalse(ACL_METHODS in self.head('/defaults', origin='www.example.com').headers)
         res = self.preflight('/defaults', 'POST', origin='www.example.com')
+        for method in ALL_METHODS:
+            self.assertTrue(method in res.headers.get(ACL_METHODS))
+
+        self.assertFalse(ACL_METHODS in self.get('/defaults_async', origin='www.example.com').headers)
+        self.assertFalse(ACL_METHODS in self.head('/defaults_async', origin='www.example.com').headers)
+        res = self.preflight('/defaults_async', 'POST', origin='www.example.com')
         for method in ALL_METHODS:
             self.assertTrue(method in res.headers.get(ACL_METHODS))
 
@@ -55,6 +71,18 @@ class MethodsCase(FlaskCorsTestCase):
         self.assertFalse(ACL_METHODS in res.headers)
 
         res = self.get('/test_methods_defined', origin='www.example.com')
+        self.assertFalse(ACL_METHODS in res.headers)
+
+        self.assertFalse(ACL_METHODS in self.get('/test_methods_defined_async').headers)
+        self.assertFalse(ACL_METHODS in self.head('/test_methods_defined_async').headers)
+
+        res = self.preflight('/test_methods_defined_async', 'POST', origin='www.example.com')
+        self.assertTrue('POST' in res.headers.get(ACL_METHODS))
+
+        res = self.preflight('/test_methods_defined_async', 'PUT', origin='www.example.com')
+        self.assertFalse(ACL_METHODS in res.headers)
+
+        res = self.get('/test_methods_defined_async', origin='www.example.com')
         self.assertFalse(ACL_METHODS in res.headers)
 
 if __name__ == "__main__":
