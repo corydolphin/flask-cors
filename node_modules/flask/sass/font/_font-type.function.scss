@@ -1,0 +1,9 @@
+// Font Type Function
+//
+// Returns the type of font defined for each font in the map variables: $fonts.
+
+@function font-type($family) {
+  $family-key: font-family-key($family);
+
+  @return map-get(map-get($fonts, $family-key), font-type);
+}

@@ -1,0 +1,25 @@
+{
+  "name": "flask",
+  "version": "0.2.10",
+  "authors": [
+    "Jarad Light (https://github.com/jaradlight)"
+  ],
+  "description": "Helper files for Sass projects.",
+  "main": "sass/_flask.scss",
+  "keywords": [
+    "css",
+    "sass",
+    "utility"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/jaradlight/flask",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "sassdoc",
+    "package.json"
+  ]
+}

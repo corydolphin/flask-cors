@@ -1,0 +1,32 @@
+/// @name palette
+/// @group palette
+/// @access public
+/// @example
+///   .basic {
+///     color: palette(teal);
+///   }
+///
+///   .with-tone {
+///     color: palette(teal, light);
+///   }
+///
+///   .aliased {
+///     color: palette(brand-primary);
+///   }
+/// @param {string} $type - Base color group key in $palettes.
+/// @param {string} $tone [base] - Tone key within a base color in $palettes.
+/// @link http://erskinedesign.com/blog/friendlier-colour-names-sass-maps/ Thanks to Tom Davies for inspiration.
+
+
+@function palette($type, $tone: 'base') {
+
+  $color: palette-color-key($type);
+
+  @if (type-of($color) == list) {
+    @return palette(nth($color, 1), nth($color, 2));
+  }
+
+  @if ($color and map-has-key($palettes, $color)) {
+    @return map-get(map-get($palettes, $color), $tone);
+  }
+}
