@@ -1,6 +1,7 @@
 # Change Log
 
 ## Unreleased
+* Allow the `QUERY` method ([RFC 10008](https://www.rfc-editor.org/rfc/rfc10008.html)) by default. `QUERY` is not CORS-safelisted, so cross-origin use is preflighted; because it was missing from `ALL_METHODS`, flask-cors omitted the `Access-Control-Allow-Methods` header entirely and the browser blocked the request.
 * Fix `mypy --strict` rejecting `CORS(blueprint)` / `init_app(blueprint)`. The `app` parameter is now typed as `Flask | Blueprint | None`, restoring Blueprint support broken in 6.0.4 ([#410](https://github.com/corydolphin/flask-cors/issues/410)). A type-checking regression test guards this going forward.
 * Add full type annotations and a `py.typed` marker. The package now passes `mypy --strict`, checked in CI.
 * Type the keyword arguments to `CORS`, `init_app`, and `cross_origin` so invalid options are caught by type checkers.
