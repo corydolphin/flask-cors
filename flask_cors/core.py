@@ -115,7 +115,7 @@ ACL_REQUEST_METHOD = "Access-Control-Request-Method"
 ACL_REQUEST_HEADERS = "Access-Control-Request-Headers"
 ACL_REQUEST_HEADER_PRIVATE_NETWORK = "Access-Control-Request-Private-Network"
 
-ALL_METHODS = ["GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"]
+ALL_METHODS = ["GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH", "DELETE", "QUERY"]
 CONFIG_OPTIONS = [
     "CORS_ORIGINS",
     "CORS_METHODS",
