@@ -41,6 +41,15 @@ class MethodsCase(FlaskCorsTestCase):
         for method in ALL_METHODS:
             self.assertTrue(method in res.headers.get(ACL_METHODS))
 
+    def test_query_method_allowed_by_default(self):
+        ''' QUERY (RFC 10008) is not CORS-safelisted, so a cross-origin QUERY
+            is preflighted. It must be allowed by default, like the other
+            non-safelisted methods.
+        '''
+        res = self.preflight('/defaults', 'QUERY', origin='www.example.com')
+        self.assertIsNotNone(res.headers.get(ACL_METHODS))
+        self.assertTrue('QUERY' in res.headers.get(ACL_METHODS))
+
     def test_methods_defined(self):
         ''' If the methods parameter is defined, it should override the default
             methods defined by the user.
