@@ -5,6 +5,7 @@ import re
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import timedelta
+from ipaddress import IPv6Address
 from typing import Any, TypedDict, Union, cast
 
 from flask import Blueprint, Flask, Response, current_app, request
@@ -508,6 +509,21 @@ def _resolve_patterns(patterns: Iterable[ResourcePattern], *, ignore_case: bool)
     return [_resolve_pattern(p, ignore_case=ignore_case) for p in patterns]
 
 
+def _resolve_origin(origin: ResourcePattern) -> ResourcePattern:
+    # IPv6 URL brackets delimit a host, not a regex character class. Restrict
+    # this exception to complete literal origins; regex origins still compile.
+    if isinstance(origin, str):
+        match = re.fullmatch(r"[a-zA-Z][a-zA-Z0-9+.-]*://\[([0-9a-fA-F:.]+)\](?::[0-9]+)?", origin)
+        if match:
+            try:
+                IPv6Address(match.group(1))
+            except ValueError:
+                pass
+            else:
+                return origin
+    return _resolve_pattern(origin, ignore_case=True)
+
+
 def serialize_options(opts: Mapping[str, Any]) -> _ComputedCorsOptions:
     """
     Normalize a raw options mapping into a strongly-typed :class:`_ComputedCorsOptions`.
@@ -537,7 +553,7 @@ def serialize_options(opts: Mapping[str, Any]) -> _ComputedCorsOptions:
             "http://www.w3.org/TR/cors/#resource-requests"
         )
 
-    origins = _resolve_patterns(sanitized_origins, ignore_case=True)
+    origins = [_resolve_origin(origin) for origin in sanitized_origins]
     allow_headers = _resolve_patterns(sanitize_regex_param(opts.get("allow_headers")), ignore_case=True)
 
     methods = flexible_str(opts.get("methods"))
