@@ -327,7 +327,7 @@ def get_cors_headers(
         # If there is no Access-Control-Request-Method header or if parsing
         # failed, do not set any additional headers
         methods = options.methods
-        if acl_request_method and methods and acl_request_method in methods:
+        if acl_request_method and methods and acl_request_method in (method.strip() for method in methods.split(",")):
             # If method is not a case-sensitive match for any of the values in
             # list of methods do not set any additional headers and terminate
             # this set of steps.
