@@ -240,7 +240,9 @@ def get_cors_origins(options: _ComputedCorsOptions, request_origin: str | None) 
         # If the value of the Origin header is a case-insensitive match
         # for any of the values in list of origins.
         # NOTE: Per RFC 1035 and RFC 4343 schemes and hostnames are case insensitive.
-        elif try_match_any_pattern(request_origin, origins, caseSensitive=False):
+        # A regular expression must match the whole origin: a prefix match would
+        # let ``https://example.com.evil.test`` through ``https?://example.com``.
+        elif try_match_any_pattern(request_origin, origins, caseSensitive=False, fullmatch=True):
             LOG.debug(
                 "The request's Origin header matches. Sending CORS headers.",
             )
@@ -403,20 +405,25 @@ def re_fix(reg: ResourcePattern) -> ResourcePattern:
     return r".*" if reg == r"*" else reg
 
 
-def try_match_any_pattern(inst: str, patterns: Iterable[ResourcePattern], caseSensitive: bool = True) -> bool:
-    return any(try_match_pattern(inst, pattern, caseSensitive) for pattern in patterns)
+def try_match_any_pattern(
+    inst: str, patterns: Iterable[ResourcePattern], caseSensitive: bool = True, fullmatch: bool = False
+) -> bool:
+    return any(try_match_pattern(inst, pattern, caseSensitive, fullmatch) for pattern in patterns)
 
 
-def try_match_pattern(value: Any, pattern: ResourcePattern, caseSensitive: bool = True) -> bool:
+def try_match_pattern(
+    value: Any, pattern: ResourcePattern, caseSensitive: bool = True, fullmatch: bool = False
+) -> bool:
     """
     Match a value against a *resolved* pattern: a compiled ``re.Pattern``
     (whose case-sensitivity is already baked in) or a literal string. Used to
     match request origins, headers, or paths; ``caseSensitive`` only affects
     the literal comparison (origins and headers are case insensitive, paths are
-    case sensitive).
+    case sensitive). With ``fullmatch`` a regular expression has to match the
+    whole value instead of a prefix of it; origins are matched this way.
     """
     if isinstance(pattern, re.Pattern):
-        return bool(pattern.match(value))
+        return bool(pattern.fullmatch(value) if fullmatch else pattern.match(value))
     try:
         v = str(value)
         p = str(pattern)

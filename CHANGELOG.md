@@ -1,6 +1,7 @@
 # Change Log
 
 ## Unreleased
+* Regular expressions in `origins` now have to match the whole `Origin` header instead of a prefix of it. Before, `origins=r"https?://example.com"` also allowed `https://example.com.evil.test`. An expression that relied on prefix matching, such as `r"http://localhost:"`, needs an explicit `.*` at the end.
 * Fix `mypy --strict` rejecting `CORS(blueprint)` / `init_app(blueprint)`. The `app` parameter is now typed as `Flask | Blueprint | None`, restoring Blueprint support broken in 6.0.4 ([#410](https://github.com/corydolphin/flask-cors/issues/410)). A type-checking regression test guards this going forward.
 * Add full type annotations and a `py.typed` marker. The package now passes `mypy --strict`, checked in CI.
 * Type the keyword arguments to `CORS`, `init_app`, and `cross_origin` so invalid options are caught by type checkers.
