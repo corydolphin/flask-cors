@@ -136,10 +136,22 @@ class AppExtensionRegexp(FlaskCorsTestCase):
     def test_regex_list(self):
         for parent in 'example.com', 'otherexample.com':
             for sub in letters:
-                domain = "http://{}.{}.com".format(sub, parent)
+                domain = "http://{}.{}".format(sub, parent)
                 for resp in self.iter_responses('/test_regex_list',
                                                 headers={'origin': domain}):
                     self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
+
+    def test_regex_matches_whole_origin(self):
+        '''
+            A regular expression has to match the whole origin, not a prefix
+            of it.
+        '''
+        for path, origin in (
+            ('/test_regex_list', 'http://a.example.com.evil.test'),
+            ('/test_regex_mixed_list', 'http://a.otherexample.com.evil.test'),
+        ):
+            for resp in self.iter_responses(path, origin=origin):
+                self.assertEqual(None, resp.headers.get(ACL_ORIGIN))
 
     def test_regex_mixed_list(self):
         '''

@@ -29,7 +29,7 @@ def cross_origin(*args: Any, **kwargs: Unpack[CrossOriginOptionsInput]) -> Calla
     :param origins:
         The origin, or list of origins to allow requests from.
         The origin(s) may be regular expressions, case-sensitive strings,
-        or else an asterisk
+        or else an asterisk. A regular expression has to match the whole origin.
 
         Default : '*'
     :type origins: list, string or regex

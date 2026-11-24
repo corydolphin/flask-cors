@@ -164,7 +164,7 @@ class OriginsTestCase(FlaskCorsTestCase):
     def test_regex_list(self):
         for parent in 'example.com', 'otherexample.com':
             for sub in letters:
-                domain = "http://{}.{}.com".format(sub, parent)
+                domain = "http://{}.{}".format(sub, parent)
                 for resp in self.iter_responses('/test_regex_list',
                                                 headers={'origin': domain}):
                     self.assertEqual(domain, resp.headers.get(ACL_ORIGIN))
@@ -192,6 +192,20 @@ class OriginsTestCase(FlaskCorsTestCase):
 
         self.assertEqual("http://example.com",
             self.get('/test_regex_mixed_list', origin='http://example.com').headers.get(ACL_ORIGIN))
+
+    def test_regex_matches_whole_origin(self):
+        '''
+            A regular expression has to match the whole origin. An origin that
+            only starts with an allowed one, such as a look-alike domain with
+            the allowed origin as its prefix, is refused.
+        '''
+        for path, origin in (
+            ('/test_multiple_protocols', 'https://example.com.evil.test'),
+            ('/test_regex_list', 'http://a.example.com.evil.test'),
+            ('/test_regex_mixed_list', 'http://a.otherexample.com.evil.test'),
+        ):
+            for resp in self.iter_responses(path, origin=origin):
+                self.assertEqual(None, resp.headers.get(ACL_ORIGIN))
 
     def test_multiple_protocols(self):
         import logging
