@@ -6,6 +6,7 @@ from functools import update_wrapper
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from flask import Response, current_app, make_response, request
+from werkzeug.exceptions import HTTPException
 
 from .core import FLASK_CORS_EVALUATED, CrossOriginOptionsInput, get_cors_options, set_cors_headers
 
@@ -132,7 +133,13 @@ def cross_origin(*args: Any, **kwargs: Unpack[CrossOriginOptionsInput]) -> Calla
             if options.automatic_options and request.method == "OPTIONS":
                 resp = current_app.make_default_options_response()
             else:
-                resp = make_response(f(*args, **kwargs))
+                try:
+                    resp = make_response(f(*args, **kwargs))
+                except HTTPException as e:
+                    # replicate the exception handling Flask would apply in
+                    # `full_dispatch_request` so the error response can still
+                    # be wrapped in CORS headers, e.g. for `abort(401)`
+                    resp = make_response(current_app.handle_user_exception(e))
 
             set_cors_headers(resp, options)
             setattr(resp, FLASK_CORS_EVALUATED, True)
